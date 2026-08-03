@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
+import { spacing } from '../theme/spacing';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,6 +11,8 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import SurfaceCard from '../components/SurfaceCard';
+import IconTile, { iconTileGradients } from '../components/IconTile';
 import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
 
@@ -31,12 +35,95 @@ export default function MoreScreen({ navigation }: Props) {
 
   const email = session?.user.email ?? '';
   const displayName = profile?.display_name || email || 'Trader';
+  const isPremium = profile?.tier === 'premium';
 
   const handleSignOut = () => {
     signOut();
     // RootNavigator swaps back to the Login stack automatically once
     // the session clears - no manual navigation needed here.
   };
+
+  const mainMenu = [
+    {
+      icon: 'grid' as const,
+      label: 'Dashboard',
+      gradient: iconTileGradients.blue,
+      onPress: () => tabNavigation?.navigate('Home'),
+    },
+    {
+      icon: 'book-open' as const,
+      label: 'Courses',
+      gradient: iconTileGradients.blue,
+      onPress: () =>
+        tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }),
+    },
+    {
+      icon: 'zap' as const,
+      label: 'Trade Alerts',
+      gradient: iconTileGradients.gold,
+      onPress: () => tabNavigation?.navigate('Alerts'),
+    },
+    {
+      icon: 'target' as const,
+      label: 'AI Scanner',
+      gradient: iconTileGradients.purple,
+      onPress: () => navigation.navigate('AIScanner'),
+    },
+    {
+      icon: 'send' as const,
+      label: 'Telegram',
+      gradient: iconTileGradients.teal,
+      onPress: () => navigation.navigate('TelegramChannels'),
+    },
+    {
+      icon: 'video' as const,
+      label: 'Live Sessions',
+      gradient: iconTileGradients.green,
+      onPress: () => tabNavigation?.navigate('Live'),
+    },
+  ];
+
+  const tradingTools = [
+    {
+      icon: 'bookmark' as const,
+      label: 'Journal',
+      gradient: iconTileGradients.gold,
+      onPress: () => navigation.navigate('TradingJournal'),
+    },
+    {
+      icon: 'briefcase' as const,
+      label: 'Broker',
+      gradient: iconTileGradients.green,
+      onPress: () => navigation.navigate('RecommendedBroker'),
+    },
+    {
+      icon: 'bar-chart-2' as const,
+      label: 'Market Analysis',
+      gradient: iconTileGradients.blue,
+      onPress: () => navigation.navigate('MarketAnalysis'),
+    },
+    {
+      icon: 'award' as const,
+      label: 'Leaderboard',
+      gradient: iconTileGradients.red,
+      onPress: () => navigation.navigate('Leaderboard'),
+    },
+  ];
+
+  const account = [
+    {
+      icon: 'bell' as const,
+      label: 'Notifications',
+      gradient: iconTileGradients.teal,
+      onPress: () => navigation.navigate('Notifications'),
+    },
+    {
+      icon: 'phone' as const,
+      label: 'Contact Us',
+      gradient: iconTileGradients.purple,
+      onPress: () => navigation.navigate('ContactUs'),
+    },
+  ];
 
   return (
     <ScreenShell>
@@ -49,93 +136,76 @@ export default function MoreScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.profileCard}>
+      <SurfaceCard style={styles.profileCard}>
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
-        <View>
+        <View style={styles.profileTextWrap}>
           <Text style={styles.profileName}>{displayName}</Text>
           {!!email && <Text style={styles.profileEmail}>{email}</Text>}
         </View>
-      </View>
+        <View style={styles.tierPill}>
+          <Feather
+            name={isPremium ? 'award' : 'lock'}
+            size={11}
+            color={isPremium ? colors.warning : colors.textFaint}
+          />
+          <Text
+            style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
+          >
+            {isPremium ? 'PREMIUM' : 'FREE'}
+          </Text>
+        </View>
+      </SurfaceCard>
 
       <SectionLabel>MAIN MENU</SectionLabel>
-      <View style={styles.section}>
-        <MenuRow
-          icon="grid"
-          label="Dashboard"
-          onPress={() => tabNavigation?.navigate('Home')}
-        />
-        <MenuRow
-          icon="book-open"
-          label="Courses"
-          onPress={() =>
-            tabNavigation?.navigate('Courses', { screen: 'CoursesHome' })
-          }
-        />
-        <MenuRow
-          icon="zap"
-          label="Trade Alerts"
-          onPress={() => tabNavigation?.navigate('Alerts')}
-        />
-        <MenuRow
-          icon="target"
-          label="AI Super Scanner"
-          onPress={() => navigation.navigate('AIScanner')}
-        />
-        <MenuRow
-          icon="sliders"
-          label="Telegram Channels"
-          onPress={() => navigation.navigate('TelegramChannels')}
-        />
-        <MenuRow
-          icon="video"
-          label="Live Sessions"
-          onPress={() => tabNavigation?.navigate('Live')}
-        />
-      </View>
+      <SurfaceCard style={styles.sectionCard}>
+        <View style={styles.grid}>
+          {mainMenu.map((item) => (
+            <IconTile
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              gradient={item.gradient}
+              onPress={item.onPress}
+            />
+          ))}
+        </View>
+      </SurfaceCard>
 
       <SectionLabel>TRADING TOOLS</SectionLabel>
-      <View style={styles.section}>
-        <MenuRow
-          icon="bookmark"
-          label="Trading Journal"
-          onPress={() => navigation.navigate('TradingJournal')}
-        />
-        <MenuRow
-          icon="briefcase"
-          label="Recommended Broker"
-          onPress={() => navigation.navigate('RecommendedBroker')}
-        />
-        <MenuRow
-          icon="bar-chart-2"
-          label="Market Analysis"
-          onPress={() => navigation.navigate('MarketAnalysis')}
-        />
-        <MenuRow
-          icon="award"
-          label="Leaderboard"
-          onPress={() => navigation.navigate('Leaderboard')}
-        />
-      </View>
+      <SurfaceCard style={styles.sectionCard}>
+        <View style={styles.grid}>
+          {tradingTools.map((item) => (
+            <IconTile
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              gradient={item.gradient}
+              onPress={item.onPress}
+            />
+          ))}
+        </View>
+      </SurfaceCard>
 
       <SectionLabel>ACCOUNT</SectionLabel>
-      <View style={styles.section}>
-        <MenuRow
-          icon="bell"
-          label="Notifications"
-          onPress={() => navigation.navigate('Notifications')}
-        />
-        <MenuRow
-          icon="phone"
-          label="Contact Us"
-          onPress={() => navigation.navigate('ContactUs')}
-        />
-      </View>
+      <SurfaceCard style={styles.sectionCard}>
+        <View style={styles.grid}>
+          {account.map((item) => (
+            <IconTile
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              gradient={item.gradient}
+              onPress={item.onPress}
+            />
+          ))}
+        </View>
+      </SurfaceCard>
 
-      <View style={styles.signOutSection}>
+      <SurfaceCard style={styles.signOutCard}>
         <MenuRow icon="log-out" label="Sign Out" destructive onPress={handleSignOut} />
-      </View>
+      </SurfaceCard>
     </ScreenShell>
   );
 }
@@ -145,11 +215,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: 'rgba(47,111,239,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(78,140,255,0.3)',
-    borderRadius: 18,
-    padding: 16,
     marginTop: 12,
   },
   avatar: {
@@ -164,6 +229,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
   },
+  profileTextWrap: {
+    flex: 1,
+  },
   profileName: {
     color: colors.text,
     fontSize: 17,
@@ -174,11 +242,36 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
-  section: {
+  tierPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: colors.surfaceAlt,
+  },
+  tierPillText: {
+    color: colors.textFaint,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  tierPillTextPremium: {
+    color: colors.warning,
+  },
+  sectionCard: {
     marginTop: 6,
   },
-  signOutSection: {
-    marginTop: 12,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: spacing.md,
+    rowGap: 18,
+  },
+  signOutCard: {
+    marginTop: 20,
     marginBottom: 8,
+    padding: spacing.md,
   },
 });
