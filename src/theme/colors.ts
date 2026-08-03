@@ -20,8 +20,8 @@ export const colors = {
   overlay: 'rgba(10,10,13,0.75)',
 
   text: '#FFFFFF',
-  textMuted: '#9BA0AB',
-  textFaint: '#63666F',
+  textMuted: '#D6D9DE',
+  textFaint: '#8B8E96',
 
   accentBlue: '#2F6FEF',
   accentBlueDim: 'rgba(47,111,239,0.14)',
