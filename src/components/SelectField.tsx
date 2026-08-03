@@ -10,7 +10,7 @@ import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Props = {
-  label: string;
+  label?: string;
   placeholder: string;
   value?: string;
   onPress?: () => void;
@@ -26,7 +26,7 @@ export default function SelectField({
 }: Props) {
   return (
     <View style={containerStyle}>
-      <Text style={styles.label}>{label}</Text>
+      {label && <Text style={styles.label}>{label}</Text>}
       <Pressable style={styles.wrapper} onPress={onPress}>
         <Text style={value ? styles.value : styles.placeholder}>
           {value ?? placeholder}
