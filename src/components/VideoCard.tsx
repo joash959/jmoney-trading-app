@@ -55,12 +55,12 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   thumbShadow: {
-    borderRadius: 16,
+    borderRadius: 14,
     ...shadows.sm,
   },
   thumb: {
     aspectRatio: 1.1,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 10,
     justifyContent: 'space-between',
     overflow: 'hidden',

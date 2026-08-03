@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 56,
     paddingHorizontal: 24,
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 2,
     borderStyle: 'dashed',
     borderColor: 'rgba(78,140,255,0.45)',

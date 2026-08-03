@@ -87,17 +87,15 @@ export default function CourseCard({
 
 const styles = StyleSheet.create({
   cardShadow: {
-    borderRadius: 20,
+    borderRadius: 14,
     ...shadows.sm,
   },
   pressed: {
     opacity: 0.85,
   },
   card: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    borderRadius: 20,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   thumb: {

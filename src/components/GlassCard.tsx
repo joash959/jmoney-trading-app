@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -10,16 +9,16 @@ type Props = {
   children: ReactNode;
   /** Layout/positioning overrides (margin, alignSelf, flex...) - applied to the outer shadow wrapper. */
   style?: StyleProp<ViewStyle>;
-  /** Visual/content overrides (padding, borderColor, alignItems...) - applied to the inner glass surface. */
+  /** Visual/content overrides (padding, borderColor, alignItems...) - applied to the inner surface. */
   contentStyle?: StyleProp<ViewStyle>;
 };
 
+/** Flat solid-fill card - kept as GlassCard so every existing screen picks
+ * up the new PrimeXBT-style look without call-site changes. */
 export default function GlassCard({ children, style, contentStyle }: Props) {
   return (
     <View style={[styles.shadowWrap, style]}>
-      <BlurView intensity={40} tint="dark" style={[styles.card, contentStyle]}>
-        {children}
-      </BlurView>
+      <View style={[styles.card, contentStyle]}>{children}</View>
     </View>
   );
 }
@@ -30,10 +29,7 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   card: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    borderTopColor: colors.cardBorderTop,
+    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     padding: spacing.lg,
     overflow: 'hidden',

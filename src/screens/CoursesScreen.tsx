@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 20,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   skeletonBody: {

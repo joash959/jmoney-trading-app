@@ -1,6 +1,7 @@
 import { Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 
 type Props = {
   label: string;
@@ -11,7 +12,14 @@ type Props = {
 
 export default function SecondaryButton({ label, icon, onPress, style }: Props) {
   return (
-    <Pressable style={[styles.button, style]} onPress={onPress}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.button,
+        pressed && styles.buttonPressed,
+        style,
+      ]}
+      onPress={onPress}
+    >
       {icon && <Feather name={icon} size={16} color={colors.text} />}
       <Text style={styles.text}>{label}</Text>
     </Pressable>
@@ -25,11 +33,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     height: 54,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    backgroundColor: colors.inputBackground,
+    borderRadius: radius.lg,
+    backgroundColor: colors.buttonSecondary,
     paddingHorizontal: 18,
+  },
+  buttonPressed: {
+    backgroundColor: colors.buttonSecondaryPressed,
   },
   text: {
     color: colors.text,

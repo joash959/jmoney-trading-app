@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { colors } from '../theme/colors';
 import GlassCard from './GlassCard';
 
 type Props = {
@@ -17,6 +18,8 @@ export default function AccentCard({ children, style }: Props) {
 
 const styles = StyleSheet.create({
   accent: {
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
     borderColor: 'rgba(78,140,255,0.35)',
   },
 });
