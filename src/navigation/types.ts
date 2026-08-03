@@ -12,4 +12,5 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Main: NavigatorScreenParams<MainTabParamList>;
+  AIScanner: undefined;
 };

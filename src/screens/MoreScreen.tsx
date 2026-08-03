@@ -17,8 +17,11 @@ type Props = CompositeScreenProps<
 >;
 
 export default function MoreScreen({ navigation }: Props) {
+  const rootNavigation =
+    navigation.getParent<NativeStackScreenProps<RootStackParamList>['navigation']>();
+
   const handleSignOut = () => {
-    navigation.getParent<NativeStackScreenProps<RootStackParamList>['navigation']>()?.reset({
+    rootNavigation?.reset({
       index: 0,
       routes: [{ name: 'Login' }],
     });
@@ -61,7 +64,11 @@ export default function MoreScreen({ navigation }: Props) {
           label="Trade Alerts"
           onPress={() => navigation.navigate('Alerts')}
         />
-        <MenuRow icon="target" label="AI Super Scanner" />
+        <MenuRow
+          icon="target"
+          label="AI Super Scanner"
+          onPress={() => rootNavigation?.navigate('AIScanner')}
+        />
         <MenuRow icon="sliders" label="Telegram Channels" />
         <MenuRow
           icon="video"

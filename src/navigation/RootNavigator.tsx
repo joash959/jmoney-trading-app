@@ -2,6 +2,7 @@ import { DarkTheme, NavigationContainer, Theme } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import AISuperScannerScreen from '../screens/AISuperScannerScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from './types';
@@ -28,6 +29,7 @@ export default function RootNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Screen name="AIScanner" component={AISuperScannerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
