@@ -11,6 +11,7 @@ export const colors = {
   accentBlueDim: 'rgba(47,111,239,0.12)',
   accentPurple: '#8B7CFF',
   accentGreen: '#25D366',
+  accentRed: '#EF4444',
   link: '#4E8CFF',
 };
 

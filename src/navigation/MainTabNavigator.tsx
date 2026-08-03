@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: colors.accentRed,
   },
 });
