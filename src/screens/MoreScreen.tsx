@@ -83,7 +83,11 @@ export default function MoreScreen({ navigation }: Props) {
 
       <SectionLabel>TRADING TOOLS</SectionLabel>
       <View style={styles.section}>
-        <MenuRow icon="bookmark" label="Trading Journal" />
+        <MenuRow
+          icon="bookmark"
+          label="Trading Journal"
+          onPress={() => rootNavigation?.navigate('TradingJournal')}
+        />
         <MenuRow icon="briefcase" label="Recommended Broker" />
         <MenuRow icon="bar-chart-2" label="Market Analysis" />
         <MenuRow icon="award" label="Leaderboard" />

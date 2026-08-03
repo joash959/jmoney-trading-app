@@ -14,4 +14,5 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>;
   AIScanner: undefined;
   TelegramChannels: undefined;
+  TradingJournal: undefined;
 };
