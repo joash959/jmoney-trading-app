@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   videoWrap: {
-    borderRadius: 18,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   video: {

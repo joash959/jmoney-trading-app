@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 16,
   },
   sessionHeaderRow: {
