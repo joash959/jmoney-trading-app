@@ -1,24 +1,29 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import type { CompositeScreenProps } from '@react-navigation/native';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MainTabParamList, RootStackParamList } from '../navigation/types';
+import {
+  MainTabParamList,
+  MoreStackParamList,
+  RootStackParamList,
+} from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
 
-type Props = CompositeScreenProps<
-  BottomTabScreenProps<MainTabParamList, 'More'>,
-  NativeStackScreenProps<RootStackParamList>
->;
+type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
 export default function MoreScreen({ navigation }: Props) {
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const rootNavigation =
-    navigation.getParent<NativeStackScreenProps<RootStackParamList>['navigation']>();
+    tabNavigation?.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleSignOut = () => {
     rootNavigation?.reset({
@@ -52,32 +57,32 @@ export default function MoreScreen({ navigation }: Props) {
         <MenuRow
           icon="grid"
           label="Dashboard"
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => tabNavigation?.navigate('Home')}
         />
         <MenuRow
           icon="book-open"
           label="Courses"
-          onPress={() => navigation.navigate('Courses')}
+          onPress={() => tabNavigation?.navigate('Courses')}
         />
         <MenuRow
           icon="zap"
           label="Trade Alerts"
-          onPress={() => navigation.navigate('Alerts')}
+          onPress={() => tabNavigation?.navigate('Alerts')}
         />
         <MenuRow
           icon="target"
           label="AI Super Scanner"
-          onPress={() => rootNavigation?.navigate('AIScanner')}
+          onPress={() => navigation.navigate('AIScanner')}
         />
         <MenuRow
           icon="sliders"
           label="Telegram Channels"
-          onPress={() => rootNavigation?.navigate('TelegramChannels')}
+          onPress={() => navigation.navigate('TelegramChannels')}
         />
         <MenuRow
           icon="video"
           label="Live Sessions"
-          onPress={() => navigation.navigate('Live')}
+          onPress={() => tabNavigation?.navigate('Live')}
         />
       </View>
 
@@ -86,18 +91,18 @@ export default function MoreScreen({ navigation }: Props) {
         <MenuRow
           icon="bookmark"
           label="Trading Journal"
-          onPress={() => rootNavigation?.navigate('TradingJournal')}
+          onPress={() => navigation.navigate('TradingJournal')}
         />
         <MenuRow
           icon="briefcase"
           label="Recommended Broker"
-          onPress={() => rootNavigation?.navigate('RecommendedBroker')}
+          onPress={() => navigation.navigate('RecommendedBroker')}
         />
         <MenuRow icon="bar-chart-2" label="Market Analysis" />
         <MenuRow
           icon="award"
           label="Leaderboard"
-          onPress={() => rootNavigation?.navigate('Leaderboard')}
+          onPress={() => navigation.navigate('Leaderboard')}
         />
       </View>
 

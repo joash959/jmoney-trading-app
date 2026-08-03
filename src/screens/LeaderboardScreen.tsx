@@ -3,10 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { RootStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
-import BackButton from '../components/BackButton';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
@@ -16,13 +15,13 @@ import LeaderboardRow from '../components/LeaderboardRow';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Leaderboard'>;
+type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
 const GOLD = '#F5C518';
 const SILVER = '#C4C9D4';
 const BRONZE = '#D97B3F';
 
-export default function LeaderboardScreen({ navigation }: Props) {
+export default function LeaderboardScreen({}: Props) {
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
   const [clientId, setClientId] = useState('');
@@ -39,7 +38,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
       />
 
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerIcon}>
           <Feather name="award" size={20} color={colors.link} />
         </View>

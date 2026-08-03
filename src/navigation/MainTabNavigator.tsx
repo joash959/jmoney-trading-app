@@ -5,7 +5,7 @@ import HomeScreen from '../screens/HomeScreen';
 import CoursesScreen from '../screens/CoursesScreen';
 import AlertsScreen from '../screens/AlertsScreen';
 import LiveScreen from '../screens/LiveScreen';
-import MoreScreen from '../screens/MoreScreen';
+import MoreStackNavigator from './MoreStackNavigator';
 import { colors } from '../theme/colors';
 import { MainTabParamList } from './types';
 
@@ -46,7 +46,7 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Courses" component={CoursesScreen} />
       <Tab.Screen name="Alerts" component={AlertsScreen} />
       <Tab.Screen name="Live" component={LiveScreen} />
-      <Tab.Screen name="More" component={MoreScreen} />
+      <Tab.Screen name="More" component={MoreStackNavigator} />
     </Tab.Navigator>
   );
 }

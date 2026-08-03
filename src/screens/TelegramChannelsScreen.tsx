@@ -2,10 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { RootStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
-import BackButton from '../components/BackButton';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
@@ -14,7 +13,7 @@ import ChannelCard from '../components/ChannelCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'TelegramChannels'>;
+type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
 const AMBER = '#F59E0B';
 
@@ -61,7 +60,7 @@ const CHANNELS = [
   },
 ];
 
-export default function TelegramChannelsScreen({ navigation }: Props) {
+export default function TelegramChannelsScreen({}: Props) {
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
@@ -73,7 +72,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
       />
 
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerIcon}>
           <Feather name="sliders" size={20} color={colors.link} />
         </View>

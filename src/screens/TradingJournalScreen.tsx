@@ -3,19 +3,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { RootStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
-import BackButton from '../components/BackButton';
 import Calendar from '../components/Calendar';
 import SectionLabel from '../components/SectionLabel';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'TradingJournal'>;
+type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
 const today = new Date();
 
-export default function TradingJournalScreen({ navigation }: Props) {
+export default function TradingJournalScreen({}: Props) {
   const [viewDate, setViewDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
@@ -52,7 +51,6 @@ export default function TradingJournalScreen({ navigation }: Props) {
       />
 
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerIcon}>
           <Feather name="bookmark" size={20} color={colors.link} />
         </View>

@@ -2,17 +2,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { RootStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
-import BackButton from '../components/BackButton';
 import UploadDropzone from '../components/UploadDropzone';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'AIScanner'>;
+type Props = NativeStackScreenProps<MoreStackParamList, 'AIScanner'>;
 
-export default function AISuperScannerScreen({ navigation }: Props) {
+export default function AISuperScannerScreen({}: Props) {
   const handleUpload = () => {
     // TODO: wire up image picker + AI chart analysis
   };
@@ -28,7 +27,6 @@ export default function AISuperScannerScreen({ navigation }: Props) {
       />
 
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerIcon}>
           <Feather name="target" size={20} color={colors.link} />
         </View>

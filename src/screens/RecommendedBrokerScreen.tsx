@@ -2,10 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { RootStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
-import BackButton from '../components/BackButton';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import PrimaryButton from '../components/PrimaryButton';
@@ -15,7 +14,7 @@ import FeatureCard from '../components/FeatureCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'RecommendedBroker'>;
+type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 
 const STATS = [
   { icon: 'clock' as const, value: '2018+', label: 'Operating Since' },
@@ -37,7 +36,7 @@ const ASSET_CLASSES = [
   { title: 'Commodities', description: 'Gold, oil, silver and energies' },
 ];
 
-export default function RecommendedBrokerScreen({ navigation }: Props) {
+export default function RecommendedBrokerScreen({}: Props) {
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
@@ -49,7 +48,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       />
 
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerIcon}>
           <Feather name="briefcase" size={20} color={colors.link} />
         </View>
