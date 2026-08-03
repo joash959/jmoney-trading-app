@@ -8,6 +8,7 @@ type Props = {
   title: string;
   author: string;
   duration: string;
+  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -16,10 +17,11 @@ export default function VideoCard({
   title,
   author,
   duration,
+  onPress,
   style,
 }: Props) {
   return (
-    <Pressable style={[styles.card, style]}>
+    <Pressable style={[styles.card, style]} onPress={onPress}>
       <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
         <Text style={styles.eyebrow} numberOfLines={2}>
           {eyebrow}

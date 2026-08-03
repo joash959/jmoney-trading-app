@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { MoreStackParamList } from '../navigation/types';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import AccentCard from '../components/AccentCard';
@@ -21,11 +24,108 @@ const GOLD = '#F5C518';
 const SILVER = '#C4C9D4';
 const BRONZE = '#D97B3F';
 
+function rankColor(rank: number | null) {
+  if (rank === 1) return GOLD;
+  if (rank === 2) return SILVER;
+  if (rank === 3) return BRONZE;
+  return colors.textFaint;
+}
+
 export default function LeaderboardScreen({}: Props) {
+  const { session } = useAuth();
+
+  const [settings, setSettings] = useState<LeaderboardSettings | null>(null);
+  const [participants, setParticipants] = useState<LeaderboardParticipant[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
   const [clientId, setClientId] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from('leaderboard_settings').select('*').limit(1).maybeSingle(),
+      supabase
+        .from('leaderboard_participants')
+        .select('*')
+        .eq('is_active', true)
+        .order('rank', { ascending: true })
+        .limit(20),
+    ]).then(([{ data: settingsData }, { data: participantData }]) => {
+      setSettings((settingsData as LeaderboardSettings) ?? null);
+      setParticipants((participantData as LeaderboardParticipant[]) ?? []);
+      setLoading(false);
+    });
+  }, []);
+
+  const currency = settings?.currency_symbol ?? 'R';
+  const prize1 = settings?.prize_1st ?? 20000;
+  const prize2 = settings?.prize_2nd ?? 7000;
+  const prize3 = settings?.prize_3rd ?? 3000;
+  const totalPool = prize1 + prize2 + prize3;
+
+  const handleEnterChallenge = async () => {
+    if (!session) return;
+    if (!fullName.trim() || !nickname.trim() || !clientId.trim()) {
+      setSubmitError('Please fill in all fields.');
+      return;
+    }
+    setSubmitError(null);
+    setSubmitting(true);
+
+    const { error } = await supabase.from('leaderboard_participants').upsert(
+      {
+        user_id: session.user.id,
+        name: fullName.trim(),
+        nickname: nickname.trim(),
+        mt5_number: clientId.trim(),
+        is_active: true,
+      },
+      { onConflict: 'user_id' }
+    );
+
+    setSubmitting(false);
+    if (error) {
+      setSubmitError(error.message);
+    } else {
+      setSubmitted(true);
+    }
+  };
+
+  if (loading) {
+    return (
+      <ScreenShell>
+        <TopBar />
+        <ActivityIndicator
+          color={colors.accentBlue}
+          style={styles.cardSpaced}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (settings && settings.show_leaderboard === false) {
+    return (
+      <ScreenShell>
+        <TopBar />
+        <View style={styles.headerRow}>
+          <View style={styles.headerIcon}>
+            <Feather name="award" size={20} color={colors.link} />
+          </View>
+          <Text style={styles.headerTitle}>Leaderboard</Text>
+        </View>
+        <Text style={[styles.headerSubtitle, styles.cardSpaced]}>
+          The leaderboard is currently inactive. Check back soon.
+        </Text>
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
@@ -44,36 +144,45 @@ export default function LeaderboardScreen({}: Props) {
         <Text style={styles.headerTitle}>Leaderboard</Text>
       </View>
       <Text style={styles.headerSubtitle}>
-        Challenge yourself with other traders and win your share of R30,000
+        Challenge yourself with other traders and win your share of{' '}
+        {currency}
+        {totalPool.toLocaleString()}
       </Text>
 
-      <AccentCard style={styles.cardSpaced}>
-        <Text style={styles.heroTitle}>
-          🏆 Enter The Millionaire League Challenge
-        </Text>
-        <Text style={styles.heroSubtitle}>Win your share of R30,000</Text>
+      {settings?.show_podium !== false && (
+        <AccentCard style={styles.cardSpaced}>
+          <Text style={styles.heroTitle}>
+            🏆 {settings?.competition_name ?? 'Enter The Millionaire League Challenge'}
+          </Text>
+          <Text style={styles.heroSubtitle}>
+            {settings?.banner_subtitle ??
+              `Win your share of ${currency}${totalPool.toLocaleString()}`}
+          </Text>
 
-        <View style={styles.podiumRow}>
-          <View style={styles.podiumColumn}>
-            <Text style={styles.podiumEmoji}>🥈</Text>
-            <View style={[styles.podiumBar, styles.podiumSilver]}>
-              <Text style={styles.podiumNumber}>2</Text>
+          <View style={styles.podiumRow}>
+            <View style={styles.podiumColumn}>
+              <Text style={styles.podiumEmoji}>🥈</Text>
+              <View style={[styles.podiumBar, styles.podiumSilver]}>
+                <Text style={styles.podiumNumber}>2</Text>
+              </View>
+            </View>
+            <View style={styles.podiumColumn}>
+              <Text style={styles.podiumEmojiLarge}>🏆</Text>
+              <View
+                style={[styles.podiumBar, styles.podiumGold, styles.podiumTall]}
+              >
+                <Text style={styles.podiumNumber}>1</Text>
+              </View>
+            </View>
+            <View style={styles.podiumColumn}>
+              <Text style={styles.podiumEmoji}>🥉</Text>
+              <View style={[styles.podiumBar, styles.podiumBronze]}>
+                <Text style={styles.podiumNumber}>3</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.podiumColumn}>
-            <Text style={styles.podiumEmojiLarge}>🏆</Text>
-            <View style={[styles.podiumBar, styles.podiumGold, styles.podiumTall]}>
-              <Text style={styles.podiumNumber}>1</Text>
-            </View>
-          </View>
-          <View style={styles.podiumColumn}>
-            <Text style={styles.podiumEmoji}>🥉</Text>
-            <View style={[styles.podiumBar, styles.podiumBronze]}>
-              <Text style={styles.podiumNumber}>3</Text>
-            </View>
-          </View>
-        </View>
-      </AccentCard>
+        </AccentCard>
+      )}
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.sectionHeadingRow}>
@@ -86,7 +195,7 @@ export default function LeaderboardScreen({}: Props) {
             icon="award"
             iconColor={GOLD}
             label="1ST PLACE"
-            amount="R20,000"
+            amount={`${currency}${prize1.toLocaleString()}`}
             amountColor={GOLD}
             backgroundColor="rgba(245,197,24,0.1)"
             borderColor="rgba(245,197,24,0.3)"
@@ -95,7 +204,7 @@ export default function LeaderboardScreen({}: Props) {
             icon="award"
             iconColor={SILVER}
             label="2ND PLACE"
-            amount="R7,000"
+            amount={`${currency}${prize2.toLocaleString()}`}
             amountColor={colors.text}
             backgroundColor={colors.card}
             borderColor={colors.cardBorder}
@@ -104,7 +213,7 @@ export default function LeaderboardScreen({}: Props) {
             icon="award"
             iconColor={BRONZE}
             label="3RD PLACE"
-            amount="R3,000"
+            amount={`${currency}${prize3.toLocaleString()}`}
             amountColor={BRONZE}
             backgroundColor="rgba(217,123,63,0.1)"
             borderColor="rgba(217,123,63,0.3)"
@@ -112,7 +221,11 @@ export default function LeaderboardScreen({}: Props) {
         </View>
 
         <Text style={styles.poolText}>
-          Total monthly prize pool: <Text style={styles.poolAmount}>R30,000</Text>
+          Total monthly prize pool:{' '}
+          <Text style={styles.poolAmount}>
+            {currency}
+            {totalPool.toLocaleString()}
+          </Text>
         </Text>
       </GlassCard>
 
@@ -122,39 +235,56 @@ export default function LeaderboardScreen({}: Props) {
           <Text style={styles.sectionHeading}>Join the Challenge</Text>
         </View>
 
-        <FormInput
-          label="Full Name"
-          icon="user"
-          value={fullName}
-          onChangeText={setFullName}
-          placeholder="Enter your full name"
-          autoCapitalize="words"
-          containerStyle={styles.fieldSpaced}
-        />
-        <FormInput
-          label="Nickname"
-          icon="user"
-          value={nickname}
-          onChangeText={setNickname}
-          placeholder="Enter your trading nickname"
-          containerStyle={styles.fieldSpaced}
-        />
-        <FormInput
-          label="PrimeXBT Client ID or MT5 Number"
-          icon="hash"
-          value={clientId}
-          onChangeText={setClientId}
-          placeholder="e.g. 1824763 or 1040834"
-          keyboardType="number-pad"
-          containerStyle={styles.fieldSpaced}
-        />
+        {submitted ? (
+          <View style={styles.fieldSpaced}>
+            <Text style={styles.successText}>
+              You're entered! Your rank will appear on the leaderboard once
+              trading activity is recorded.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <FormInput
+              label="Full Name"
+              icon="user"
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="Enter your full name"
+              autoCapitalize="words"
+              containerStyle={styles.fieldSpaced}
+            />
+            <FormInput
+              label="Nickname"
+              icon="user"
+              value={nickname}
+              onChangeText={setNickname}
+              placeholder="Enter your trading nickname"
+              containerStyle={styles.fieldSpaced}
+            />
+            <FormInput
+              label="PrimeXBT Client ID or MT5 Number"
+              icon="hash"
+              value={clientId}
+              onChangeText={setClientId}
+              placeholder="e.g. 1824763 or 1040834"
+              keyboardType="number-pad"
+              containerStyle={styles.fieldSpaced}
+            />
 
-        <PrimaryButton
-          label="Enter Challenge"
-          icon={null}
-          variant="flat"
-          style={styles.fieldSpaced}
-        />
+            {submitError && (
+              <Text style={styles.errorText}>{submitError}</Text>
+            )}
+
+            <PrimaryButton
+              label={submitting ? 'Entering...' : 'Enter Challenge'}
+              icon={null}
+              variant="flat"
+              disabled={submitting}
+              onPress={handleEnterChallenge}
+              style={styles.fieldSpaced}
+            />
+          </>
+        )}
       </GlassCard>
 
       <Pressable
@@ -173,8 +303,8 @@ export default function LeaderboardScreen({}: Props) {
       </Pressable>
       {rulesOpen && (
         <Text style={styles.rulesBody}>
-          Full challenge terms coming soon — check back here for eligibility
-          and judging details.
+          {settings?.rules ??
+            'Full challenge terms coming soon — check back here for eligibility and judging details.'}
         </Text>
       )}
 
@@ -185,20 +315,40 @@ export default function LeaderboardScreen({}: Props) {
         </View>
 
         <View style={styles.fieldSpaced}>
-          <LeaderboardRow
-            rankIconColor={GOLD}
-            name="Raj"
-            subtitle="Balraj Mahabeer"
-            lots="0.00"
-            badge={{ type: 'new' }}
-          />
-          <LeaderboardRow
-            rankIconColor={SILVER}
-            name="Nate dogg"
-            subtitle="Nathan Jacobs"
-            lots="0.00"
-            badge={{ type: 'down', amount: 1 }}
-          />
+          {participants.map((participant) => {
+            const badge =
+              participant.previous_rank == null
+                ? ({ type: 'new' } as const)
+                : participant.rank != null &&
+                    participant.rank < participant.previous_rank
+                  ? ({
+                      type: 'up',
+                      amount: participant.previous_rank - participant.rank,
+                    } as const)
+                  : participant.rank != null &&
+                      participant.rank > participant.previous_rank
+                    ? ({
+                        type: 'down',
+                        amount: participant.rank - participant.previous_rank,
+                      } as const)
+                    : undefined;
+
+            return (
+              <LeaderboardRow
+                key={participant.id}
+                rankIconColor={rankColor(participant.rank)}
+                name={participant.nickname || participant.name}
+                subtitle={participant.name}
+                lots={(participant.total_volume ?? 0).toFixed(2)}
+                badge={badge}
+              />
+            );
+          })}
+          {participants.length === 0 && (
+            <Text style={styles.emptyText}>
+              No traders on the leaderboard yet.
+            </Text>
+          )}
         </View>
       </GlassCard>
 
@@ -326,6 +476,18 @@ const styles = StyleSheet.create({
   fieldSpaced: {
     marginTop: 16,
   },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 13,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  successText: {
+    color: colors.accentGreen,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
   rulesRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -353,5 +515,11 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     marginTop: 10,
     paddingHorizontal: 4,
+  },
+  emptyText: {
+    color: colors.textMuted,
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 8,
   },
 });

@@ -33,7 +33,7 @@ function formatDuration(minutes: number | null) {
 }
 
 export default function CourseDetailScreen({ route }: Props) {
-  const { courseId } = route.params;
+  const { courseId, lessonId: requestedLessonId } = route.params;
   const { profile } = useAuth();
   const { width: windowWidth } = useWindowDimensions();
   const videoWidth = windowWidth - 40;
@@ -103,10 +103,12 @@ export default function CourseDetailScreen({ route }: Props) {
       setCourse(loadedCourse);
       setLessons(loadedLessons);
 
-      const firstPlayable = loadedLessons.find(
-        (lesson) =>
-          lesson.is_preview || !loadedCourse?.is_premium || hasPremiumAccess
-      );
+      const isPlayable = (lesson: Lesson) =>
+        lesson.is_preview || !loadedCourse?.is_premium || hasPremiumAccess;
+      const requested = requestedLessonId
+        ? loadedLessons.find((l) => l.id === requestedLessonId && isPlayable(l))
+        : undefined;
+      const firstPlayable = requested ?? loadedLessons.find(isPlayable);
       setActiveLessonId(firstPlayable?.id ?? null);
       setLoading(false);
       // hasPremiumAccess is derived from profile, which is stable for the

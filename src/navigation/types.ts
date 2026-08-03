@@ -11,7 +11,7 @@ export type MoreStackParamList = {
 
 export type CoursesStackParamList = {
   CoursesHome: undefined;
-  CourseDetail: { courseId: string };
+  CourseDetail: { courseId: string; lessonId?: string };
 };
 
 export type MainTabParamList = {

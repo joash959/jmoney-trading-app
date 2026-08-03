@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { MainTabParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import Badge from '../components/Badge';
@@ -17,6 +21,21 @@ import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
+type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
+
+type LatestVideo = {
+  id: string;
+  courseId: string;
+  title: string;
+  author: string;
+  duration: string;
+};
+
+type ContinueCourse = {
+  courseId: string;
+  title: string;
+};
+
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
@@ -24,16 +43,64 @@ function getGreeting() {
   return 'Good evening';
 }
 
-const VIDEOS = [
-  { title: 'Introduction To Technical Analysis\nPART 4', duration: '15:00' },
-  { title: 'Introduction To Technical Analysis\nPART 3', duration: '20:00' },
-  { title: 'Introduction To Technical Analysis\nPART 2', duration: '32:00' },
-  { title: 'Introduction To Technical Analysis\nPART 1', duration: '23:00' },
-];
+function formatDuration(minutes: number | null) {
+  if (!minutes) return '';
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: Props) {
+  const { profile } = useAuth();
   const [clientId, setClientId] = useState('');
-  const firstName = 'Trader';
+  const [videos, setVideos] = useState<LatestVideo[]>([]);
+  const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
+    null
+  );
+
+  const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
+
+  useEffect(() => {
+    supabase
+      .from('lessons')
+      .select('id, title, duration_minutes, course_id, courses(title, instructor_name)')
+      .order('created_at', { ascending: false })
+      .limit(4)
+      .then(({ data }) => {
+        if (!data) return;
+        setVideos(
+          data.map((row: any) => ({
+            id: row.id,
+            courseId: row.course_id,
+            title: row.title,
+            author: row.courses?.instructor_name ?? 'JMONEY',
+            duration: formatDuration(row.duration_minutes),
+          }))
+        );
+      });
+
+    supabase
+      .from('user_course_progress')
+      .select('course_id, updated_at, courses(title)')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        const row = data as any;
+        if (row?.course_id) {
+          setContinueCourse({
+            courseId: row.course_id,
+            title: row.courses?.title ?? 'Your course',
+          });
+        }
+      });
+  }, []);
+
+  const openCourse = (courseId: string, lessonId?: string) => {
+    navigation.navigate('Courses', {
+      screen: 'CourseDetail',
+      params: { courseId, lessonId },
+    });
+  };
 
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
@@ -158,49 +225,76 @@ export default function HomeScreen() {
         />
       </View>
 
-      <EmptyStateCard
-        icon="book"
-        title="No Course Started"
-        subtitle="Start learning by enrolling in a course"
-        buttonLabel="Browse Courses"
-        style={styles.cardSpaced}
-      />
+      {continueCourse ? (
+        <EmptyStateCard
+          icon="book"
+          title="Continue learning"
+          subtitle={continueCourse.title}
+          buttonLabel="Resume Course"
+          onPress={() => openCourse(continueCourse.courseId)}
+          style={styles.cardSpaced}
+        />
+      ) : (
+        <EmptyStateCard
+          icon="book"
+          title="No Course Started"
+          subtitle="Start learning by enrolling in a course"
+          buttonLabel="Browse Courses"
+          onPress={() =>
+            navigation.navigate('Courses', { screen: 'CoursesHome' })
+          }
+          style={styles.cardSpaced}
+        />
+      )}
 
-      <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
-        <View>
-          <Text style={styles.sectionTitle}>Latest Videos</Text>
-          <Text style={styles.sectionSubtitle}>
-            Fresh content from our mentors
-          </Text>
-        </View>
-        <Pressable style={styles.viewAllRow}>
-          <Text style={styles.viewAllText}>View All</Text>
-          <Feather name="clock" size={13} color={colors.link} />
-        </Pressable>
-      </View>
+      {videos.length > 0 && (
+        <>
+          <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
+            <View>
+              <Text style={styles.sectionTitle}>Latest Videos</Text>
+              <Text style={styles.sectionSubtitle}>
+                Fresh content from our mentors
+              </Text>
+            </View>
+            <Pressable
+              style={styles.viewAllRow}
+              onPress={() =>
+                navigation.navigate('Courses', { screen: 'CoursesHome' })
+              }
+            >
+              <Text style={styles.viewAllText}>View All</Text>
+              <Feather name="clock" size={13} color={colors.link} />
+            </Pressable>
+          </View>
 
-      <View style={[styles.videoRow, styles.fieldSpaced]}>
-        {VIDEOS.slice(0, 2).map((video) => (
-          <VideoCard
-            key={video.title}
-            eyebrow="INTRODUCTION TO TECHNICAL ANALYSIS"
-            title={video.title}
-            author="Joash Naidoo"
-            duration={video.duration}
-          />
-        ))}
-      </View>
-      <View style={[styles.videoRow, styles.fieldSpaced]}>
-        {VIDEOS.slice(2, 4).map((video) => (
-          <VideoCard
-            key={video.title}
-            eyebrow="INTRODUCTION TO TECHNICAL ANALYSIS"
-            title={video.title}
-            author="Joash Naidoo"
-            duration={video.duration}
-          />
-        ))}
-      </View>
+          <View style={[styles.videoRow, styles.fieldSpaced]}>
+            {videos.slice(0, 2).map((video) => (
+              <VideoCard
+                key={video.id}
+                eyebrow="LATEST LESSON"
+                title={video.title}
+                author={video.author}
+                duration={video.duration}
+                onPress={() => openCourse(video.courseId, video.id)}
+              />
+            ))}
+          </View>
+          {videos.length > 2 && (
+            <View style={[styles.videoRow, styles.fieldSpaced]}>
+              {videos.slice(2, 4).map((video) => (
+                <VideoCard
+                  key={video.id}
+                  eyebrow="LATEST LESSON"
+                  title={video.title}
+                  author={video.author}
+                  duration={video.duration}
+                  onPress={() => openCourse(video.courseId, video.id)}
+                />
+              ))}
+            </View>
+          )}
+        </>
+      )}
 
       <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
