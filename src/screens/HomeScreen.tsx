@@ -187,18 +187,21 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'book-open' as const,
       label: 'Courses',
       gradient: iconTileGradients.blue,
+      image: require('../../assets/courses.png'),
       onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
     },
     {
       icon: 'target' as const,
       label: 'AI Scanner',
       gradient: iconTileGradients.purple,
+      image: require('../../assets/aiscanner.png'),
       onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
     },
     {
       icon: 'send' as const,
       label: 'Telegram',
       gradient: iconTileGradients.teal,
+      image: require('../../assets/telegram.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'TelegramChannels' }),
     },
@@ -206,12 +209,14 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'video' as const,
       label: 'Live Sessions',
       gradient: iconTileGradients.green,
+      image: require('../../assets/livesessions.png'),
       onPress: () => navigation.navigate('Live'),
     },
     {
       icon: 'bookmark' as const,
       label: 'Journal',
       gradient: iconTileGradients.gold,
+      image: require('../../assets/tradingjournal.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'TradingJournal' }),
     },
@@ -219,12 +224,14 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'award' as const,
       label: 'Leaderboard',
       gradient: iconTileGradients.red,
+      image: require('../../assets/leaderboard.png'),
       onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
     },
     {
       icon: 'bar-chart-2' as const,
       label: 'Market Analysis',
       gradient: iconTileGradients.blue,
+      image: require('../../assets/marketanalysis.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'MarketAnalysis' }),
     },
@@ -232,6 +239,7 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'phone' as const,
       label: 'Contact Us',
       gradient: iconTileGradients.purple,
+      image: require('../../assets/contactus.png'),
       onPress: () => navigation.navigate('More', { screen: 'ContactUs' }),
     },
   ];
@@ -354,6 +362,7 @@ export default function HomeScreen({ navigation }: Props) {
               icon={action.icon}
               label={action.label}
               gradient={action.gradient}
+              image={action.image}
               onPress={action.onPress}
             />
           ))}
