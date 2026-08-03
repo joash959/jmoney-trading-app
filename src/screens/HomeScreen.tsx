@@ -14,6 +14,7 @@ import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
 import VideoCard from '../components/VideoCard';
 import EmptyStateCard from '../components/EmptyStateCard';
+import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 function getGreeting() {
@@ -201,19 +202,7 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      <View style={[styles.disclaimerCard, styles.cardSpaced]}>
-        <Feather name="alert-triangle" size={16} color={colors.textFaint} />
-        <Text style={styles.disclaimerText}>
-          <Text style={styles.disclaimerBold}>Disclaimer: </Text>
-          Representative of FSP No. 53590. Market observations and content
-          shared are for educational and entertainment purposes only and do
-          not constitute financial advice. Trading in financial markets
-          involves risk and may result in the loss of some or all of your
-          capital. Past performance is not indicative of future results.
-          Always consult your own financial advisor before making any
-          trading or investment decisions.
-        </Text>
-      </View>
+      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }
@@ -336,24 +325,5 @@ const styles = StyleSheet.create({
   videoRow: {
     flexDirection: 'row',
     gap: 14,
-  },
-  disclaimerCard: {
-    flexDirection: 'row',
-    gap: 10,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    borderRadius: 18,
-    padding: 16,
-  },
-  disclaimerText: {
-    flex: 1,
-    color: colors.textFaint,
-    fontSize: 11,
-    lineHeight: 16,
-  },
-  disclaimerBold: {
-    fontWeight: '700',
-    color: colors.textMuted,
   },
 });

@@ -8,7 +8,7 @@ type Props = {
   label: string;
   value: string;
   valueColor?: string;
-  sublabel: string;
+  sublabel?: string;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -30,9 +30,11 @@ export default function InsightCard({
       <Text style={[styles.value, { color: valueColor }]} numberOfLines={1}>
         {value}
       </Text>
-      <Text style={styles.sublabel} numberOfLines={1}>
-        {sublabel}
-      </Text>
+      {sublabel && (
+        <Text style={styles.sublabel} numberOfLines={1}>
+          {sublabel}
+        </Text>
+      )}
     </View>
   );
 }

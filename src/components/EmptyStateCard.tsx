@@ -6,15 +6,17 @@ import PrimaryButton from './PrimaryButton';
 
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
+  iconVariant?: 'circle' | 'plain';
   title: string;
   subtitle: string;
-  buttonLabel: string;
+  buttonLabel?: string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
 export default function EmptyStateCard({
   icon,
+  iconVariant = 'circle',
   title,
   subtitle,
   buttonLabel,
@@ -23,18 +25,24 @@ export default function EmptyStateCard({
 }: Props) {
   return (
     <GlassCard style={[styles.card, style]}>
-      <View style={styles.iconCircle}>
-        <Feather name={icon} size={22} color={colors.link} />
-      </View>
+      {iconVariant === 'circle' ? (
+        <View style={styles.iconCircle}>
+          <Feather name={icon} size={22} color={colors.link} />
+        </View>
+      ) : (
+        <Feather name={icon} size={48} color={colors.textFaint} />
+      )}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
-      <PrimaryButton
-        label={buttonLabel}
-        icon={null}
-        variant="flat"
-        onPress={onPress}
-        style={styles.button}
-      />
+      {buttonLabel && (
+        <PrimaryButton
+          label={buttonLabel}
+          icon={null}
+          variant="flat"
+          onPress={onPress}
+          style={styles.button}
+        />
+      )}
     </GlassCard>
   );
 }
