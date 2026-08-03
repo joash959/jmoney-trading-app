@@ -31,3 +31,15 @@ export type Course = {
   created_at: string;
   updated_at: string;
 };
+
+export type Lesson = {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  video_url: string | null;
+  duration_minutes: number | null;
+  order_index: number | null;
+  is_preview: boolean;
+  created_at: string;
+};

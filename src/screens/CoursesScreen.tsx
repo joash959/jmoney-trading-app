@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { Course } from '../types/database';
+import { CoursesStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import SearchBar from '../components/SearchBar';
@@ -11,13 +13,15 @@ import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
+type Props = NativeStackScreenProps<CoursesStackParamList, 'CoursesHome'>;
+
 function formatDuration(hours: number | null) {
   if (!hours) return '< 1h';
   if (hours < 1) return `${Math.round(hours * 60)} min`;
   return `${hours}h`;
 }
 
-export default function CoursesScreen() {
+export default function CoursesScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,6 +118,9 @@ export default function CoursesScreen() {
                 description={course.description ?? ''}
                 duration={formatDuration(course.duration_hours)}
                 lessons={course.lessons_count ?? 0}
+                onPress={() =>
+                  navigation.navigate('CourseDetail', { courseId: course.id })
+                }
               />
             ))}
           </View>

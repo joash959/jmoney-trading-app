@@ -66,7 +66,9 @@ export default function MoreScreen({ navigation }: Props) {
         <MenuRow
           icon="book-open"
           label="Courses"
-          onPress={() => tabNavigation?.navigate('Courses')}
+          onPress={() =>
+            tabNavigation?.navigate('Courses', { screen: 'CoursesHome' })
+          }
         />
         <MenuRow
           icon="zap"

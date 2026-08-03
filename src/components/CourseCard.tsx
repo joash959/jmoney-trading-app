@@ -12,6 +12,7 @@ type Props = {
   description: string;
   duration: string;
   lessons: number;
+  onPress?: () => void;
 };
 
 function getInitials(name: string) {
@@ -32,9 +33,10 @@ export default function CourseCard({
   description,
   duration,
   lessons,
+  onPress,
 }: Props) {
   return (
-    <Pressable style={styles.card}>
+    <Pressable style={styles.card} onPress={onPress}>
       <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
         <View style={styles.levelPill}>
           <Text style={styles.levelText}>{level}</Text>

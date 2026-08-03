@@ -2,7 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
-import CoursesScreen from '../screens/CoursesScreen';
+import CoursesStackNavigator from './CoursesStackNavigator';
 import AlertsScreen from '../screens/AlertsScreen';
 import LiveScreen from '../screens/LiveScreen';
 import MoreStackNavigator from './MoreStackNavigator';
@@ -43,7 +43,7 @@ export default function MainTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Courses" component={CoursesScreen} />
+      <Tab.Screen name="Courses" component={CoursesStackNavigator} />
       <Tab.Screen name="Alerts" component={AlertsScreen} />
       <Tab.Screen name="Live" component={LiveScreen} />
       <Tab.Screen name="More" component={MoreStackNavigator} />

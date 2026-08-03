@@ -9,9 +9,14 @@ export type MoreStackParamList = {
   RecommendedBroker: undefined;
 };
 
+export type CoursesStackParamList = {
+  CoursesHome: undefined;
+  CourseDetail: { courseId: string };
+};
+
 export type MainTabParamList = {
   Home: undefined;
-  Courses: undefined;
+  Courses: NavigatorScreenParams<CoursesStackParamList>;
   Alerts: undefined;
   Live: undefined;
   More: NavigatorScreenParams<MoreStackParamList>;
