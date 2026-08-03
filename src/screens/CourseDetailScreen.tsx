@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { getYoutubeVideoId } from '../lib/youtube';
 import { Course, Lesson } from '../types/database';
 import { CoursesStackParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
@@ -26,6 +35,9 @@ function formatDuration(minutes: number | null) {
 export default function CourseDetailScreen({ route }: Props) {
   const { courseId } = route.params;
   const { profile } = useAuth();
+  const { width: windowWidth } = useWindowDimensions();
+  const videoWidth = windowWidth - 40;
+  const videoHeight = videoWidth * (9 / 16);
 
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -109,12 +121,18 @@ export default function CourseDetailScreen({ route }: Props) {
 
   useEffect(() => {
     const activeLesson = lessons.find((lesson) => lesson.id === activeLessonId);
-    if (activeLesson?.video_url) {
-      player.replaceAsync(activeLesson.video_url);
+    const url = activeLesson?.video_url;
+    // YouTube links aren't playable media files - they're handled by the
+    // YoutubePlayer (WebView-based) branch below instead of expo-video.
+    if (url && !getYoutubeVideoId(url)) {
+      player.replaceAsync(url);
     }
   }, [activeLessonId, lessons, player]);
 
   const activeLesson = lessons.find((lesson) => lesson.id === activeLessonId);
+  const youtubeId = activeLesson?.video_url
+    ? getYoutubeVideoId(activeLesson.video_url)
+    : null;
 
   const handleSelectLesson = (lesson: Lesson) => {
     if (!canPlay(lesson)) return;
@@ -147,7 +165,15 @@ export default function CourseDetailScreen({ route }: Props) {
       ) : (
         <>
           <View style={[styles.videoWrap, styles.cardSpaced]}>
-            {activeLesson?.video_url ? (
+            {youtubeId ? (
+              <YoutubePlayer
+                key={youtubeId}
+                height={videoHeight}
+                width={videoWidth}
+                videoId={youtubeId}
+                play
+              />
+            ) : activeLesson?.video_url ? (
               <VideoView
                 player={player}
                 style={styles.video}
@@ -166,7 +192,7 @@ export default function CourseDetailScreen({ route }: Props) {
             )}
           </View>
 
-          {__DEV__ && (
+          {__DEV__ && !youtubeId && (
             <Text style={styles.debugText}>
               video_url: {activeLesson?.video_url ?? '(none)'}
               {playbackError ? `\nplayer error: ${playbackError}` : ''}
