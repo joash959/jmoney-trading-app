@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTH_NAMES = [
@@ -78,6 +79,7 @@ export default function Calendar({
   const weeks = chunk(buildCells(year, month), 7);
 
   return (
+    <View style={styles.shadowWrap}>
     <View style={styles.card}>
       <View style={styles.navRow}>
         <Pressable style={styles.navButton} onPress={onPrevMonth} hitSlop={6}>
@@ -148,14 +150,17 @@ export default function Calendar({
         </View>
       ))}
     </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  shadowWrap: {
+    borderRadius: 14,
+    ...shadows.sm,
+  },
   card: {
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     overflow: 'hidden',
   },

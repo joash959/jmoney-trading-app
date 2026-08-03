@@ -9,6 +9,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -179,12 +180,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     padding: 14,
+    ...shadows.sm,
   },
   rowUnread: {
+    borderWidth: 1,
     borderColor: 'rgba(78,140,255,0.35)',
     backgroundColor: 'rgba(47,111,239,0.08)',
   },

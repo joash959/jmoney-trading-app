@@ -18,8 +18,8 @@ export default function AccentCard({ children, style }: Props) {
 
 const styles = StyleSheet.create({
   accent: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: 'rgba(78,140,255,0.35)',
+    backgroundColor: colors.surface,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accentBlue,
   },
 });

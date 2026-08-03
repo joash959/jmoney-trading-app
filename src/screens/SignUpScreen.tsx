@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import { RootStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { parseFunctionError } from '../lib/functionError';
@@ -422,11 +423,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     padding: 14,
     marginTop: 18,
+    ...shadows.sm,
   },
   checkbox: {
     width: 20,

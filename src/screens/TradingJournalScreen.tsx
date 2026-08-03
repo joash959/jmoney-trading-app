@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -337,11 +338,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    ...shadows.sm,
   },
   summaryLabel: {
     color: colors.textMuted,
@@ -386,10 +386,9 @@ const styles = StyleSheet.create({
   },
   entryCard: {
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     padding: 16,
+    ...shadows.sm,
   },
   entryDate: {
     color: colors.text,
@@ -419,11 +418,10 @@ const styles = StyleSheet.create({
   },
   emptyCard: {
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     paddingVertical: 28,
     alignItems: 'center',
+    ...shadows.sm,
   },
   emptyText: {
     color: colors.textMuted,
@@ -437,11 +435,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    ...shadows.sm,
   },
   weekDate: {
     color: colors.text,

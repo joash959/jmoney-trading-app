@@ -3,6 +3,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { LiveSession } from '../types/database';
@@ -224,10 +225,9 @@ const styles = StyleSheet.create({
   },
   sessionCard: {
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     padding: 16,
+    ...shadows.sm,
   },
   sessionHeaderRow: {
     flexDirection: 'row',

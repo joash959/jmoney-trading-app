@@ -8,9 +8,11 @@ export const colors = {
   buttonSecondary: '#2B2C32',
   buttonSecondaryPressed: '#34353C',
 
-  card: 'rgba(255,255,255,0.06)',
-  cardBorder: 'rgba(255,255,255,0.08)',
-  cardBorderTop: 'rgba(255,255,255,0.14)',
+  // Same solid fill as `surface`, no border - every card in the app should
+  // render identically to the Home screen's "Your Progress" card.
+  card: '#17181C',
+  cardBorder: 'transparent',
+  cardBorderTop: 'transparent',
   surfaceElevated: 'rgba(255,255,255,0.09)',
   borderStrong: 'rgba(255,255,255,0.14)',
   inputBackground: '#1C1D22',

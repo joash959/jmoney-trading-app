@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 6,
+    ...shadows.sm,
   },
   label: {
     color: colors.textMuted,

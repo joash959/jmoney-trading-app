@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 export default function WhatsAppHelpCard() {
   return (
@@ -22,12 +23,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     backgroundColor: colors.card,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: 20,
+    ...shadows.sm,
   },
   helpIcon: {
     width: 26,

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   relativeTime: string;
@@ -28,10 +29,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     padding: 16,
+    ...shadows.sm,
   },
   iconCircle: {
     width: 34,
