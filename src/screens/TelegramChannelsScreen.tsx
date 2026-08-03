@@ -19,6 +19,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import ScreenHeader from '../components/ScreenHeader';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
@@ -112,15 +113,11 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="sliders" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Telegram Channels</Text>
-      </View>
-      <Text style={styles.headerSubtitle}>
-        Join our Telegram channels for Trade Alerts.
-      </Text>
+      <ScreenHeader
+        icon="sliders"
+        title="Telegram Channels"
+        subtitle="Join our Telegram channels for Trade Alerts."
+      />
 
       {loading ? (
         <ActivityIndicator
@@ -233,31 +230,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    flexShrink: 1,
-  },
-  headerSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 10,
-  },
   cardSpaced: {
     marginTop: 20,
   },

@@ -16,6 +16,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import { NotificationRow } from '../types/database';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
@@ -100,12 +101,7 @@ export default function NotificationsScreen({}: Props) {
     >
       <TopBar />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="bell" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Notifications</Text>
-      </View>
+      <ScreenHeader icon="bell" title="Notifications" />
 
       {unreadCount > 0 && (
         <Pressable style={styles.markAllRow} onPress={handleMarkAllRead}>
@@ -163,26 +159,6 @@ export default function NotificationsScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    flexShrink: 1,
-  },
   markAllRow: {
     marginTop: 14,
     alignSelf: 'flex-start',

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { MoreStackParamList } from '../navigation/types';
@@ -11,6 +10,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import ScreenHeader from '../components/ScreenHeader';
 import Calendar from '../components/Calendar';
 import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
@@ -198,15 +198,11 @@ export default function TradingJournalScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="bookmark" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Trading Journal</Text>
-      </View>
-      <Text style={styles.headerSubtitle}>
-        Track your daily trading performance
-      </Text>
+      <ScreenHeader
+        icon="bookmark"
+        title="Trading Journal"
+        subtitle="Track your daily trading performance"
+      />
 
       <View style={[styles.summaryBar, styles.cardSpaced]}>
         <Text style={styles.summaryLabel}>Monthly:</Text>
@@ -333,31 +329,6 @@ export default function TradingJournalScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    flexShrink: 1,
-  },
-  headerSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 10,
-  },
   cardSpaced: {
     marginTop: 20,
   },

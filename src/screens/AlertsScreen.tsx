@@ -9,6 +9,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
@@ -127,18 +128,16 @@ export default function AlertsScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="bell" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Trade Alerts</Text>
-        <View style={styles.countPill}>
-          <Text style={styles.countText}>{alerts.length}</Text>
-        </View>
-      </View>
-      <Text style={styles.headerSubtitle}>
-        Real-time Trade Alert Insights with JMONEY
-      </Text>
+      <ScreenHeader
+        icon="bell"
+        title="Trade Alerts"
+        subtitle="Real-time Trade Alert Insights with JMONEY"
+        rightElement={
+          <View style={styles.countPill}>
+            <Text style={styles.countText}>{alerts.length}</Text>
+          </View>
+        }
+      />
 
       {loading ? (
         <View style={styles.fieldSpaced}>
@@ -220,25 +219,6 @@ export default function AlertsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 24,
-    fontWeight: '800',
-  },
   countPill: {
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -250,11 +230,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 13,
     fontWeight: '700',
-  },
-  headerSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 6,
   },
   errorText: {
     color: colors.accentRed,

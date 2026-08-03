@@ -11,6 +11,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import ScreenHeader from '../components/ScreenHeader';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
@@ -127,15 +128,11 @@ export default function LeaderboardScreen({ navigation }: Props) {
     return (
       <ScreenShell>
         <TopBar />
-        <View style={styles.headerRow}>
-          <View style={styles.headerIcon}>
-            <Feather name="award" size={20} color={colors.link} />
-          </View>
-          <Text style={styles.headerTitle}>Leaderboard</Text>
-        </View>
-        <Text style={[styles.headerSubtitle, styles.cardSpaced]}>
-          The leaderboard is currently inactive. Check back soon.
-        </Text>
+        <ScreenHeader
+          icon="award"
+          title="Leaderboard"
+          subtitle="The leaderboard is currently inactive. Check back soon."
+        />
       </ScreenShell>
     );
   }
@@ -155,17 +152,11 @@ export default function LeaderboardScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="award" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Leaderboard</Text>
-      </View>
-      <Text style={styles.headerSubtitle}>
-        Challenge yourself with other traders and win your share of{' '}
-        {currency}
-        {totalPool.toLocaleString()}
-      </Text>
+      <ScreenHeader
+        icon="award"
+        title="Leaderboard"
+        subtitle={`Challenge yourself with other traders and win your share of ${currency}${totalPool.toLocaleString()}`}
+      />
 
       {settings?.show_podium !== false && (
         <AccentCard style={styles.cardSpaced}>
@@ -376,31 +367,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    flexShrink: 1,
-  },
-  headerSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 10,
-  },
   cardSpaced: {
     marginTop: 20,
   },

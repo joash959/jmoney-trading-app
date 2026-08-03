@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
@@ -11,6 +10,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
+import ScreenHeader from '../components/ScreenHeader';
 import SearchBar from '../components/SearchBar';
 import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
@@ -98,15 +98,11 @@ export default function CoursesScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.headerRow}>
-        <View style={styles.headerIcon}>
-          <Feather name="book-open" size={20} color={colors.link} />
-        </View>
-        <Text style={styles.headerTitle}>Courses</Text>
-      </View>
-      <Text style={styles.headerSubtitle}>
-        Master trading with our comprehensive video courses
-      </Text>
+      <ScreenHeader
+        icon="book-open"
+        title="Courses"
+        subtitle="Master trading with our comprehensive video courses"
+      />
 
       <SearchBar
         value={search}
@@ -160,30 +156,6 @@ export default function CoursesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 24,
-    fontWeight: '800',
-  },
-  headerSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 6,
-  },
   searchBar: {
     marginTop: 20,
   },

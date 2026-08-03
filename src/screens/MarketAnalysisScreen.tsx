@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -10,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import GlowBackground from '../components/GlowBackground';
 import TopBar from '../components/TopBar';
+import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
@@ -108,12 +108,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         <GlowBackground />
         <View style={styles.gatedContent}>
           <TopBar />
-          <View style={styles.headerRow}>
-            <View style={styles.headerIcon}>
-              <Feather name="bar-chart-2" size={20} color={colors.link} />
-            </View>
-            <Text style={styles.headerTitle}>Market Analysis</Text>
-          </View>
+          <ScreenHeader icon="bar-chart-2" title="Market Analysis" />
           <EmptyStateCard
             icon="lock"
             title="Premium Feature"
@@ -133,12 +128,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <GlowBackground />
       <View style={styles.headerWrap}>
         <TopBar />
-        <View style={styles.headerRow}>
-          <View style={styles.headerIcon}>
-            <Feather name="bar-chart-2" size={20} color={colors.link} />
-          </View>
-          <Text style={styles.headerTitle}>Market Analysis</Text>
-        </View>
+        <ScreenHeader icon="bar-chart-2" title="Market Analysis" />
       </View>
       <WebView
         source={{ html: WIDGET_HTML }}
@@ -165,27 +155,6 @@ const styles = StyleSheet.create({
   gatedContent: {
     flex: 1,
     paddingHorizontal: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    flexShrink: 1,
   },
   cardSpaced: {
     marginTop: 20,
