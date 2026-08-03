@@ -47,6 +47,8 @@ function chunk<T>(items: T[], size: number): T[][] {
   return rows;
 }
 
+type DayMarker = 'profit' | 'loss' | 'flat';
+
 type Props = {
   year: number;
   month: number;
@@ -55,6 +57,7 @@ type Props = {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onToday: () => void;
+  dayMarkers?: Record<number, DayMarker>;
 };
 
 export default function Calendar({
@@ -65,6 +68,7 @@ export default function Calendar({
   onPrevMonth,
   onNextMonth,
   onToday,
+  dayMarkers,
 }: Props) {
   const now = new Date();
   const isCurrentMonth =
@@ -103,6 +107,9 @@ export default function Calendar({
           {week.map((cell, cellIndex) => {
             const isToday = cell.currentMonth && cell.day === todayDay;
             const isSelected = cell.currentMonth && cell.day === selectedDay;
+            const marker = cell.currentMonth
+              ? dayMarkers?.[cell.day]
+              : undefined;
 
             return (
               <Pressable
@@ -124,6 +131,16 @@ export default function Calendar({
                   >
                     {cell.day}
                   </Text>
+                )}
+                {marker && (
+                  <View
+                    style={[
+                      styles.marker,
+                      marker === 'profit' && styles.markerProfit,
+                      marker === 'loss' && styles.markerLoss,
+                      marker === 'flat' && styles.markerFlat,
+                    ]}
+                  />
                 )}
               </Pressable>
             );
@@ -232,5 +249,21 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 13,
     fontWeight: '700',
+  },
+  marker: {
+    position: 'absolute',
+    bottom: 6,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  markerProfit: {
+    backgroundColor: colors.accentGreen,
+  },
+  markerLoss: {
+    backgroundColor: colors.accentRed,
+  },
+  markerFlat: {
+    backgroundColor: colors.textFaint,
   },
 });

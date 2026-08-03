@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
-import { FunctionsHttpError } from '@supabase/supabase-js';
 import * as Clipboard from 'expo-clipboard';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
+import { parseFunctionError } from '../lib/functionError';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import Badge from '../components/Badge';
@@ -84,16 +84,7 @@ export default function SignUpScreen({ navigation }: Props) {
     setSubmitting(false);
 
     if (fnError) {
-      let message = 'Something went wrong. Please try again.';
-      if (fnError instanceof FunctionsHttpError) {
-        try {
-          const body = await fnError.context.json();
-          message = body.error ?? message;
-        } catch {
-          // keep the default message if the error body isn't JSON
-        }
-      }
-      setError(message);
+      setError(await parseFunctionError(fnError));
       return;
     }
 

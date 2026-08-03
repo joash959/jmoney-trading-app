@@ -81,6 +81,75 @@ export type LeaderboardParticipant = {
   updated_at: string;
 };
 
+export type Community = {
+  id: string;
+  name: string;
+  description: string | null;
+  member_count: string | null;
+  telegram_link: string;
+  icon_name: string;
+  category: string;
+  display_order: number;
+  is_active: boolean;
+  tier: 'free' | 'premium';
+  created_at: string;
+  updated_at: string;
+};
+
+export type TelegramLink = {
+  id: string;
+  user_id: string;
+  telegram_user_id: number | null;
+  telegram_username: string | null;
+  telegram_first_name: string | null;
+  status: 'pending' | 'invited' | 'joined' | 'removed';
+  in_channel: boolean;
+  invite_link: string | null;
+  joined_at: string | null;
+  removed_at: string | null;
+};
+
+export type TelegramAccessReason =
+  | 'not_funded'
+  | 'not_approved'
+  | 'expired'
+  | 'eligible_removed'
+  | 'not_joined'
+  | null;
+
+export type TelegramAccessStatus = {
+  link: TelegramLink | null;
+  funded: boolean;
+  accessActive: boolean;
+  isApproved: boolean;
+  accessExpiresAt: string | null;
+  expired: boolean;
+  removedAt: string | null;
+  reason: TelegramAccessReason;
+  canRecover: boolean;
+};
+
+export type TradeJournalEntry = {
+  id: string;
+  user_id: string;
+  trade_date: string;
+  profit_loss: number;
+  number_of_trades: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type NotificationRow = {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+};
+
 export type LiveSession = {
   id: string;
   title: string;

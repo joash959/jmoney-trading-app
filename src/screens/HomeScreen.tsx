@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { parseFunctionError } from '../lib/functionError';
 import { MainTabParamList } from '../navigation/types';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
@@ -50,12 +51,15 @@ function formatDuration(minutes: number | null) {
 }
 
 export default function HomeScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const [clientId, setClientId] = useState('');
   const [videos, setVideos] = useState<LatestVideo[]>([]);
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
     null
   );
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
 
@@ -100,6 +104,43 @@ export default function HomeScreen({ navigation }: Props) {
       screen: 'CourseDetail',
       params: { courseId, lessonId },
     });
+  };
+
+  const handleConnect = async () => {
+    if (!clientId.trim()) return;
+    setVerifyError(null);
+    setVerifyMessage(null);
+    setVerifyLoading(true);
+
+    const { data, error } = await supabase.functions.invoke(
+      'primexbt-verify',
+      { body: { action: 'verify', brokerId: clientId.trim() } }
+    );
+
+    setVerifyLoading(false);
+
+    if (error) {
+      setVerifyError(await parseFunctionError(error));
+      return;
+    }
+    if (!data?.found) {
+      setVerifyError(
+        "We couldn't find that PrimeXBT client ID. Double-check it's your 7-digit client ID, not your MT5 account number."
+      );
+      return;
+    }
+    if (data.funded) {
+      setVerifyMessage(
+        data.upgraded
+          ? 'Account verified and funded — premium unlocked! 🎉'
+          : 'Account verified and funded.'
+      );
+      refreshProfile();
+    } else {
+      setVerifyMessage(
+        'Account found, but not yet funded. Fund your account (minimum R500) to unlock premium features.'
+      );
+    }
   };
 
   return (
@@ -161,15 +202,26 @@ export default function HomeScreen({ navigation }: Props) {
           recognised.
         </Text>
 
+        {verifyMessage && (
+          <Text style={styles.successText}>{verifyMessage}</Text>
+        )}
+        {verifyError && <Text style={styles.errorText}>{verifyError}</Text>}
+
         <PrimaryButton
-          label="Connect & unlock premium"
+          label={verifyLoading ? 'Checking...' : 'Connect & unlock premium'}
           icon="shield"
-          disabled={clientId.length === 0}
+          disabled={clientId.trim().length === 0 || verifyLoading}
+          onPress={handleConnect}
           style={styles.fieldSpaced}
         />
         <SecondaryButton
           label="Don't have an account? Open & fund PrimeXBT"
           icon="external-link"
+          onPress={() =>
+            Linking.openURL(
+              'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt'
+            )
+          }
           style={styles.fieldSpaced}
         />
       </AccentCard>
@@ -371,6 +423,18 @@ const styles = StyleSheet.create({
   helperBold: {
     color: colors.textMuted,
     fontWeight: '700',
+  },
+  successText: {
+    color: colors.accentGreen,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 14,
+  },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 14,
   },
   lockRow: {
     flexDirection: 'row',
