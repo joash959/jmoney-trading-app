@@ -7,8 +7,10 @@ import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
@@ -31,8 +33,9 @@ function rankColor(rank: number | null) {
   return colors.textFaint;
 }
 
-export default function LeaderboardScreen({}: Props) {
+export default function LeaderboardScreen({ navigation }: Props) {
   const { session } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
 
   const [settings, setSettings] = useState<LeaderboardSettings | null>(null);
   const [participants, setParticipants] = useState<LeaderboardParticipant[]>(
@@ -131,9 +134,10 @@ export default function LeaderboardScreen({}: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() => navigation.navigate('Notifications')}
+          />
         }
       />
 
@@ -358,16 +362,6 @@ export default function LeaderboardScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

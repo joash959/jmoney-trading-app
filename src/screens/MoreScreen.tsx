@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
 
@@ -24,6 +25,7 @@ function getInitials(name: string) {
 
 export default function MoreScreen({ navigation }: Props) {
   const { session, profile, signOut } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
 
@@ -40,9 +42,10 @@ export default function MoreScreen({ navigation }: Props) {
     <ScreenShell>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() => navigation.navigate('Notifications')}
+          />
         }
       />
 
@@ -104,7 +107,11 @@ export default function MoreScreen({ navigation }: Props) {
           label="Recommended Broker"
           onPress={() => navigation.navigate('RecommendedBroker')}
         />
-        <MenuRow icon="bar-chart-2" label="Market Analysis" />
+        <MenuRow
+          icon="bar-chart-2"
+          label="Market Analysis"
+          onPress={() => navigation.navigate('MarketAnalysis')}
+        />
         <MenuRow
           icon="award"
           label="Leaderboard"
@@ -114,8 +121,16 @@ export default function MoreScreen({ navigation }: Props) {
 
       <SectionLabel>ACCOUNT</SectionLabel>
       <View style={styles.section}>
-        <MenuRow icon="bell" label="Notifications" />
-        <MenuRow icon="phone" label="Contact Us" />
+        <MenuRow
+          icon="bell"
+          label="Notifications"
+          onPress={() => navigation.navigate('Notifications')}
+        />
+        <MenuRow
+          icon="phone"
+          label="Contact Us"
+          onPress={() => navigation.navigate('ContactUs')}
+        />
       </View>
 
       <View style={styles.signOutSection}>
@@ -126,16 +141,6 @@ export default function MoreScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',

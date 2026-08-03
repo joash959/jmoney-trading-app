@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { Course } from '../types/database';
-import { CoursesStackParamList } from '../navigation/types';
+import { CoursesStackParamList, MainTabParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import SearchBar from '../components/SearchBar';
 import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
@@ -22,6 +25,9 @@ function formatDuration(hours: number | null) {
 }
 
 export default function CoursesScreen({ navigation }: Props) {
+  const { count: unreadCount } = useUnreadNotificationsCount();
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const [search, setSearch] = useState('');
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,9 +69,12 @@ export default function CoursesScreen({ navigation }: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() =>
+              tabNavigation?.navigate('More', { screen: 'Notifications' })
+            }
+          />
         }
       />
 
@@ -131,16 +140,6 @@ export default function CoursesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
+import { MainTabParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import FloatingChatButton from '../components/FloatingChatButton';
+
+type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
 
 type TradeAlert = {
   id: string;
@@ -38,7 +44,8 @@ function formatTimestamp(iso: string) {
   });
 }
 
-export default function AlertsScreen() {
+export default function AlertsScreen({ navigation }: Props) {
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [alerts, setAlerts] = useState<TradeAlert[]>([]);
   const [longCount, setLongCount] = useState(0);
   const [shortCount, setShortCount] = useState(0);
@@ -106,9 +113,12 @@ export default function AlertsScreen() {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() =>
+              navigation.navigate('More', { screen: 'Notifications' })
+            }
+          />
         }
       />
 
@@ -194,16 +204,6 @@ export default function AlertsScreen() {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

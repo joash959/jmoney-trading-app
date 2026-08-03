@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { MoreStackParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import PrimaryButton from '../components/PrimaryButton';
@@ -36,14 +38,21 @@ const ASSET_CLASSES = [
   { title: 'Commodities', description: 'Gold, oil, silver and energies' },
 ];
 
-export default function RecommendedBrokerScreen({}: Props) {
+const AFFILIATE_LINK =
+  'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt';
+
+export default function RecommendedBrokerScreen({ navigation }: Props) {
+  const { count: unreadCount } = useUnreadNotificationsCount();
+  const openAffiliateLink = () => Linking.openURL(AFFILIATE_LINK);
+
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() => navigation.navigate('Notifications')}
+          />
         }
       />
 
@@ -90,9 +99,14 @@ export default function RecommendedBrokerScreen({}: Props) {
           label="Start Trading"
           icon="external-link"
           variant="flat"
+          onPress={openAffiliateLink}
           style={styles.fieldSpaced}
         />
-        <SecondaryButton label="Visit PrimeXBT" style={styles.fieldSpaced} />
+        <SecondaryButton
+          label="Visit PrimeXBT"
+          onPress={openAffiliateLink}
+          style={styles.fieldSpaced}
+        />
       </AccentCard>
 
       <GlassCard style={[styles.cardSpaced, styles.statsCard]}>
@@ -212,11 +226,13 @@ export default function RecommendedBrokerScreen({}: Props) {
           label="Open Live Account"
           icon="external-link"
           variant="flat"
+          onPress={openAffiliateLink}
           style={styles.fieldSpaced}
         />
         <SecondaryButton
           label="Visit PrimeXBT Website"
           icon="external-link"
+          onPress={openAffiliateLink}
           style={styles.fieldSpaced}
         />
       </GlassCard>
@@ -227,16 +243,6 @@ export default function RecommendedBrokerScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

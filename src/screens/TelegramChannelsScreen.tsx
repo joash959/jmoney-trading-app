@@ -15,8 +15,10 @@ import { supabase } from '../lib/supabase';
 import { toFeatherIcon } from '../lib/icons';
 import { parseFunctionError } from '../lib/functionError';
 import { Community, TelegramAccessStatus } from '../types/database';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
@@ -37,7 +39,8 @@ const REASON_TEXT: Record<string, string> = {
   not_joined: 'You haven\'t joined the channel yet.',
 };
 
-export default function TelegramChannelsScreen({}: Props) {
+export default function TelegramChannelsScreen({ navigation }: Props) {
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [status, setStatus] = useState<TelegramAccessStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,9 +92,10 @@ export default function TelegramChannelsScreen({}: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() => navigation.navigate('Notifications')}
+          />
         }
       />
 
@@ -216,16 +220,6 @@ export default function TelegramChannelsScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

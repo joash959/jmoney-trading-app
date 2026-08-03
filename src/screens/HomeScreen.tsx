@@ -7,8 +7,10 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { parseFunctionError } from '../lib/functionError';
 import { MainTabParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import Badge from '../components/Badge';
 import GradientText from '../components/GradientText';
 import GlassCard from '../components/GlassCard';
@@ -52,6 +54,7 @@ function formatDuration(minutes: number | null) {
 
 export default function HomeScreen({ navigation }: Props) {
   const { profile, refreshProfile } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [clientId, setClientId] = useState('');
   const [videos, setVideos] = useState<LatestVideo[]>([]);
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
@@ -147,9 +150,12 @@ export default function HomeScreen({ navigation }: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <Pressable style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </Pressable>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() =>
+              navigation.navigate('More', { screen: 'Notifications' })
+            }
+          />
         }
       />
 
@@ -354,16 +360,6 @@ export default function HomeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   greetingCard: {
     marginTop: 16,
   },

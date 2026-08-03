@@ -7,6 +7,9 @@ export type MoreStackParamList = {
   TradingJournal: undefined;
   Leaderboard: undefined;
   RecommendedBroker: undefined;
+  MarketAnalysis: undefined;
+  Notifications: undefined;
+  ContactUs: undefined;
 };
 
 export type CoursesStackParamList = {

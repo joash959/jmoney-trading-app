@@ -8,12 +8,16 @@ import {
   View,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { LiveSession } from '../types/database';
+import { MainTabParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
@@ -34,8 +38,11 @@ function formatSessionDate(dateStr: string, timeStr: string | null) {
   return `${dateLabel} • ${timeLabel}`;
 }
 
-export default function LiveScreen() {
+type Props = BottomTabScreenProps<MainTabParamList, 'Live'>;
+
+export default function LiveScreen({ navigation }: Props) {
   const { profile } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,9 +86,12 @@ export default function LiveScreen() {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() =>
+              navigation.navigate('More', { screen: 'Notifications' })
+            }
+          />
         }
       />
 
@@ -191,16 +201,6 @@ export default function LiveScreen() {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

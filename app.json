@@ -30,6 +30,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#05070E"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "JMONEY needs access to your photos so you can upload a chart screenshot for the AI Super Scanner."
+        }
       ]
     ]
   }

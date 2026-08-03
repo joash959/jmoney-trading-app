@@ -10,14 +10,17 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { getYoutubeVideoId } from '../lib/youtube';
 import { Course, Lesson } from '../types/database';
-import { CoursesStackParamList } from '../navigation/types';
+import { CoursesStackParamList, MainTabParamList } from '../navigation/types';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
 import FloatingChatButton from '../components/FloatingChatButton';
 import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
@@ -32,9 +35,12 @@ function formatDuration(minutes: number | null) {
   return rest ? `${hours}h ${rest}m` : `${hours}h`;
 }
 
-export default function CourseDetailScreen({ route }: Props) {
+export default function CourseDetailScreen({ route, navigation }: Props) {
   const { courseId, lessonId: requestedLessonId } = route.params;
   const { profile } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const { width: windowWidth } = useWindowDimensions();
   const videoWidth = windowWidth - 40;
   const videoHeight = videoWidth * (9 / 16);
@@ -145,9 +151,12 @@ export default function CourseDetailScreen({ route }: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() =>
+              tabNavigation?.navigate('More', { screen: 'Notifications' })
+            }
+          />
         }
       />
 
@@ -268,16 +277,6 @@ export default function CourseDetailScreen({ route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   cardSpaced: {
     marginTop: 20,
   },

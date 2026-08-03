@@ -7,8 +7,10 @@ import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { TradeJournalEntry } from '../types/database';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import Calendar from '../components/Calendar';
 import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
@@ -35,8 +37,9 @@ function formatDayLabel(date: Date) {
   });
 }
 
-export default function TradingJournalScreen({}: Props) {
+export default function TradingJournalScreen({ navigation }: Props) {
   const { session } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const [viewDate, setViewDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
@@ -188,9 +191,10 @@ export default function TradingJournalScreen({}: Props) {
     <ScreenShell overlay={<FloatingChatButton />}>
       <TopBar
         rightElement={
-          <View style={styles.bellButton}>
-            <Feather name="bell" size={18} color={colors.text} />
-          </View>
+          <NotificationBell
+            count={unreadCount}
+            onPress={() => navigation.navigate('Notifications')}
+          />
         }
       />
 
@@ -329,16 +333,6 @@ export default function TradingJournalScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

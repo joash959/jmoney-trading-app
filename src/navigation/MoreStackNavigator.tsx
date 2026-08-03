@@ -5,6 +5,9 @@ import TelegramChannelsScreen from '../screens/TelegramChannelsScreen';
 import TradingJournalScreen from '../screens/TradingJournalScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
 import RecommendedBrokerScreen from '../screens/RecommendedBrokerScreen';
+import MarketAnalysisScreen from '../screens/MarketAnalysisScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import ContactUsScreen from '../screens/ContactUsScreen';
 import { MoreStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<MoreStackParamList>();
@@ -24,6 +27,9 @@ export default function MoreStackNavigator() {
         name="RecommendedBroker"
         component={RecommendedBrokerScreen}
       />
+      <Stack.Screen name="MarketAnalysis" component={MarketAnalysisScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="ContactUs" component={ContactUsScreen} />
     </Stack.Navigator>
   );
 }
