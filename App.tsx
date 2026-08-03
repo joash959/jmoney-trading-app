@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import LoginScreen from './src/screens/LoginScreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import RootNavigator from './src/navigation/RootNavigator';
 
 export default function App() {
   return (
-    <>
-      <LoginScreen />
+    <SafeAreaProvider>
+      <RootNavigator />
       <StatusBar style="light" />
-    </>
+    </SafeAreaProvider>
   );
 }
