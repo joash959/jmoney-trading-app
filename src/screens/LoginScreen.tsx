@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -12,8 +13,32 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import MaskedView from '@react-native-masked-view/masked-view';
+import * as Haptics from 'expo-haptics';
 import { colors, gradients } from '../theme/colors';
+import GlowBackground from '../components/GlowBackground';
+
+function useFocusGlow() {
+  const anim = useRef(new Animated.Value(0)).current;
+  const onFocus = () =>
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 180,
+      useNativeDriver: false,
+    }).start();
+  const onBlur = () =>
+    Animated.timing(anim, {
+      toValue: 0,
+      duration: 180,
+      useNativeDriver: false,
+    }).start();
+  const borderColor = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [colors.inputBorder, colors.accentBlue],
+  });
+  return { onFocus, onBlur, borderColor };
+}
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -21,12 +46,52 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  const emailGlow = useFocusGlow();
+  const passwordGlow = useFocusGlow();
+
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const contentOffset = useRef(new Animated.Value(24)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentOffset, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [contentOpacity, contentOffset]);
+
+  const handlePressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  };
+
   const handleSignIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // TODO: wire up Supabase auth here
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <GlowBackground />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -35,150 +100,189 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.topBar}>
-            <View style={styles.logoRow}>
-              <LinearGradient
-                colors={gradients.brand}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.logoMark}
-              >
-                <Feather name="trending-up" size={18} color={colors.text} />
-              </LinearGradient>
-              <Text style={styles.logoText}>JMONEY</Text>
-            </View>
-            <Pressable style={styles.signUpPill}>
-              <Text style={styles.signUpPillText}>Sign up</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.badge}>
-            <Feather name="shield" size={13} color={colors.link} />
-            <Text style={styles.badgeText}>Secure sign in</Text>
-          </View>
-
-          <View style={styles.heading}>
-            <Text style={styles.headingLine}>Welcome</Text>
-            <MaskedView
-              maskElement={
-                <Text style={[styles.headingLine, styles.headingAccent]}>
-                  back
-                </Text>
-              }
-            >
-              <LinearGradient
-                colors={gradients.brand}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text
-                  style={[
-                    styles.headingLine,
-                    styles.headingAccent,
-                    styles.headingAccentHidden,
-                  ]}
+          <Animated.View
+            style={{
+              opacity: contentOpacity,
+              transform: [{ translateY: contentOffset }],
+            }}
+          >
+            <View style={styles.topBar}>
+              <View style={styles.logoRow}>
+                <LinearGradient
+                  colors={gradients.brand}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.logoMark}
                 >
-                  back
-                </Text>
-              </LinearGradient>
-            </MaskedView>
-          </View>
-          <Text style={styles.subtitle}>Sign in to access your dashboard.</Text>
-
-          <View style={styles.card}>
-            <Text style={styles.label}>EMAIL</Text>
-            <View style={styles.inputWrapper}>
-              <Feather name="mail" size={18} color={colors.textFaint} />
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Email address"
-                placeholderTextColor={colors.textFaint}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                style={styles.input}
-              />
+                  <Feather name="trending-up" size={18} color={colors.text} />
+                </LinearGradient>
+                <Text style={styles.logoText}>JMONEY</Text>
+              </View>
+              <Pressable style={styles.signUpPill}>
+                <Text style={styles.signUpPillText}>Sign up</Text>
+              </Pressable>
             </View>
 
-            <Text style={[styles.label, styles.labelSpaced]}>PASSWORD</Text>
-            <View style={styles.inputWrapper}>
-              <Feather name="lock" size={18} color={colors.textFaint} />
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Password"
-                placeholderTextColor={colors.textFaint}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-                style={styles.input}
-              />
-              <Pressable
-                onPress={() => setShowPassword((prev) => !prev)}
-                hitSlop={8}
+            <View style={styles.badge}>
+              <Feather name="shield" size={13} color={colors.link} />
+              <Text style={styles.badgeText}>Secure sign in</Text>
+            </View>
+
+            <View style={styles.heading}>
+              <Text style={styles.headingLine}>Welcome</Text>
+              <MaskedView
+                maskElement={
+                  <Text style={[styles.headingLine, styles.headingAccent]}>
+                    back
+                  </Text>
+                }
               >
-                <Feather
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={18}
-                  color={colors.textFaint}
+                <LinearGradient
+                  colors={gradients.brand}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text
+                    style={[
+                      styles.headingLine,
+                      styles.headingAccent,
+                      styles.headingAccentHidden,
+                    ]}
+                  >
+                    back
+                  </Text>
+                </LinearGradient>
+              </MaskedView>
+            </View>
+            <Text style={styles.subtitle}>
+              Sign in to access your dashboard.
+            </Text>
+
+            <BlurView intensity={40} tint="dark" style={styles.card}>
+              <Text style={styles.label}>EMAIL</Text>
+              <Animated.View
+                style={[
+                  styles.inputWrapper,
+                  { borderColor: emailGlow.borderColor },
+                ]}
+              >
+                <Feather name="mail" size={18} color={colors.textFaint} />
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  onFocus={emailGlow.onFocus}
+                  onBlur={emailGlow.onBlur}
+                  placeholder="Email address"
+                  placeholderTextColor={colors.textFaint}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.input}
                 />
-              </Pressable>
-            </View>
+              </Animated.View>
 
-            <View style={styles.optionsRow}>
-              <Pressable
-                style={styles.rememberMe}
-                onPress={() => setRememberMe((prev) => !prev)}
+              <Text style={[styles.label, styles.labelSpaced]}>PASSWORD</Text>
+              <Animated.View
+                style={[
+                  styles.inputWrapper,
+                  { borderColor: passwordGlow.borderColor },
+                ]}
               >
-                <View
-                  style={[
-                    styles.checkbox,
-                    rememberMe && styles.checkboxChecked,
-                  ]}
+                <Feather name="lock" size={18} color={colors.textFaint} />
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  onFocus={passwordGlow.onFocus}
+                  onBlur={passwordGlow.onBlur}
+                  placeholder="Password"
+                  placeholderTextColor={colors.textFaint}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.input}
+                />
+                <Pressable
+                  onPress={() => setShowPassword((prev) => !prev)}
+                  hitSlop={8}
                 >
-                  {rememberMe && (
-                    <Feather name="check" size={12} color={colors.text} />
-                  )}
-                </View>
-                <Text style={styles.rememberMeText}>Remember me</Text>
-              </Pressable>
-              <Pressable>
-                <Text style={styles.link}>Forgot password?</Text>
-              </Pressable>
-            </View>
+                  <Feather
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={18}
+                    color={colors.textFaint}
+                  />
+                </Pressable>
+              </Animated.View>
 
-            <Pressable onPress={handleSignIn}>
-              <LinearGradient
-                colors={gradients.button}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.signInButton}
+              <View style={styles.optionsRow}>
+                <Pressable
+                  style={styles.rememberMe}
+                  onPress={() => setRememberMe((prev) => !prev)}
+                >
+                  <View
+                    style={[
+                      styles.checkbox,
+                      rememberMe && styles.checkboxChecked,
+                    ]}
+                  >
+                    {rememberMe && (
+                      <Feather name="check" size={12} color={colors.text} />
+                    )}
+                  </View>
+                  <Text style={styles.rememberMeText}>Remember me</Text>
+                </Pressable>
+                <Pressable>
+                  <Text style={styles.link}>Forgot password?</Text>
+                </Pressable>
+              </View>
+
+              <Pressable
+                onPress={handleSignIn}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
               >
-                <Text style={styles.signInButtonText}>Sign in</Text>
-                <Feather name="arrow-right" size={18} color={colors.text} />
-              </LinearGradient>
-            </Pressable>
-          </View>
+                <Animated.View
+                  style={{ transform: [{ scale: buttonScale }] }}
+                >
+                  <LinearGradient
+                    colors={gradients.button}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.signInButton}
+                  >
+                    <Text style={styles.signInButtonText}>Sign in</Text>
+                    <Feather
+                      name="arrow-right"
+                      size={18}
+                      color={colors.text}
+                    />
+                  </LinearGradient>
+                </Animated.View>
+              </Pressable>
+            </BlurView>
 
-          <Text style={styles.signUpRow}>
-            Don't have an account?{' '}
-            <Text style={styles.link}>Sign up free</Text>
-          </Text>
+            <Text style={styles.signUpRow}>
+              Don't have an account?{' '}
+              <Text style={styles.link}>Sign up free</Text>
+            </Text>
 
-          <Pressable style={styles.helpCard}>
-            <View style={styles.helpIcon}>
+            <Pressable style={styles.helpCard}>
+              <View style={styles.helpIcon}>
+                <Feather
+                  name="message-circle"
+                  size={16}
+                  color={colors.accentGreen}
+                />
+              </View>
+              <Text style={styles.helpText}>
+                Need help? <Text style={styles.helpLink}>WhatsApp us</Text>
+              </Text>
               <Feather
-                name="message-circle"
+                name="arrow-right"
                 size={16}
                 color={colors.accentGreen}
               />
-            </View>
-            <Text style={styles.helpText}>
-              Need help? <Text style={styles.helpLink}>WhatsApp us</Text>
-            </Text>
-            <Feather name="arrow-right" size={16} color={colors.accentGreen} />
-          </Pressable>
+            </Pressable>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -274,12 +378,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    backgroundColor: colors.card,
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: 24,
     padding: 20,
     marginTop: 28,
+    overflow: 'hidden',
   },
   label: {
     color: colors.textMuted,
@@ -296,8 +401,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     backgroundColor: colors.inputBackground,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderWidth: 1.5,
     borderRadius: 16,
     paddingHorizontal: 14,
     height: 52,
