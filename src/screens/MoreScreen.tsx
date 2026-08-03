@@ -1,17 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import type {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-  MainTabParamList,
-  MoreStackParamList,
-  RootStackParamList,
-} from '../navigation/types';
+import { MainTabParamList, MoreStackParamList } from '../navigation/types';
+import { useAuth } from '../contexts/AuthContext';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import MenuRow from '../components/MenuRow';
@@ -19,17 +13,27 @@ import SectionLabel from '../components/SectionLabel';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export default function MoreScreen({ navigation }: Props) {
+  const { session, profile, signOut } = useAuth();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
-  const rootNavigation =
-    tabNavigation?.getParent<NativeStackNavigationProp<RootStackParamList>>();
+
+  const email = session?.user.email ?? '';
+  const displayName = profile?.display_name || email || 'Trader';
 
   const handleSignOut = () => {
-    rootNavigation?.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    signOut();
+    // RootNavigator swaps back to the Login stack automatically once
+    // the session clears - no manual navigation needed here.
   };
 
   return (
@@ -44,11 +48,11 @@ export default function MoreScreen({ navigation }: Props) {
 
       <View style={styles.profileCard}>
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
-          <Text style={styles.avatarText}>JO</Text>
+          <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
         <View>
-          <Text style={styles.profileName}>Jojo Jono</Text>
-          <Text style={styles.profileEmail}>2123@1234.com</Text>
+          <Text style={styles.profileName}>{displayName}</Text>
+          {!!email && <Text style={styles.profileEmail}>{email}</Text>}
         </View>
       </View>
 

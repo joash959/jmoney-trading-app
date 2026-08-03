@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { supabase } from '../lib/supabase';
+import { Course } from '../types/database';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import SearchBar from '../components/SearchBar';
@@ -9,76 +11,49 @@ import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
-const COURSES = [
-  {
-    level: 'Beginner',
-    eyebrow: 'INTRODUCTION TO TECHNICAL ANALYSIS',
-    instructor: 'Joash Naidoo',
-    category: 'Technical Analysis',
-    title: 'Technical Analysis',
-    description:
-      'Technical analysis can help you make sense of what drives market prices. In this course we show you how to start using charts to identify trends and opportunities.',
-    duration: '2h',
-    lessons: 4,
-  },
-  {
-    level: 'Beginner',
-    eyebrow: 'INTRODUCTION TO TRADING',
-    instructor: 'Joash Naidoo',
-    category: 'Forex',
-    title: 'Introduction To Trading',
-    description:
-      'A beginner-friendly walkthrough covering the fundamentals every new trader needs to know before placing their first trade.',
-    duration: '1h',
-    lessons: 4,
-  },
-  {
-    level: 'Beginner',
-    eyebrow: 'HOW TO USE MILLIONAIRE MENTOR PLATFORM',
-    instructor: 'Joash Naidoo',
-    category: 'Forex',
-    title: 'How to use Millionaire Mentor Platform',
-    description:
-      'Watch this first as it will direct you through navigation of the Millionaire Mentor Platform.',
-    duration: '< 1h',
-    lessons: 1,
-  },
-  {
-    level: 'Beginner',
-    eyebrow: 'HOW TO SETUP BROKER TRADING ACCOUNT',
-    instructor: 'Desal Naidoo',
-    category: 'Forex',
-    title: 'How to setup Broker Trading Account',
-    description: 'Easy how to guide on setting up your broker trading account.',
-    duration: '1h',
-    lessons: 1,
-  },
-  {
-    level: 'Beginner',
-    eyebrow: 'HOW TO USE METATRADER 5 MOBILE',
-    instructor: 'Desal Naidoo',
-    category: 'Forex',
-    title: 'How to use MetaTrader 5',
-    description:
-      'This course will guide you through the ins and outs of MetaTrader 5.',
-    duration: '1h',
-    lessons: 1,
-  },
-  {
-    level: 'Beginner',
-    eyebrow: '5 BASIC TIPS ON TRADING PSYCHOLOGY',
-    instructor: 'Desal Naidoo',
-    category: 'Psychology',
-    title: '5 Basic Tips on Trading Psychology',
-    description:
-      'Simple, practical tips to help you master the mental side of trading.',
-    duration: '1h',
-    lessons: 5,
-  },
-];
+function formatDuration(hours: number | null) {
+  if (!hours) return '< 1h';
+  if (hours < 1) return `${Math.round(hours * 60)} min`;
+  return `${hours}h`;
+}
 
 export default function CoursesScreen() {
   const [search, setSearch] = useState('');
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('courses')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error: fetchError }) => {
+        if (cancelled) return;
+        if (fetchError) {
+          setError(fetchError.message);
+        } else {
+          setCourses((data as Course[]) ?? []);
+        }
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filteredCourses = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return courses;
+    return courses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(query) ||
+        course.description?.toLowerCase().includes(query)
+    );
+  }, [courses, search]);
 
   return (
     <ScreenShell overlay={<FloatingChatButton />}>
@@ -112,15 +87,38 @@ export default function CoursesScreen() {
         containerStyle={styles.fieldSpaced}
       />
 
-      <Text style={styles.resultsText}>
-        Showing {COURSES.length} of {COURSES.length} courses
-      </Text>
+      {loading ? (
+        <ActivityIndicator
+          color={colors.accentBlue}
+          style={styles.fieldSpaced}
+        />
+      ) : error ? (
+        <Text style={[styles.errorText, styles.fieldSpaced]}>
+          Couldn't load courses: {error}
+        </Text>
+      ) : (
+        <>
+          <Text style={styles.resultsText}>
+            Showing {filteredCourses.length} of {courses.length} courses
+          </Text>
 
-      <View style={styles.list}>
-        {COURSES.map((course) => (
-          <CourseCard key={course.title} {...course} />
-        ))}
-      </View>
+          <View style={styles.list}>
+            {filteredCourses.map((course) => (
+              <CourseCard
+                key={course.id}
+                level={course.level ?? 'Beginner'}
+                eyebrow={course.title.toUpperCase()}
+                instructor={course.instructor_name ?? 'JMONEY'}
+                category={course.category ?? 'Trading'}
+                title={course.title}
+                description={course.description ?? ''}
+                duration={formatDuration(course.duration_hours)}
+                lessons={course.lessons_count ?? 0}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </ScreenShell>
   );
 }
@@ -174,5 +172,10 @@ const styles = StyleSheet.create({
   list: {
     gap: 20,
     marginTop: 14,
+  },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

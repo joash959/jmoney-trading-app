@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from '../navigation/types';
+import { useAuth } from '../contexts/AuthContext';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import Badge from '../components/Badge';
@@ -16,15 +17,28 @@ import WhatsAppHelpCard from '../components/WhatsAppHelpCard';
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSignIn = () => {
-    // TODO: wire up Supabase auth here - navigating straight to the
-    // dashboard for now so screens after login are previewable.
-    navigation.navigate('Main', { screen: 'Home' });
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      setError('Enter your email and password.');
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    const { error: signInError } = await signIn(email.trim(), password);
+    setSubmitting(false);
+    if (signInError) {
+      setError(signInError);
+    }
+    // On success, RootNavigator swaps to the Main stack automatically
+    // once the session updates - no manual navigation needed here.
   };
 
   return (
@@ -97,9 +111,12 @@ export default function LoginScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <PrimaryButton
-          label="Sign in"
+          label={submitting ? 'Signing in...' : 'Sign in'}
           onPress={handleSignIn}
+          disabled={submitting}
           style={styles.signInButton}
         />
       </GlassCard>
@@ -181,6 +198,12 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     marginTop: 22,
+  },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 13,
+    marginTop: 16,
+    textAlign: 'center',
   },
   signUpRow: {
     textAlign: 'center',
