@@ -10,7 +10,12 @@ import {
 import { colors } from '../theme/colors';
 import GlowBackground from './GlowBackground';
 
-export default function ScreenShell({ children }: { children: ReactNode }) {
+type Props = {
+  children: ReactNode;
+  overlay?: ReactNode;
+};
+
+export default function ScreenShell({ children, overlay }: Props) {
   const opacity = useRef(new Animated.Value(0)).current;
   const offset = useRef(new Animated.Value(24)).current;
 
@@ -47,6 +52,7 @@ export default function ScreenShell({ children }: { children: ReactNode }) {
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {overlay}
     </SafeAreaView>
   );
 }

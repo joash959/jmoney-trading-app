@@ -1,12 +1,14 @@
+import { ReactNode } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme/colors';
 
 type Props = {
-  pillLabel: string;
+  pillLabel?: string;
   onPillPress?: () => void;
+  rightElement?: ReactNode;
 };
 
-export default function TopBar({ pillLabel, onPillPress }: Props) {
+export default function TopBar({ pillLabel, onPillPress, rightElement }: Props) {
   return (
     <View style={styles.topBar}>
       <View style={styles.logoRow}>
@@ -17,9 +19,12 @@ export default function TopBar({ pillLabel, onPillPress }: Props) {
         />
         <Text style={styles.logoText}>JMONEY</Text>
       </View>
-      <Pressable style={styles.pill} onPress={onPillPress}>
-        <Text style={styles.pillText}>{pillLabel}</Text>
-      </Pressable>
+      {rightElement ??
+        (pillLabel && (
+          <Pressable style={styles.pill} onPress={onPillPress}>
+            <Text style={styles.pillText}>{pillLabel}</Text>
+          </Pressable>
+        ))}
     </View>
   );
 }

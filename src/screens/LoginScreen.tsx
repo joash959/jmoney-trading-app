@@ -22,7 +22,9 @@ export default function LoginScreen({ navigation }: Props) {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSignIn = () => {
-    // TODO: wire up Supabase auth here
+    // TODO: wire up Supabase auth here - navigating straight to the
+    // dashboard for now so screens after login are previewable.
+    navigation.navigate('Main', { screen: 'Home' });
   };
 
   return (
