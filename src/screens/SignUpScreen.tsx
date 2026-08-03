@@ -2,34 +2,176 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
+import { FunctionsHttpError } from '@supabase/supabase-js';
+import * as Clipboard from 'expo-clipboard';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from '../navigation/types';
+import { supabase } from '../lib/supabase';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import Badge from '../components/Badge';
 import GradientText from '../components/GradientText';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
-import SelectField from '../components/SelectField';
 import PrimaryButton from '../components/PrimaryButton';
 import WhatsAppHelpCard from '../components/WhatsAppHelpCard';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
+type CreatedAccount = {
+  email: string;
+  password: string;
+};
+
 export default function SignUpScreen({ navigation }: Props) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [country, setCountry] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [createdAccount, setCreatedAccount] = useState<CreatedAccount | null>(
+    null
+  );
+  const [copiedField, setCopiedField] = useState<'email' | 'password' | null>(
+    null
+  );
 
   const handleOpenBroker = () => {
     // TODO: open PrimeXBT signup link via Linking.openURL
   };
 
-  const handleContinue = () => {
-    // TODO: wire up Supabase account creation here
+  const handleCopy = async (field: 'email' | 'password', value: string) => {
+    await Clipboard.setStringAsync(value);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 1500);
   };
+
+  const handleContinue = async () => {
+    if (
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !email.trim() ||
+      !country.trim() ||
+      !whatsapp.trim()
+    ) {
+      setError('Please fill in all fields.');
+      return;
+    }
+    if (!agreed) {
+      setError('Please agree to the Terms & Conditions to continue.');
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+
+    const { data, error: fnError } = await supabase.functions.invoke(
+      'submit-onboarding-lead',
+      {
+        body: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          country: country.trim(),
+          phone: whatsapp.trim(),
+        },
+      }
+    );
+
+    setSubmitting(false);
+
+    if (fnError) {
+      let message = 'Something went wrong. Please try again.';
+      if (fnError instanceof FunctionsHttpError) {
+        try {
+          const body = await fnError.context.json();
+          message = body.error ?? message;
+        } catch {
+          // keep the default message if the error body isn't JSON
+        }
+      }
+      setError(message);
+      return;
+    }
+
+    if (data?.password) {
+      setCreatedAccount({ email: data.email, password: data.password });
+    } else {
+      setError(
+        data?.message ??
+          'An account already exists for this email. Please log in.'
+      );
+    }
+  };
+
+  if (createdAccount) {
+    return (
+      <ScreenShell>
+        <TopBar
+          pillLabel="Log in"
+          onPillPress={() => navigation.navigate('Login')}
+        />
+
+        <View style={styles.badgeRow}>
+          <Badge icon="check" label="Account created" />
+        </View>
+
+        <View style={styles.heading}>
+          <Text style={styles.headingLine}>You're</Text>
+          <GradientText style={[styles.headingLine, styles.headingAccent]}>
+            in!
+          </GradientText>
+        </View>
+        <Text style={styles.subtitle}>
+          Save these details — you'll need them to log in. We've also
+          emailed them to you.
+        </Text>
+
+        <GlassCard style={styles.card}>
+          <Text style={styles.credentialLabel}>EMAIL</Text>
+          <Pressable
+            style={styles.credentialRow}
+            onPress={() => handleCopy('email', createdAccount.email)}
+          >
+            <Text style={styles.credentialValue}>{createdAccount.email}</Text>
+            <Feather
+              name={copiedField === 'email' ? 'check' : 'copy'}
+              size={16}
+              color={colors.textFaint}
+            />
+          </Pressable>
+
+          <Text style={[styles.credentialLabel, styles.fieldSpaced]}>
+            PASSWORD
+          </Text>
+          <Pressable
+            style={styles.credentialRow}
+            onPress={() => handleCopy('password', createdAccount.password)}
+          >
+            <Text style={styles.credentialValue}>
+              {createdAccount.password}
+            </Text>
+            <Feather
+              name={copiedField === 'password' ? 'check' : 'copy'}
+              size={16}
+              color={colors.textFaint}
+            />
+          </Pressable>
+
+          <PrimaryButton
+            label="Log in now"
+            onPress={() => navigation.navigate('Login')}
+            style={styles.fieldSpaced}
+          />
+        </GlassCard>
+
+        <WhatsAppHelpCard />
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell>
@@ -126,9 +268,12 @@ export default function SignUpScreen({ navigation }: Props) {
         />
 
         <View style={[styles.row, styles.fieldSpaced]}>
-          <SelectField
+          <FormInput
             label="COUNTRY"
-            placeholder="Select country"
+            value={country}
+            onChangeText={setCountry}
+            placeholder="Your country"
+            autoCapitalize="words"
             containerStyle={styles.rowField}
           />
           <FormInput
@@ -155,9 +300,12 @@ export default function SignUpScreen({ navigation }: Props) {
           </Text>
         </Pressable>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <PrimaryButton
-          label="Continue"
+          label={submitting ? 'Creating account...' : 'Continue'}
           onPress={handleContinue}
+          disabled={submitting}
           style={styles.fieldSpaced}
         />
       </GlassCard>
@@ -182,6 +330,9 @@ export default function SignUpScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  badgeRow: {
+    marginTop: 24,
+  },
   eyebrow: {
     color: colors.link,
     fontSize: 13,
@@ -192,7 +343,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 16,
   },
   headingLine: {
     fontSize: 34,
@@ -309,6 +460,12 @@ const styles = StyleSheet.create({
     color: colors.link,
     fontWeight: '600',
   },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 13,
+    marginTop: 16,
+    textAlign: 'center',
+  },
   disclaimer: {
     color: colors.textFaint,
     fontSize: 11,
@@ -325,5 +482,28 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: 'center',
     marginTop: 12,
+  },
+  credentialLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    marginBottom: 8,
+  },
+  credentialRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1.5,
+    borderColor: colors.inputBorder,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    height: 52,
+  },
+  credentialValue: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
