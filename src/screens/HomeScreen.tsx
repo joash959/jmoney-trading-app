@@ -20,6 +20,7 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
+import IconTile, { iconTileGradients } from '../components/IconTile';
 import VideoCard from '../components/VideoCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
@@ -162,6 +163,60 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
+  const quickActions = [
+    {
+      icon: 'book-open' as const,
+      label: 'Courses',
+      gradient: iconTileGradients.blue,
+      onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
+    },
+    {
+      icon: 'target' as const,
+      label: 'AI Scanner',
+      gradient: iconTileGradients.purple,
+      onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
+    },
+    {
+      icon: 'send' as const,
+      label: 'Telegram',
+      gradient: iconTileGradients.teal,
+      onPress: () =>
+        navigation.navigate('More', { screen: 'TelegramChannels' }),
+    },
+    {
+      icon: 'video' as const,
+      label: 'Live Sessions',
+      gradient: iconTileGradients.green,
+      onPress: () => navigation.navigate('Live'),
+    },
+    {
+      icon: 'bookmark' as const,
+      label: 'Journal',
+      gradient: iconTileGradients.gold,
+      onPress: () =>
+        navigation.navigate('More', { screen: 'TradingJournal' }),
+    },
+    {
+      icon: 'award' as const,
+      label: 'Leaderboard',
+      gradient: iconTileGradients.red,
+      onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
+    },
+    {
+      icon: 'bar-chart-2' as const,
+      label: 'Market Analysis',
+      gradient: iconTileGradients.blue,
+      onPress: () =>
+        navigation.navigate('More', { screen: 'MarketAnalysis' }),
+    },
+    {
+      icon: 'phone' as const,
+      label: 'Contact Us',
+      gradient: iconTileGradients.purple,
+      onPress: () => navigation.navigate('More', { screen: 'ContactUs' }),
+    },
+  ];
+
   return (
     <ScreenShell
       overlay={<FloatingChatButton />}
@@ -200,6 +255,18 @@ export default function HomeScreen({ navigation }: Props) {
           <SecondaryButton label="WhatsApp" icon="message-circle" />
         </View>
       </GlassCard>
+
+      <View style={[styles.quickActionsGrid, styles.cardSpaced]}>
+        {quickActions.map((action) => (
+          <IconTile
+            key={action.label}
+            icon={action.icon}
+            label={action.label}
+            gradient={action.gradient}
+            onPress={action.onPress}
+          />
+        ))}
+      </View>
 
       <AccentCard style={styles.cardSpaced}>
         <View style={styles.cardHeadingRow}>
@@ -382,6 +449,12 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   greetingCard: {
     marginTop: 16,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 18,
   },
   greetingHeadingRow: {
     flexDirection: 'row',
