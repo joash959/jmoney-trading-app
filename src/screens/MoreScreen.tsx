@@ -90,7 +90,11 @@ export default function MoreScreen({ navigation }: Props) {
         />
         <MenuRow icon="briefcase" label="Recommended Broker" />
         <MenuRow icon="bar-chart-2" label="Market Analysis" />
-        <MenuRow icon="award" label="Leaderboard" />
+        <MenuRow
+          icon="award"
+          label="Leaderboard"
+          onPress={() => rootNavigation?.navigate('Leaderboard')}
+        />
       </View>
 
       <SectionLabel>ACCOUNT</SectionLabel>

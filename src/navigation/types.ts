@@ -15,4 +15,5 @@ export type RootStackParamList = {
   AIScanner: undefined;
   TelegramChannels: undefined;
   TradingJournal: undefined;
+  Leaderboard: undefined;
 };
