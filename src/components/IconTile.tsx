@@ -66,7 +66,7 @@ export default function IconTile({
 
 const styles = StyleSheet.create({
   wrap: {
-    width: 76,
+    width: '23%',
     alignItems: 'center',
   },
   pressed: {

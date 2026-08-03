@@ -5,6 +5,10 @@ export const colors = {
   cardBorderTop: 'rgba(255,255,255,0.24)',
   surfaceElevated: 'rgba(255,255,255,0.1)',
   borderStrong: 'rgba(255,255,255,0.18)',
+  // Flat, solid-fill surfaces (no blur) - the PrimeXBT-style dashboard look.
+  surface: '#12161F',
+  surfaceAlt: '#1A2030',
+  surfaceTrack: '#1E2534',
   inputBackground: 'rgba(255,255,255,0.06)',
   inputBorder: 'rgba(255,255,255,0.14)',
   overlay: 'rgba(5,7,14,0.72)',

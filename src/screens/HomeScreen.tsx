@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { spacing } from '../theme/spacing';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { parseFunctionError } from '../lib/functionError';
@@ -13,9 +14,10 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import Badge from '../components/Badge';
-import GradientText from '../components/GradientText';
-import GlassCard from '../components/GlassCard';
-import AccentCard from '../components/AccentCard';
+import SurfaceCard from '../components/SurfaceCard';
+import SegmentedBar from '../components/SegmentedBar';
+import PromoCarousel from '../components/PromoCarousel';
+import SentimentPoll from '../components/SentimentPoll';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
@@ -41,6 +43,8 @@ type ContinueCourse = {
   title: string;
 };
 
+const PROGRESS_SEGMENTS_MAX = 10;
+
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
@@ -62,15 +66,23 @@ export default function HomeScreen({ navigation }: Props) {
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
     null
   );
+  const [coursesTotal, setCoursesTotal] = useState(0);
+  const [coursesStarted, setCoursesStarted] = useState(0);
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
+  const isPremium = profile?.tier === 'premium';
 
   const fetchData = async () => {
-    const [{ data: lessonData }, { data: progressData }] = await Promise.all([
+    const [
+      { data: lessonData },
+      { data: progressData },
+      { count: totalCount },
+      { data: progressRows },
+    ] = await Promise.all([
       supabase
         .from('lessons')
         .select(
@@ -84,6 +96,8 @@ export default function HomeScreen({ navigation }: Props) {
         .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
+      supabase.from('courses').select('id', { count: 'exact', head: true }),
+      supabase.from('user_course_progress').select('course_id'),
     ]);
 
     if (lessonData) {
@@ -106,6 +120,11 @@ export default function HomeScreen({ navigation }: Props) {
             title: progressRow.courses?.title ?? 'Your course',
           }
         : null
+    );
+
+    setCoursesTotal(totalCount ?? 0);
+    setCoursesStarted(
+      new Set((progressRows ?? []).map((row: any) => row.course_id)).size
     );
   };
 
@@ -217,6 +236,47 @@ export default function HomeScreen({ navigation }: Props) {
     },
   ];
 
+  const promoItems = [
+    {
+      icon: 'target' as const,
+      title: 'Scan any chart',
+      subtitle: 'Let AI mark key levels and call the trend instantly.',
+      gradient: iconTileGradients.purple,
+      onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
+    },
+    {
+      icon: 'send' as const,
+      title: 'Join the community',
+      subtitle: 'Live trade alerts and mentorship, the moment you\'re funded.',
+      gradient: iconTileGradients.teal,
+      onPress: () =>
+        navigation.navigate('More', { screen: 'TelegramChannels' }),
+    },
+    {
+      icon: 'award' as const,
+      title: 'Climb the leaderboard',
+      subtitle: 'Compete with other traders for real prizes.',
+      gradient: iconTileGradients.gold,
+      onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
+    },
+    {
+      icon: 'book-open' as const,
+      title: 'Keep learning',
+      subtitle: "New lessons added regularly — pick up where you left off.",
+      gradient: iconTileGradients.blue,
+      onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
+    },
+  ];
+
+  const displaySegments = Math.max(Math.min(coursesTotal, PROGRESS_SEGMENTS_MAX), 1);
+  const filledSegments =
+    coursesTotal > 0
+      ? Math.max(
+          Math.round((coursesStarted / coursesTotal) * displaySegments),
+          coursesStarted > 0 ? 1 : 0
+        )
+      : 0;
+
   return (
     <ScreenShell
       overlay={<FloatingChatButton />}
@@ -234,15 +294,23 @@ export default function HomeScreen({ navigation }: Props) {
         }
       />
 
-      <GlassCard style={styles.greetingCard}>
-        <Badge icon="star" label={getGreeting()} />
-        <View style={styles.greetingHeadingRow}>
-          <Text style={styles.greetingHeading}>Welcome back, </Text>
-          <GradientText style={styles.greetingHeading}>
-            {firstName}
-          </GradientText>
-          <Text style={styles.greetingHeading}>!</Text>
+      <SurfaceCard style={styles.heroCard}>
+        <View style={styles.heroTopRow}>
+          <Badge icon="star" label={getGreeting()} />
+          <View style={styles.tierPill}>
+            <Feather
+              name={isPremium ? 'award' : 'lock'}
+              size={11}
+              color={isPremium ? colors.warning : colors.textFaint}
+            />
+            <Text
+              style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
+            >
+              {isPremium ? 'PREMIUM' : 'FREE PLAN'}
+            </Text>
+          </View>
         </View>
+        <Text style={styles.greetingHeading}>Welcome back, {firstName}!</Text>
         <Text style={styles.greetingSubtitle}>
           Discover the secrets of Forex Markets and become the NEXT
           MILLIONAIRE!
@@ -250,25 +318,57 @@ export default function HomeScreen({ navigation }: Props) {
         <View style={styles.greetingButtons}>
           <PrimaryButton
             label="Get Started"
+            variant="flat"
             style={styles.getStartedButton}
           />
           <SecondaryButton label="WhatsApp" icon="message-circle" />
         </View>
-      </GlassCard>
+      </SurfaceCard>
 
-      <View style={[styles.quickActionsGrid, styles.cardSpaced]}>
-        {quickActions.map((action) => (
-          <IconTile
-            key={action.label}
-            icon={action.icon}
-            label={action.label}
-            gradient={action.gradient}
-            onPress={action.onPress}
-          />
-        ))}
+      <SurfaceCard style={styles.cardSpaced}>
+        <View style={styles.progressHeaderRow}>
+          <Text style={styles.cardHeading}>Your Progress</Text>
+          <Feather name="chevron-right" size={18} color={colors.textFaint} />
+        </View>
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>Courses started</Text>
+          <View style={styles.countPill}>
+            <Text style={styles.countPillText}>
+              {coursesStarted}/{coursesTotal || '—'}
+            </Text>
+          </View>
+        </View>
+        <SegmentedBar
+          segments={displaySegments}
+          filled={filledSegments}
+          filledColor={colors.warning}
+          style={styles.progressBarSpaced}
+        />
+      </SurfaceCard>
+
+      <SurfaceCard style={styles.cardSpaced}>
+        <View style={styles.quickActionsGrid}>
+          {quickActions.map((action) => (
+            <IconTile
+              key={action.label}
+              icon={action.icon}
+              label={action.label}
+              gradient={action.gradient}
+              onPress={action.onPress}
+            />
+          ))}
+        </View>
+      </SurfaceCard>
+
+      <View style={styles.cardSpaced}>
+        <PromoCarousel items={promoItems} />
       </View>
 
-      <AccentCard style={styles.cardSpaced}>
+      <View style={styles.cardSpaced}>
+        <SentimentPoll />
+      </View>
+
+      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
         <View style={styles.cardHeadingRow}>
           <Feather name="shield" size={18} color={colors.text} />
           <Text style={styles.cardHeading}>Connect your PrimeXBT account</Text>
@@ -303,6 +403,7 @@ export default function HomeScreen({ navigation }: Props) {
         <PrimaryButton
           label={verifyLoading ? 'Checking...' : 'Connect & unlock premium'}
           icon="shield"
+          variant="flat"
           disabled={clientId.trim().length === 0 || verifyLoading}
           onPress={handleConnect}
           style={styles.fieldSpaced}
@@ -317,9 +418,9 @@ export default function HomeScreen({ navigation }: Props) {
           }
           style={styles.fieldSpaced}
         />
-      </AccentCard>
+      </SurfaceCard>
 
-      <AccentCard style={styles.cardSpaced}>
+      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
         <View style={styles.cardHeadingRow}>
           <Feather name="send" size={18} color={colors.link} />
           <Text style={styles.cardHeading}>Private members channel</Text>
@@ -336,7 +437,7 @@ export default function HomeScreen({ navigation }: Props) {
             verified.
           </Text>
         </View>
-      </AccentCard>
+      </SurfaceCard>
 
       <View style={[styles.statsRow, styles.cardSpaced]}>
         <StatCard
@@ -447,8 +548,31 @@ export default function HomeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  greetingCard: {
+  heroCard: {
     marginTop: 16,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  tierPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: colors.surfaceAlt,
+  },
+  tierPillText: {
+    color: colors.textFaint,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  tierPillTextPremium: {
+    color: colors.warning,
   },
   quickActionsGrid: {
     flexDirection: 'row',
@@ -456,13 +580,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 18,
   },
-  greetingHeadingRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 14,
-  },
   greetingHeading: {
     color: colors.text,
+    marginTop: spacing.md,
     ...typography.display,
   },
   greetingSubtitle: {
@@ -482,6 +602,39 @@ const styles = StyleSheet.create({
   },
   cardSpaced: {
     marginTop: 20,
+  },
+  accentBorder: {
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accentBlue,
+  },
+  progressHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 14,
+  },
+  progressLabel: {
+    color: colors.textMuted,
+    fontSize: 14,
+  },
+  countPill: {
+    backgroundColor: colors.warningDim,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  countPillText: {
+    color: colors.warning,
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  progressBarSpaced: {
+    marginTop: 12,
   },
   cardHeadingRow: {
     flexDirection: 'row',

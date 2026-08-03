@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import CoursesStackNavigator from './CoursesStackNavigator';
 import AlertsScreen from '../screens/AlertsScreen';
@@ -31,12 +31,14 @@ export default function MainTabNavigator() {
         tabBarInactiveTintColor: colors.textFaint,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
-        tabBarIcon: ({ color, size }) => (
-          <Feather
-            name={ICONS[route.name as keyof MainTabParamList]}
-            size={size - 4}
-            color={color}
-          />
+        tabBarIcon: ({ focused, color, size }) => (
+          <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+            <Feather
+              name={ICONS[route.name as keyof MainTabParamList]}
+              size={size - 4}
+              color={focused ? colors.text : color}
+            />
+          </View>
         ),
         tabBarBadge: route.name === 'Alerts' ? 11 : undefined,
         tabBarBadgeStyle: styles.badge,
@@ -62,5 +64,15 @@ const styles = StyleSheet.create({
   },
   badge: {
     backgroundColor: colors.accentRed,
+  },
+  iconWrap: {
+    width: 38,
+    height: 30,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapActive: {
+    backgroundColor: colors.accentBlue,
   },
 });
