@@ -21,7 +21,7 @@ const WIDGET_HTML = `
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <style>
-      html, body { margin: 0; padding: 0; background: #05070E; }
+      html, body { margin: 0; padding: 0; background: #0A0A0D; }
       .tradingview-widget-container { margin-bottom: 12px; }
     </style>
   </head>
@@ -39,7 +39,7 @@ const WIDGET_HTML = `
           "theme": "dark",
           "style": "1",
           "locale": "en",
-          "toolbar_bg": "#05070E",
+          "toolbar_bg": "#0A0A0D",
           "enable_publishing": false,
           "allow_symbol_change": true,
           "hide_side_toolbar": true,
