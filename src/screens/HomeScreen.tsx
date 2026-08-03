@@ -3,6 +3,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { parseFunctionError } from '../lib/functionError';
@@ -389,8 +390,7 @@ const styles = StyleSheet.create({
   },
   greetingHeading: {
     color: colors.text,
-    fontSize: 24,
-    fontWeight: '800',
+    ...typography.display,
   },
   greetingSubtitle: {
     color: colors.textMuted,

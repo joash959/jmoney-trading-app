@@ -30,9 +30,10 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
+    borderTopColor: colors.cardBorderTop,
     borderRadius: radius.xl,
     padding: spacing.lg,
     overflow: 'hidden',

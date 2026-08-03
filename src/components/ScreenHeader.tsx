@@ -3,6 +3,7 @@ import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
+import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
@@ -25,7 +26,7 @@ export default function ScreenHeader({
     <View style={[styles.wrap, style]}>
       <View style={styles.row}>
         <View style={styles.iconCircle}>
-          <Feather name={icon} size={20} color={colors.link} />
+          <Feather name={icon} size={22} color={colors.link} />
         </View>
         <Text style={styles.title} numberOfLines={1}>
           {title}
@@ -39,25 +40,26 @@ export default function ScreenHeader({
 
 const styles = StyleSheet.create({
   wrap: {
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm + 2,
   },
   iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
+    width: 48,
+    height: 48,
+    borderRadius: radius.lg,
     backgroundColor: colors.accentBlueDim,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.glow,
   },
   title: {
     flex: 1,
     color: colors.text,
-    ...typography.title2,
+    ...typography.title1,
   },
   subtitle: {
     color: colors.textMuted,
