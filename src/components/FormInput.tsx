@@ -1,17 +1,9 @@
 import { ReactNode } from 'react';
-import {
-  Animated,
-  KeyboardTypeOptions,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { Animated, KeyboardTypeOptions, StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
+import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 import { radius } from '../theme/radius';
 import { useFocusGlow } from '../hooks/useFocusGlow';
 
@@ -90,5 +82,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text,
     fontSize: 15,
+    fontFamily: fonts.interRegular,
   },
 });

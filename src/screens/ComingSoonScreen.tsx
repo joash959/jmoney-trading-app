@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import ScreenShell from '../components/ScreenShell';

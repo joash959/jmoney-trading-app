@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { fonts } from '../theme/fonts';
 import { radius } from '../theme/radius';
 import { useFocusGlow } from '../hooks/useFocusGlow';
 
@@ -53,5 +54,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text,
     fontSize: 15,
+    fontFamily: fonts.interRegular,
   },
 });

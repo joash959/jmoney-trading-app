@@ -1,12 +1,6 @@
 import { useRef } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleProp,
-  StyleSheet,
-  Text,
-  ViewStyle,
-} from 'react-native';
+import { Animated, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
