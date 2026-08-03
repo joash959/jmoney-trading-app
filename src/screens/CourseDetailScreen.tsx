@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import YoutubePlayer from 'react-native-youtube-iframe';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
@@ -21,6 +20,7 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import Pill from '../components/Pill';
 import FloatingChatButton from '../components/FloatingChatButton';
+import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
 
 type Props = NativeStackScreenProps<CoursesStackParamList, 'CourseDetail'>;
 
@@ -166,12 +166,10 @@ export default function CourseDetailScreen({ route }: Props) {
         <>
           <View style={[styles.videoWrap, styles.cardSpaced]}>
             {youtubeId ? (
-              <YoutubePlayer
-                key={youtubeId}
-                height={videoHeight}
-                width={videoWidth}
+              <YoutubeLessonPlayer
                 videoId={youtubeId}
-                play
+                width={videoWidth}
+                height={videoHeight}
               />
             ) : activeLesson?.video_url ? (
               <VideoView
