@@ -16,4 +16,5 @@ export type RootStackParamList = {
   TelegramChannels: undefined;
   TradingJournal: undefined;
   Leaderboard: undefined;
+  RecommendedBroker: undefined;
 };

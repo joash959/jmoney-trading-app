@@ -6,6 +6,7 @@ import AISuperScannerScreen from '../screens/AISuperScannerScreen';
 import TelegramChannelsScreen from '../screens/TelegramChannelsScreen';
 import TradingJournalScreen from '../screens/TradingJournalScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
+import RecommendedBrokerScreen from '../screens/RecommendedBrokerScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from './types';
@@ -39,6 +40,10 @@ export default function RootNavigator() {
         />
         <Stack.Screen name="TradingJournal" component={TradingJournalScreen} />
         <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Stack.Screen
+          name="RecommendedBroker"
+          component={RecommendedBrokerScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
