@@ -32,8 +32,24 @@ export default function CourseDetailScreen({ route }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   const player = useVideoPlayer(null);
+
+  useEffect(() => {
+    const subscription = player.addListener(
+      'statusChange',
+      ({ status, error: statusError }) => {
+        console.log('[video] statusChange', status, statusError);
+        if (status === 'error') {
+          setPlaybackError(statusError?.message ?? 'Unknown playback error');
+        } else {
+          setPlaybackError(null);
+        }
+      }
+    );
+    return () => subscription.remove();
+  }, [player]);
 
   const hasPremiumAccess = profile?.tier === 'premium';
 
@@ -150,6 +166,13 @@ export default function CourseDetailScreen({ route }: Props) {
             )}
           </View>
 
+          {__DEV__ && (
+            <Text style={styles.debugText}>
+              video_url: {activeLesson?.video_url ?? '(none)'}
+              {playbackError ? `\nplayer error: ${playbackError}` : ''}
+            </Text>
+          )}
+
           <Text style={styles.courseTitle}>{course.title}</Text>
           <View style={styles.metaRow}>
             {course.level && <Pill label={course.level} color={colors.accentGreen} />}
@@ -255,6 +278,11 @@ const styles = StyleSheet.create({
   videoPlaceholderText: {
     color: colors.textFaint,
     fontSize: 13,
+  },
+  debugText: {
+    color: colors.accentRed,
+    fontSize: 11,
+    marginTop: 8,
   },
   courseTitle: {
     color: colors.text,
