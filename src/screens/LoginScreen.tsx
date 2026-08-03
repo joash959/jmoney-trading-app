@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -108,14 +109,11 @@ export default function LoginScreen() {
           >
             <View style={styles.topBar}>
               <View style={styles.logoRow}>
-                <LinearGradient
-                  colors={gradients.brand}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+                <Image
+                  source={require('../../assets/jmoney-mark.png')}
                   style={styles.logoMark}
-                >
-                  <Feather name="trending-up" size={18} color={colors.text} />
-                </LinearGradient>
+                  resizeMode="contain"
+                />
                 <Text style={styles.logoText}>JMONEY</Text>
               </View>
               <Pressable style={styles.signUpPill}>
