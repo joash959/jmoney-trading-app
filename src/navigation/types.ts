@@ -13,4 +13,5 @@ export type RootStackParamList = {
   SignUp: undefined;
   Main: NavigatorScreenParams<MainTabParamList>;
   AIScanner: undefined;
+  TelegramChannels: undefined;
 };

@@ -69,7 +69,11 @@ export default function MoreScreen({ navigation }: Props) {
           label="AI Super Scanner"
           onPress={() => rootNavigation?.navigate('AIScanner')}
         />
-        <MenuRow icon="sliders" label="Telegram Channels" />
+        <MenuRow
+          icon="sliders"
+          label="Telegram Channels"
+          onPress={() => rootNavigation?.navigate('TelegramChannels')}
+        />
         <MenuRow
           icon="video"
           label="Live Sessions"
