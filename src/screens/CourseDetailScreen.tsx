@@ -381,13 +381,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   premiumPill: {
-    backgroundColor: 'rgba(245,197,24,0.12)',
+    backgroundColor: colors.warningDim,
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
   premiumPillText: {
-    color: '#F5C518',
+    color: colors.warning,
     fontSize: 10,
     fontWeight: '700',
   },

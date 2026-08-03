@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   name: string;
@@ -14,7 +15,7 @@ export default function RatingCard({ name, rating }: Props) {
         {name}
       </Text>
       <View style={styles.ratingRow}>
-        <Feather name="star" size={13} color="#F5C518" />
+        <Feather name="star" size={13} color={colors.warning} />
         <Text style={styles.rating}>{rating}</Text>
       </View>
     </View>
@@ -31,6 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 6,
+    ...shadows.sm,
   },
   name: {
     color: colors.textMuted,

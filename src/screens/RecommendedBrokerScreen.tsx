@@ -109,7 +109,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         />
       </AccentCard>
 
-      <GlassCard style={[styles.cardSpaced, styles.statsCard]}>
+      <GlassCard style={styles.cardSpaced} contentStyle={styles.statsCard}>
         <View style={styles.statsRow}>
           {STATS.slice(0, 2).map((stat, i) => (
             <View
@@ -215,7 +215,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         style={styles.fieldSpaced}
       />
 
-      <GlassCard style={[styles.cardSpaced, styles.ctaCard]}>
+      <GlassCard style={styles.cardSpaced} contentStyle={styles.ctaCard}>
         <Feather name="globe" size={30} color={colors.link} />
         <Text style={styles.ctaTitle}>Ready to Start Trading?</Text>
         <Text style={styles.ctaDescription}>

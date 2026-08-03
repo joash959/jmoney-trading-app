@@ -2,6 +2,7 @@ import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-n
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   eyebrow: string;
@@ -21,18 +22,23 @@ export default function VideoCard({
   style,
 }: Props) {
   return (
-    <Pressable style={[styles.card, style]} onPress={onPress}>
-      <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
-        <Text style={styles.eyebrow} numberOfLines={2}>
-          {eyebrow}
-        </Text>
-        <View style={styles.playCircle}>
-          <Feather name="play" size={16} color={colors.text} />
-        </View>
-        <View style={styles.durationBadge}>
-          <Text style={styles.durationText}>{duration}</Text>
-        </View>
-      </LinearGradient>
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
+      onPress={onPress}
+    >
+      <View style={styles.thumbShadow}>
+        <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
+          <Text style={styles.eyebrow} numberOfLines={2}>
+            {eyebrow}
+          </Text>
+          <View style={styles.playCircle}>
+            <Feather name="play" size={16} color={colors.text} />
+          </View>
+          <View style={styles.durationBadge}>
+            <Text style={styles.durationText}>{duration}</Text>
+          </View>
+        </LinearGradient>
+      </View>
       <Text style={styles.title} numberOfLines={2}>
         {title}
       </Text>
@@ -45,6 +51,13 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
   },
+  pressed: {
+    opacity: 0.85,
+  },
+  thumbShadow: {
+    borderRadius: 16,
+    ...shadows.sm,
+  },
   thumb: {
     aspectRatio: 1.1,
     borderRadius: 16,
@@ -53,7 +66,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   eyebrow: {
-    color: '#F5C518',
+    color: colors.warning,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.5,

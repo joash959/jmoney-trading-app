@@ -8,7 +8,11 @@ type Props = {
 };
 
 export default function AccentCard({ children, style }: Props) {
-  return <GlassCard style={[styles.accent, style]}>{children}</GlassCard>;
+  return (
+    <GlassCard style={style} contentStyle={styles.accent}>
+      {children}
+    </GlassCard>
+  );
 }
 
 const styles = StyleSheet.create({

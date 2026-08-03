@@ -11,6 +11,8 @@ import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   label: string;
@@ -69,7 +71,7 @@ export default function PrimaryButton({
             colors={gradients.button}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={[styles.button, style]}
+            style={[styles.button, styles.gradientShadow, style]}
           >
             {content}
           </LinearGradient>
@@ -90,10 +92,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     height: 54,
-    borderRadius: 18,
+    borderRadius: radius.lg,
+  },
+  gradientShadow: {
+    ...shadows.glow,
   },
   flatButton: {
     backgroundColor: colors.accentBlue,
+    ...shadows.sm,
   },
   buttonText: {
     color: colors.text,

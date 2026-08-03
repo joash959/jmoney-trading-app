@@ -1,6 +1,9 @@
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
+import { shadows } from '../theme/shadows';
+import { spacing } from '../theme/spacing';
 
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
@@ -49,8 +52,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: radius.lg,
+    padding: spacing.sm + 2,
+    ...shadows.sm,
   },
   topRow: {
     flexDirection: 'row',

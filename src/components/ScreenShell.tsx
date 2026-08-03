@@ -3,6 +3,7 @@ import {
   Animated,
   KeyboardAvoidingView,
   Platform,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,9 +14,16 @@ import GlowBackground from './GlowBackground';
 type Props = {
   children: ReactNode;
   overlay?: ReactNode;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 };
 
-export default function ScreenShell({ children, overlay }: Props) {
+export default function ScreenShell({
+  children,
+  overlay,
+  refreshing,
+  onRefresh,
+}: Props) {
   const opacity = useRef(new Animated.Value(0)).current;
   const offset = useRef(new Animated.Value(24)).current;
 
@@ -44,6 +52,16 @@ export default function ScreenShell({ children, overlay }: Props) {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl
+                refreshing={!!refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.accentBlue}
+                colors={[colors.accentBlue]}
+              />
+            ) : undefined
+          }
         >
           <Animated.View
             style={{ opacity, transform: [{ translateY: offset }] }}

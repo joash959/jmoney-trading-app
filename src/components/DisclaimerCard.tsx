@@ -1,6 +1,7 @@
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 18,
+    borderRadius: radius.lg,
     padding: 16,
   },
   text: {

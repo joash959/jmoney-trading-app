@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
+import { shadows } from '../theme/shadows';
 
 type Props = {
   level: string;
@@ -36,50 +37,62 @@ export default function CourseCard({
   onPress,
 }: Props) {
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
-        <View style={styles.levelPill}>
-          <Text style={styles.levelText}>{level}</Text>
-        </View>
-        <Text style={styles.eyebrow} numberOfLines={2}>
-          {eyebrow}
-        </Text>
-        <View style={styles.avatarWrap}>
-          <LinearGradient colors={gradients.brand} style={styles.avatar}>
-            <Text style={styles.avatarText}>{getInitials(instructor)}</Text>
-          </LinearGradient>
-          <View style={styles.playBadge}>
-            <Feather name="play" size={12} color={colors.text} />
+    <Pressable
+      style={({ pressed }) => [styles.cardShadow, pressed && styles.pressed]}
+      onPress={onPress}
+    >
+      <View style={styles.card}>
+        <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
+          <View style={styles.levelPill}>
+            <Text style={styles.levelText}>{level}</Text>
           </View>
-        </View>
-      </LinearGradient>
-
-      <View style={styles.body}>
-        <Text style={styles.category}>{category}</Text>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.description} numberOfLines={2}>
-          {description}
-        </Text>
-
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Feather name="clock" size={13} color={colors.textFaint} />
-            <Text style={styles.metaText}>{duration}</Text>
+          <Text style={styles.eyebrow} numberOfLines={2}>
+            {eyebrow}
+          </Text>
+          <View style={styles.avatarWrap}>
+            <LinearGradient colors={gradients.brand} style={styles.avatar}>
+              <Text style={styles.avatarText}>{getInitials(instructor)}</Text>
+            </LinearGradient>
+            <View style={styles.playBadge}>
+              <Feather name="play" size={12} color={colors.text} />
+            </View>
           </View>
-          <View style={styles.metaItem}>
-            <Feather name="book" size={13} color={colors.textFaint} />
-            <Text style={styles.metaText}>{lessons} lessons</Text>
-          </View>
-        </View>
+        </LinearGradient>
 
-        <View style={styles.divider} />
-        <Text style={styles.instructor}>{instructor}</Text>
+        <View style={styles.body}>
+          <Text style={styles.category}>{category}</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {description}
+          </Text>
+
+          <View style={styles.metaRow}>
+            <View style={styles.metaItem}>
+              <Feather name="clock" size={13} color={colors.textFaint} />
+              <Text style={styles.metaText}>{duration}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Feather name="book" size={13} color={colors.textFaint} />
+              <Text style={styles.metaText}>{lessons} lessons</Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+          <Text style={styles.instructor}>{instructor}</Text>
+        </View>
       </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  cardShadow: {
+    borderRadius: 20,
+    ...shadows.sm,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
   card: {
     backgroundColor: colors.card,
     borderWidth: 1,
@@ -104,7 +117,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   eyebrow: {
-    color: '#F5C518',
+    color: colors.warning,
     fontSize: 15,
     fontWeight: '800',
     letterSpacing: 0.3,

@@ -24,7 +24,7 @@ export default function EmptyStateCard({
   style,
 }: Props) {
   return (
-    <GlassCard style={[styles.card, style]}>
+    <GlassCard style={style} contentStyle={styles.card}>
       {iconVariant === 'circle' ? (
         <View style={styles.iconCircle}>
           <Feather name={icon} size={22} color={colors.link} />

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
@@ -11,6 +11,7 @@ import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
+import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
@@ -50,54 +51,54 @@ export default function AlertsScreen({ navigation }: Props) {
   const [longCount, setLongCount] = useState(0);
   const [shortCount, setShortCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  const fetchAlerts = useCallback(async () => {
+    const [{ data: alertData, error: alertError }, { data: signalData }] =
+      await Promise.all([
+        supabase
+          .from('trade_alerts')
+          .select('id, message, created_at')
+          .order('created_at', { ascending: false })
+          .limit(30),
+        supabase
+          .from('trading_signals')
+          .select('signal_type')
+          .gte(
+            'created_at',
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+          ),
+      ]);
 
-    (async () => {
-      const [{ data: alertData, error: alertError }, { data: signalData }] =
-        await Promise.all([
-          supabase
-            .from('trade_alerts')
-            .select('id, message, created_at')
-            .order('created_at', { ascending: false })
-            .limit(30),
-          supabase
-            .from('trading_signals')
-            .select('signal_type')
-            .gte(
-              'created_at',
-              new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-            ),
-        ]);
+    if (alertError) {
+      setError(alertError.message);
+      return;
+    }
 
-      if (cancelled) return;
+    setError(null);
+    setAlerts((alertData as TradeAlert[]) ?? []);
 
-      if (alertError) {
-        setError(alertError.message);
-        setLoading(false);
-        return;
-      }
-
-      setAlerts((alertData as TradeAlert[]) ?? []);
-
-      let long = 0;
-      let short = 0;
-      (signalData ?? []).forEach((row: any) => {
-        const type = (row.signal_type ?? '').toLowerCase();
-        if (type.includes('buy') || type.includes('long')) long += 1;
-        else if (type.includes('sell') || type.includes('short')) short += 1;
-      });
-      setLongCount(long);
-      setShortCount(short);
-      setLoading(false);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    let long = 0;
+    let short = 0;
+    (signalData ?? []).forEach((row: any) => {
+      const type = (row.signal_type ?? '').toLowerCase();
+      if (type.includes('buy') || type.includes('long')) long += 1;
+      else if (type.includes('sell') || type.includes('short')) short += 1;
+    });
+    setLongCount(long);
+    setShortCount(short);
   }, []);
+
+  useEffect(() => {
+    fetchAlerts().then(() => setLoading(false));
+  }, [fetchAlerts]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAlerts();
+    setRefreshing(false);
+  };
 
   const todayCount = alerts.filter((alert) => {
     const created = new Date(alert.created_at);
@@ -110,7 +111,11 @@ export default function AlertsScreen({ navigation }: Props) {
   }).length;
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell
@@ -136,10 +141,21 @@ export default function AlertsScreen({ navigation }: Props) {
       </Text>
 
       {loading ? (
-        <ActivityIndicator
-          color={colors.accentBlue}
-          style={styles.fieldSpaced}
-        />
+        <View style={styles.fieldSpaced}>
+          <View style={styles.statsRow}>
+            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+          </View>
+          <View style={[styles.statsRow, styles.fieldSpaced]}>
+            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+          </View>
+          <View style={[styles.list, styles.sectionSpaced]}>
+            <Skeleton height={68} radius={16} />
+            <Skeleton height={68} radius={16} />
+            <Skeleton height={68} radius={16} />
+          </View>
+        </View>
       ) : error ? (
         <Text style={[styles.errorText, styles.fieldSpaced]}>
           Couldn't load alerts: {error}
@@ -275,5 +291,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     paddingVertical: 16,
+  },
+  skeletonFlex: {
+    flex: 1,
   },
 });

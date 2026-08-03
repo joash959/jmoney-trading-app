@@ -18,7 +18,10 @@ type Props = {
 
 export default function UploadDropzone({ title, subtitle, onPress, style }: Props) {
   return (
-    <Pressable style={[styles.zone, style]} onPress={onPress}>
+    <Pressable
+      style={({ pressed }) => [styles.zone, pressed && styles.pressed, style]}
+      onPress={onPress}
+    >
       <View style={styles.iconCircle}>
         <Feather name="upload" size={20} color={colors.link} />
       </View>
@@ -39,6 +42,9 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: 'rgba(78,140,255,0.45)',
     backgroundColor: 'rgba(47,111,239,0.08)',
+  },
+  pressed: {
+    opacity: 0.75,
   },
   iconCircle: {
     width: 56,

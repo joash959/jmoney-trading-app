@@ -13,7 +13,10 @@ export default function MenuRow({ icon, label, onPress, destructive }: Props) {
   const tint = destructive ? colors.accentRed : colors.text;
 
   return (
-    <Pressable style={styles.row} onPress={onPress}>
+    <Pressable
+      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+      onPress={onPress}
+    >
       <View style={styles.left}>
         <Feather name={icon} size={20} color={tint} />
         <Text style={[styles.label, { color: tint }]}>{label}</Text>
@@ -31,6 +34,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 14,
+    borderRadius: 12,
+  },
+  rowPressed: {
+    opacity: 0.6,
   },
   left: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,7 +22,7 @@ import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
-const GOLD = '#F5C518';
+const GOLD = colors.warning;
 const SILVER = '#C4C9D4';
 const BRONZE = '#D97B3F';
 
@@ -42,6 +42,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
     []
   );
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -51,21 +52,30 @@ export default function LeaderboardScreen({ navigation }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
 
-  useEffect(() => {
-    Promise.all([
-      supabase.from('leaderboard_settings').select('*').limit(1).maybeSingle(),
-      supabase
-        .from('leaderboard_participants')
-        .select('*')
-        .eq('is_active', true)
-        .order('rank', { ascending: true })
-        .limit(20),
-    ]).then(([{ data: settingsData }, { data: participantData }]) => {
-      setSettings((settingsData as LeaderboardSettings) ?? null);
-      setParticipants((participantData as LeaderboardParticipant[]) ?? []);
-      setLoading(false);
-    });
+  const fetchLeaderboard = useCallback(async () => {
+    const [{ data: settingsData }, { data: participantData }] =
+      await Promise.all([
+        supabase.from('leaderboard_settings').select('*').limit(1).maybeSingle(),
+        supabase
+          .from('leaderboard_participants')
+          .select('*')
+          .eq('is_active', true)
+          .order('rank', { ascending: true })
+          .limit(20),
+      ]);
+    setSettings((settingsData as LeaderboardSettings) ?? null);
+    setParticipants((participantData as LeaderboardParticipant[]) ?? []);
   }, []);
+
+  useEffect(() => {
+    fetchLeaderboard().then(() => setLoading(false));
+  }, [fetchLeaderboard]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchLeaderboard();
+    setRefreshing(false);
+  };
 
   const currency = settings?.currency_symbol ?? 'R';
   const prize1 = settings?.prize_1st ?? 20000;
@@ -131,7 +141,11 @@ export default function LeaderboardScreen({ navigation }: Props) {
   }
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell

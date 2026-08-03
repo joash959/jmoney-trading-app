@@ -63,44 +63,59 @@ export default function HomeScreen({ navigation }: Props) {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
   const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
 
-  useEffect(() => {
-    supabase
-      .from('lessons')
-      .select('id, title, duration_minutes, course_id, courses(title, instructor_name)')
-      .order('created_at', { ascending: false })
-      .limit(4)
-      .then(({ data }) => {
-        if (!data) return;
-        setVideos(
-          data.map((row: any) => ({
-            id: row.id,
-            courseId: row.course_id,
-            title: row.title,
-            author: row.courses?.instructor_name ?? 'JMONEY',
-            duration: formatDuration(row.duration_minutes),
-          }))
-        );
-      });
+  const fetchData = async () => {
+    const [{ data: lessonData }, { data: progressData }] = await Promise.all([
+      supabase
+        .from('lessons')
+        .select(
+          'id, title, duration_minutes, course_id, courses(title, instructor_name)'
+        )
+        .order('created_at', { ascending: false })
+        .limit(4),
+      supabase
+        .from('user_course_progress')
+        .select('course_id, updated_at, courses(title)')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    supabase
-      .from('user_course_progress')
-      .select('course_id, updated_at, courses(title)')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        const row = data as any;
-        if (row?.course_id) {
-          setContinueCourse({
-            courseId: row.course_id,
-            title: row.courses?.title ?? 'Your course',
-          });
-        }
-      });
+    if (lessonData) {
+      setVideos(
+        lessonData.map((row: any) => ({
+          id: row.id,
+          courseId: row.course_id,
+          title: row.title,
+          author: row.courses?.instructor_name ?? 'JMONEY',
+          duration: formatDuration(row.duration_minutes),
+        }))
+      );
+    }
+
+    const progressRow = progressData as any;
+    setContinueCourse(
+      progressRow?.course_id
+        ? {
+            courseId: progressRow.course_id,
+            title: progressRow.courses?.title ?? 'Your course',
+          }
+        : null
+    );
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([fetchData(), refreshProfile()]);
+    setRefreshing(false);
+  };
 
   const openCourse = (courseId: string, lessonId?: string) => {
     navigation.navigate('Courses', {
@@ -147,7 +162,11 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell

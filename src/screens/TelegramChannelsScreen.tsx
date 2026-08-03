@@ -44,6 +44,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [status, setStatus] = useState<TelegramAccessStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -54,19 +55,27 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
     setStatus((data as TelegramAccessStatus) ?? null);
   }, []);
 
-  useEffect(() => {
-    Promise.all([
+  const fetchAll = useCallback(async () => {
+    const [{ data }] = await Promise.all([
       supabase
         .from('communities')
         .select('*')
         .eq('is_active', true)
         .order('display_order', { ascending: true }),
       fetchStatus(),
-    ]).then(([{ data }]) => {
-      setCommunities((data as Community[]) ?? []);
-      setLoading(false);
-    });
+    ]);
+    setCommunities((data as Community[]) ?? []);
   }, [fetchStatus]);
+
+  useEffect(() => {
+    fetchAll().then(() => setLoading(false));
+  }, [fetchAll]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAll();
+    setRefreshing(false);
+  };
 
   const handleAction = async (action: 'start_link' | 'self_invite') => {
     setActionError(null);
@@ -89,7 +98,11 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
   const joined = status?.link?.status === 'joined' && status?.link?.in_channel;
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell

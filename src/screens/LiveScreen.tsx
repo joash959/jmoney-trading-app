@@ -1,12 +1,5 @@
-import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Linking,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
@@ -22,6 +15,7 @@ import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
+import Skeleton from '../components/Skeleton';
 
 function formatSessionDate(dateStr: string, timeStr: string | null) {
   const date = new Date(`${dateStr}T${timeStr ?? '00:00:00'}`);
@@ -45,23 +39,32 @@ export default function LiveScreen({ navigation }: Props) {
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    supabase
+  const fetchSessions = useCallback(async () => {
+    const { data, error: fetchError } = await supabase
       .from('live_sessions')
       .select('*')
       .eq('is_active', true)
-      .order('session_date', { ascending: true })
-      .then(({ data, error: fetchError }) => {
-        if (fetchError) {
-          setError(fetchError.message);
-        } else {
-          setSessions((data as LiveSession[]) ?? []);
-        }
-        setLoading(false);
-      });
+      .order('session_date', { ascending: true });
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setError(null);
+      setSessions((data as LiveSession[]) ?? []);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchSessions().then(() => setLoading(false));
+  }, [fetchSessions]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchSessions();
+    setRefreshing(false);
+  };
 
   const now = new Date();
   const upcoming = sessions.filter(
@@ -83,7 +86,11 @@ export default function LiveScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell
@@ -106,10 +113,11 @@ export default function LiveScreen({ navigation }: Props) {
       </Text>
 
       {loading ? (
-        <ActivityIndicator
-          color={colors.accentBlue}
-          style={styles.cardSpaced}
-        />
+        <View style={[styles.list, styles.cardSpaced]}>
+          <Skeleton height={92} radius={16} />
+          <Skeleton height={92} radius={16} />
+          <Skeleton height={92} radius={16} />
+        </View>
       ) : error ? (
         <Text style={[styles.errorText, styles.cardSpaced]}>
           Couldn't load sessions: {error}
@@ -158,7 +166,7 @@ export default function LiveScreen({ navigation }: Props) {
                       </Text>
                       {locked && (
                         <View style={styles.premiumPill}>
-                          <Feather name="lock" size={11} color="#F5C518" />
+                          <Feather name="lock" size={11} color={colors.warning} />
                           <Text style={styles.premiumPillText}>Premium</Text>
                         </View>
                       )}
@@ -264,13 +272,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(245,197,24,0.12)',
+    backgroundColor: colors.warningDim,
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
   premiumPillText: {
-    color: '#F5C518',
+    color: colors.warning,
     fontSize: 10,
     fontWeight: '700',
   },

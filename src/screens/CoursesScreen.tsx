@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -14,7 +14,21 @@ import NotificationBell from '../components/NotificationBell';
 import SearchBar from '../components/SearchBar';
 import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
+import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
+
+function CourseCardSkeleton() {
+  return (
+    <View style={styles.skeletonCard}>
+      <Skeleton height={150} radius={20} />
+      <View style={styles.skeletonBody}>
+        <Skeleton width="40%" height={12} />
+        <Skeleton width="80%" height={18} style={styles.skeletonGapTop} />
+        <Skeleton width="95%" height={13} style={styles.skeletonGapTop} />
+      </View>
+    </View>
+  );
+}
 
 type Props = NativeStackScreenProps<CoursesStackParamList, 'CoursesHome'>;
 
@@ -31,29 +45,31 @@ export default function CoursesScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    supabase
+  const fetchCourses = useCallback(async () => {
+    const { data, error: fetchError } = await supabase
       .from('courses')
       .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data, error: fetchError }) => {
-        if (cancelled) return;
-        if (fetchError) {
-          setError(fetchError.message);
-        } else {
-          setCourses((data as Course[]) ?? []);
-        }
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
+      .order('created_at', { ascending: false });
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setError(null);
+      setCourses((data as Course[]) ?? []);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCourses().then(() => setLoading(false));
+  }, [fetchCourses]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchCourses();
+    setRefreshing(false);
+  };
 
   const filteredCourses = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -66,7 +82,11 @@ export default function CoursesScreen({ navigation }: Props) {
   }, [courses, search]);
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar
         rightElement={
           <NotificationBell
@@ -101,10 +121,10 @@ export default function CoursesScreen({ navigation }: Props) {
       />
 
       {loading ? (
-        <ActivityIndicator
-          color={colors.accentBlue}
-          style={styles.fieldSpaced}
-        />
+        <View style={[styles.list, styles.fieldSpaced]}>
+          <CourseCardSkeleton />
+          <CourseCardSkeleton />
+        </View>
       ) : error ? (
         <Text style={[styles.errorText, styles.fieldSpaced]}>
           Couldn't load courses: {error}
@@ -183,5 +203,18 @@ const styles = StyleSheet.create({
     color: colors.accentRed,
     fontSize: 14,
     textAlign: 'center',
+  },
+  skeletonCard: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  skeletonBody: {
+    padding: 16,
+  },
+  skeletonGapTop: {
+    marginTop: 10,
   },
 });

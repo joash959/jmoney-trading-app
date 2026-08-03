@@ -47,6 +47,7 @@ export default function NotificationsScreen({}: Props) {
   const { refetch: refetchCount } = useUnreadNotificationsCount();
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
     if (!session) return;
@@ -55,12 +56,17 @@ export default function NotificationsScreen({}: Props) {
       .select('*')
       .order('created_at', { ascending: false });
     setNotifications((data as NotificationRow[]) ?? []);
-    setLoading(false);
   }, [session]);
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotifications().then(() => setLoading(false));
   }, [fetchNotifications]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -87,7 +93,11 @@ export default function NotificationsScreen({}: Props) {
   };
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell
+      overlay={<FloatingChatButton />}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+    >
       <TopBar />
 
       <View style={styles.headerRow}>

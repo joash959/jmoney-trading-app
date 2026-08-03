@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { useFocusGlow } from '../hooks/useFocusGlow';
 
 type Props = {
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: colors.inputBackground,
     borderWidth: 1.5,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     paddingHorizontal: 14,
     height: 52,
   },
