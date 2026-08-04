@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -338,32 +338,37 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <LinearGradient
-        colors={gradients.brand}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.connectCard, styles.cardSpaced]}
+      <Pressable
+        onPress={() => setConnectModalVisible(true)}
+        style={({ pressed }) => [styles.cardSpaced, pressed && styles.connectPressed]}
       >
-        <View style={styles.cardHeadingRow}>
-          <Feather name="shield" size={18} color={colors.text} />
-          <Text style={styles.cardHeading}>Connect your PrimeXBT account</Text>
-        </View>
-        <Text style={styles.connectCardDescription}>
-          Link your account to unlock premium features instantly.
-        </Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.connectButton,
-            pressed && styles.connectButtonPressed,
-          ]}
-          onPress={() => setConnectModalVisible(true)}
+        <LinearGradient
+          colors={gradients.button}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.connectCard}
         >
-          <Feather name="shield" size={16} color={colors.accentBlue} />
-          <Text style={styles.connectButtonText}>
-            Connect to unlock premium
-          </Text>
-        </Pressable>
-      </LinearGradient>
+          <Feather
+            name="arrow-right"
+            size={20}
+            color={colors.text}
+            style={styles.connectArrow}
+          />
+          <View style={styles.connectRow}>
+            <View style={styles.connectTextCol}>
+              <Text style={styles.connectTitle}>
+                Connect your PrimeXBT account
+              </Text>
+              <Text style={styles.connectSubtitle}>100% free and secure</Text>
+            </View>
+            <Image
+              source={require('../../assets/broker.png')}
+              style={styles.connectIcon}
+              resizeMode="contain"
+            />
+          </View>
+        </LinearGradient>
+      </Pressable>
 
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.quickActionsGrid}>
@@ -610,31 +615,41 @@ const styles = StyleSheet.create({
   connectCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
+    position: 'relative',
     ...shadows.glow,
   },
-  connectCardDescription: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 8,
-  },
-  connectButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    height: 54,
-    borderRadius: radius.lg,
-    backgroundColor: colors.text,
-    marginTop: 16,
-  },
-  connectButtonPressed: {
+  connectPressed: {
     opacity: 0.85,
   },
-  connectButtonText: {
-    color: colors.accentBlue,
-    fontSize: 15,
-    fontWeight: '700',
+  connectArrow: {
+    position: 'absolute',
+    top: spacing.lg,
+    right: spacing.lg,
+  },
+  connectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  connectTextCol: {
+    flex: 1,
+    paddingRight: 16,
+  },
+  connectTitle: {
+    color: colors.text,
+    fontSize: 19,
+    fontWeight: '800',
+    lineHeight: 24,
+    paddingRight: 24,
+  },
+  connectSubtitle: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    marginTop: 6,
+  },
+  connectIcon: {
+    width: 72,
+    height: 72,
   },
   progressHeaderRow: {
     flexDirection: 'row',
