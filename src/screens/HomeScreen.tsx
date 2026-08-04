@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
+import { radius } from '../theme/radius';
+import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { parseFunctionError } from '../lib/functionError';
@@ -335,22 +338,32 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
+      <LinearGradient
+        colors={gradients.button}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.connectCard, styles.cardSpaced]}
+      >
         <View style={styles.cardHeadingRow}>
           <Feather name="shield" size={18} color={colors.text} />
           <Text style={styles.cardHeading}>Connect your PrimeXBT account</Text>
         </View>
-        <Text style={styles.cardDescription}>
+        <Text style={styles.connectCardDescription}>
           Link your account to unlock premium features instantly.
         </Text>
-        <PrimaryButton
-          label="Connect to unlock premium"
-          icon="shield"
-          variant="flat"
+        <Pressable
+          style={({ pressed }) => [
+            styles.connectButton,
+            pressed && styles.connectButtonPressed,
+          ]}
           onPress={() => setConnectModalVisible(true)}
-          style={styles.fieldSpaced}
-        />
-      </SurfaceCard>
+        >
+          <Feather name="shield" size={16} color={colors.accentBlue} />
+          <Text style={styles.connectButtonText}>
+            Connect to unlock premium
+          </Text>
+        </Pressable>
+      </LinearGradient>
 
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.quickActionsGrid}>
@@ -593,6 +606,35 @@ const styles = StyleSheet.create({
   accentBorder: {
     borderLeftWidth: 3,
     borderLeftColor: colors.accentBlue,
+  },
+  connectCard: {
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    ...shadows.glow,
+  },
+  connectCardDescription: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 8,
+  },
+  connectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 54,
+    borderRadius: radius.lg,
+    backgroundColor: colors.text,
+    marginTop: 16,
+  },
+  connectButtonPressed: {
+    opacity: 0.85,
+  },
+  connectButtonText: {
+    color: colors.accentBlue,
+    fontSize: 15,
+    fontWeight: '700',
   },
   progressHeaderRow: {
     flexDirection: 'row',
