@@ -305,9 +305,9 @@ export default function HomeScreen({ navigation }: Props) {
             label="Get Started"
             icon={null}
             variant="flat"
-            style={styles.getStartedButton}
+            style={styles.heroButton}
           />
-          <SecondaryButton label="WhatsApp us" />
+          <SecondaryButton label="WhatsApp us" style={styles.heroButton} />
         </View>
       </SurfaceCard>
 
@@ -421,7 +421,7 @@ export default function HomeScreen({ navigation }: Props) {
         />
         <PrimaryButton
           label={continueCourse ? 'Continue Course' : 'Start Course'}
-          icon="book-open"
+          icon={null}
           variant="flat"
           onPress={() =>
             continueCourse
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 18,
   },
-  getStartedButton: {
+  heroButton: {
     flex: 1,
     height: 48,
   },
