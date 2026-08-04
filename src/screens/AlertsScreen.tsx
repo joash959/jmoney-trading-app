@@ -131,6 +131,7 @@ export default function AlertsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="bell"
+        image={require('../../assets/tradealerts.png')}
         title="Trade Alerts"
         subtitle="Real-time Trade Alert Insights with JMONEY"
         rightElement={

@@ -109,7 +109,11 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         <GlowBackground />
         <View style={styles.gatedContent}>
           <TopBar />
-          <ScreenHeader icon="bar-chart-2" title="Market Analysis" />
+          <ScreenHeader
+            icon="bar-chart-2"
+            image={require('../../assets/marketanalysis.png')}
+            title="Market Analysis"
+          />
           <EmptyStateCard
             icon="lock"
             title="Premium Feature"
@@ -129,7 +133,11 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <GlowBackground />
       <View style={styles.headerWrap}>
         <TopBar />
-        <ScreenHeader icon="bar-chart-2" title="Market Analysis" />
+        <ScreenHeader
+          icon="bar-chart-2"
+          image={require('../../assets/marketanalysis.png')}
+          title="Market Analysis"
+        />
       </View>
       <WebView
         source={{ html: WIDGET_HTML }}

@@ -132,6 +132,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <TopBar />
         <ScreenHeader
           icon="award"
+          image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
           subtitle="The leaderboard is currently inactive. Check back soon."
         />
@@ -156,6 +157,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="award"
+        image={require('../../assets/leaderboard.png')}
         title="Leaderboard"
         subtitle={`Challenge yourself with other traders and win your share of ${currency}${totalPool.toLocaleString()}`}
       />

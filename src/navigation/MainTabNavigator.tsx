@@ -45,10 +45,28 @@ export default function MainTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Courses" component={CoursesStackNavigator} />
+      <Tab.Screen
+        name="Courses"
+        component={CoursesStackNavigator}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('Courses', { screen: 'CoursesHome' });
+          },
+        })}
+      />
       <Tab.Screen name="Alerts" component={AlertsScreen} />
       <Tab.Screen name="Live" component={LiveScreen} />
-      <Tab.Screen name="More" component={MoreStackNavigator} />
+      <Tab.Screen
+        name="More"
+        component={MoreStackNavigator}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('More', { screen: 'MoreHome' });
+          },
+        })}
+      />
     </Tab.Navigator>
   );
 }

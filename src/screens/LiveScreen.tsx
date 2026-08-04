@@ -107,6 +107,7 @@ export default function LiveScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="video"
+        image={require('../../assets/livesessions.png')}
         title="Live Sessions"
         subtitle="Join upcoming live trading sessions and webinars."
       />

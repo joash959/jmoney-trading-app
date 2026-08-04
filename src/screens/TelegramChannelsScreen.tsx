@@ -109,6 +109,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="sliders"
+        image={require('../../assets/telegram.png')}
         title="Telegram Channels"
         subtitle="Join our Telegram channels for Trade Alerts."
       />

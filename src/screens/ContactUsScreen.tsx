@@ -36,6 +36,7 @@ export default function ContactUsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="phone"
+        image={require('../../assets/contactus.png')}
         title="Contact Us"
         subtitle="Need a hand? Reach out and our team will get back to you."
       />

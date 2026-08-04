@@ -60,6 +60,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="briefcase"
+        image={require('../../assets/broker.png')}
         title="Recommended Broker"
         subtitle="Our trusted partner for your trading journey."
       />

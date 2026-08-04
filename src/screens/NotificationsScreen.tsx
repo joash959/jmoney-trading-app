@@ -97,7 +97,11 @@ export default function NotificationsScreen({}: Props) {
     >
       <TopBar />
 
-      <ScreenHeader icon="bell" title="Notifications" />
+      <ScreenHeader
+        icon="bell"
+        image={require('../../assets/notifications.png')}
+        title="Notifications"
+      />
 
       {unreadCount > 0 && (
         <Pressable style={styles.markAllRow} onPress={handleMarkAllRead}>

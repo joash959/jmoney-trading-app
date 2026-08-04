@@ -202,6 +202,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="bookmark"
+        image={require('../../assets/tradingjournal.png')}
         title="Trading Journal"
         subtitle="Track your daily trading performance"
       />
