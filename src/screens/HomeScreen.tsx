@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,7 +19,6 @@ import SurfaceCard from '../components/SurfaceCard';
 import SegmentedBar from '../components/SegmentedBar';
 import PromoCarousel from '../components/PromoCarousel';
 import SentimentPoll from '../components/SentimentPoll';
-import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
@@ -28,6 +27,7 @@ import VideoCard from '../components/VideoCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
@@ -63,6 +63,7 @@ export default function HomeScreen({ navigation }: Props) {
   const { profile, refreshProfile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [clientId, setClientId] = useState('');
+  const [connectModalVisible, setConnectModalVisible] = useState(false);
   const [videos, setVideos] = useState<LatestVideo[]>([]);
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
     null
@@ -334,24 +335,20 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <SurfaceCard style={styles.cardSpaced}>
-        <View style={styles.progressHeaderRow}>
-          <Text style={styles.cardHeading}>Your Progress</Text>
-          <Feather name="chevron-right" size={18} color={colors.textFaint} />
+      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
+        <View style={styles.cardHeadingRow}>
+          <Feather name="shield" size={18} color={colors.text} />
+          <Text style={styles.cardHeading}>Connect your PrimeXBT account</Text>
         </View>
-        <View style={styles.progressRow}>
-          <Text style={styles.progressLabel}>Courses started</Text>
-          <View style={styles.countPill}>
-            <Text style={styles.countPillText}>
-              {coursesStarted}/{coursesTotal || '—'}
-            </Text>
-          </View>
-        </View>
-        <SegmentedBar
-          segments={displaySegments}
-          filled={filledSegments}
-          filledColor={colors.warning}
-          style={styles.progressBarSpaced}
+        <Text style={styles.cardDescription}>
+          Link your account to unlock premium features instantly.
+        </Text>
+        <PrimaryButton
+          label="Connect to unlock premium"
+          icon="shield"
+          variant="flat"
+          onPress={() => setConnectModalVisible(true)}
+          style={styles.fieldSpaced}
         />
       </SurfaceCard>
 
@@ -378,55 +375,24 @@ export default function HomeScreen({ navigation }: Props) {
         <SentimentPoll />
       </View>
 
-      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
-        <View style={styles.cardHeadingRow}>
-          <Feather name="shield" size={18} color={colors.text} />
-          <Text style={styles.cardHeading}>Connect your PrimeXBT account</Text>
+      <SurfaceCard style={styles.cardSpaced}>
+        <View style={styles.progressHeaderRow}>
+          <Text style={styles.cardHeading}>Your Progress</Text>
+          <Feather name="chevron-right" size={18} color={colors.textFaint} />
         </View>
-        <Text style={styles.cardDescription}>
-          Enter your PrimeXBT client ID or MT5 account number to unlock
-          premium features instantly. Your account needs a minimum deposit
-          of R500.
-        </Text>
-
-        <FormInput
-          label="PRIMEXBT CLIENT ID"
-          value={clientId}
-          onChangeText={setClientId}
-          placeholder="e.g. 2629398"
-          keyboardType="number-pad"
-          containerStyle={styles.fieldSpaced}
-        />
-        <Text style={styles.helperText}>
-          Use your <Text style={styles.helperBold}>PrimeXBT client ID</Text>{' '}
-          (7 digits, usually starting with 26), found in the PrimeXBT app
-          under Profile / Account settings. MT5 account numbers often
-          aren't listed on our partner report, so they may not be
-          recognised.
-        </Text>
-
-        {verifyMessage && (
-          <Text style={styles.successText}>{verifyMessage}</Text>
-        )}
-        {verifyError && <Text style={styles.errorText}>{verifyError}</Text>}
-
-        <PrimaryButton
-          label={verifyLoading ? 'Checking...' : 'Connect & unlock premium'}
-          icon="shield"
-          variant="flat"
-          disabled={clientId.trim().length === 0 || verifyLoading}
-          onPress={handleConnect}
-          style={styles.fieldSpaced}
-        />
-        <SecondaryButton
-          label="Don't have an account? Open & fund PrimeXBT"
-          icon="external-link"
-          onPress={() =>
-            Linking.openURL(
-              'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt'
-            )
-          }
-          style={styles.fieldSpaced}
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>Courses started</Text>
+          <View style={styles.countPill}>
+            <Text style={styles.countPillText}>
+              {coursesStarted}/{coursesTotal || '—'}
+            </Text>
+          </View>
+        </View>
+        <SegmentedBar
+          segments={displaySegments}
+          filled={filledSegments}
+          filledColor={colors.warning}
+          style={styles.progressBarSpaced}
         />
       </SurfaceCard>
 
@@ -553,6 +519,17 @@ export default function HomeScreen({ navigation }: Props) {
       )}
 
       <DisclaimerCard style={styles.cardSpaced} />
+
+      <PrimeXBTConnectModal
+        visible={connectModalVisible}
+        onClose={() => setConnectModalVisible(false)}
+        clientId={clientId}
+        onChangeClientId={setClientId}
+        onConnect={handleConnect}
+        loading={verifyLoading}
+        successMessage={verifyMessage}
+        errorMessage={verifyError}
+      />
     </ScreenShell>
   );
 }
