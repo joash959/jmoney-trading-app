@@ -147,7 +147,6 @@ export default function CoursesScreen({ navigation }: Props) {
                 key={course.id}
                 style={styles.gridItem}
                 level={course.level ?? 'Beginner'}
-                eyebrow={course.title.toUpperCase()}
                 instructor={course.instructor_name ?? 'JMONEY'}
                 category={course.category ?? 'Trading'}
                 title={course.title}

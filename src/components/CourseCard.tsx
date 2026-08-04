@@ -1,4 +1,4 @@
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,7 +7,6 @@ import { shadows } from '../theme/shadows';
 
 type Props = {
   level: string;
-  eyebrow: string;
   instructor: string;
   category: string;
   title: string;
@@ -29,7 +28,6 @@ function getInitials(name: string) {
 
 export default function CourseCard({
   level,
-  eyebrow,
   instructor,
   category,
   title,
@@ -53,9 +51,13 @@ export default function CourseCard({
           <View style={styles.levelPill}>
             <Text style={styles.levelText}>{level}</Text>
           </View>
-          <Text style={styles.eyebrow} numberOfLines={2}>
-            {eyebrow}
-          </Text>
+          <View style={styles.thumbIconWrap} pointerEvents="none">
+            <Image
+              source={require('../../assets/courses.png')}
+              style={styles.thumbIcon}
+              resizeMode="contain"
+            />
+          </View>
           <View style={styles.avatarWrap}>
             <LinearGradient colors={gradients.brand} style={styles.avatar}>
               <Text style={styles.avatarText}>{getInitials(instructor)}</Text>
@@ -127,12 +129,15 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
-  eyebrow: {
-    color: colors.warning,
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 0.2,
-    marginTop: 8,
+  thumbIconWrap: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  thumbIcon: {
+    width: '42%',
+    height: '42%',
+    opacity: 0.9,
   },
   avatarWrap: {
     position: 'absolute',
