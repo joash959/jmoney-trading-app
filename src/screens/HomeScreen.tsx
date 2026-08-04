@@ -8,6 +8,7 @@ import { colors, gradients } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 import { radius } from '../theme/radius';
+import { fonts } from '../theme/fonts';
 import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -323,7 +324,14 @@ export default function HomeScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-        <Text style={styles.greetingHeading}>Welcome back, {firstName}!</Text>
+        <Text
+          style={styles.greetingHeading}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.55}
+        >
+          Welcome back, {firstName}!
+        </Text>
         <Text style={styles.greetingSubtitle}>
           Discover the secrets of Forex Markets and become the NEXT
           MILLIONAIRE!
@@ -331,6 +339,7 @@ export default function HomeScreen({ navigation }: Props) {
         <View style={styles.greetingButtons}>
           <PrimaryButton
             label="Get Started"
+            icon={null}
             variant="flat"
             style={styles.getStartedButton}
           />
@@ -597,6 +606,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     lineHeight: 20,
+    fontFamily: fonts.poppinsSemiBold,
   },
   greetingButtons: {
     flexDirection: 'row',
