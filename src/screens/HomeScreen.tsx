@@ -359,7 +359,9 @@ export default function HomeScreen({ navigation }: Props) {
               <Text style={styles.connectTitle}>
                 Connect your PrimeXBT account
               </Text>
-              <Text style={styles.connectSubtitle}>100% free and secure</Text>
+              <Text style={styles.connectSubtitle}>
+                Unlock premium features and trade alerts
+              </Text>
             </View>
             <Image
               source={require('../../assets/broker.png')}
