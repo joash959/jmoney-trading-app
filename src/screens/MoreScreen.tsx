@@ -16,6 +16,7 @@ import SurfaceCard from '../components/SurfaceCard';
 import IconTile, { iconTileGradients } from '../components/IconTile';
 import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
@@ -222,6 +223,8 @@ export default function MoreScreen({ navigation }: Props) {
       <SurfaceCard style={styles.signOutCard}>
         <MenuRow icon="log-out" label="Sign Out" destructive onPress={handleSignOut} />
       </SurfaceCard>
+
+      <DisclaimerCard style={styles.disclaimerSpaced} />
     </ScreenShell>
   );
 }
@@ -289,5 +292,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 8,
     padding: spacing.md,
+  },
+  disclaimerSpaced: {
+    marginTop: 4,
   },
 });

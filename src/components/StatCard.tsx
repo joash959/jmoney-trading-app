@@ -29,13 +29,13 @@ export default function StatCard({
   return (
     <View style={[styles.card, style]}>
       <View style={styles.topRow}>
-        <View style={styles.iconCircle}>
-          {image ? (
-            <Image source={image} style={styles.iconImage} resizeMode="contain" />
-          ) : (
+        {image ? (
+          <Image source={image} style={styles.iconImagePlain} resizeMode="contain" />
+        ) : (
+          <View style={styles.iconCircle}>
             <Feather name={icon} size={16} color={colors.link} />
-          )}
-        </View>
+          </View>
+        )}
         {trendLabel && (
           <View style={styles.trendPill}>
             <Feather name="trending-up" size={10} color={colors.accentGreen} />
@@ -77,9 +77,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconImage: {
-    width: 26,
-    height: 26,
+  iconImagePlain: {
+    width: 38,
+    height: 38,
   },
   trendPill: {
     flexDirection: 'row',

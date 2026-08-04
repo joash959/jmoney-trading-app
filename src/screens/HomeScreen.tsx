@@ -27,21 +27,11 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
 import IconTile, { iconTileGradients } from '../components/IconTile';
-import VideoCard from '../components/VideoCard';
-import EmptyStateCard from '../components/EmptyStateCard';
 import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
-
-type LatestVideo = {
-  id: string;
-  courseId: string;
-  title: string;
-  author: string;
-  duration: string;
-};
 
 type ContinueCourse = {
   courseId: string;
@@ -57,18 +47,11 @@ function getGreeting() {
   return 'Good evening';
 }
 
-function formatDuration(minutes: number | null) {
-  if (!minutes) return '';
-  if (minutes < 60) return `${minutes} min`;
-  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
-}
-
 export default function HomeScreen({ navigation }: Props) {
   const { profile, refreshProfile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [clientId, setClientId] = useState('');
   const [connectModalVisible, setConnectModalVisible] = useState(false);
-  const [videos, setVideos] = useState<LatestVideo[]>([]);
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
     null
   );
@@ -83,40 +66,17 @@ export default function HomeScreen({ navigation }: Props) {
   const isPremium = profile?.tier === 'premium';
 
   const fetchData = async () => {
-    const [
-      { data: lessonData },
-      { data: progressData },
-      { count: totalCount },
-      { data: progressRows },
-    ] = await Promise.all([
-      supabase
-        .from('lessons')
-        .select(
-          'id, title, duration_minutes, course_id, courses(title, instructor_name)'
-        )
-        .order('created_at', { ascending: false })
-        .limit(4),
-      supabase
-        .from('user_course_progress')
-        .select('course_id, updated_at, courses(title)')
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase.from('courses').select('id', { count: 'exact', head: true }),
-      supabase.from('user_course_progress').select('course_id'),
-    ]);
-
-    if (lessonData) {
-      setVideos(
-        lessonData.map((row: any) => ({
-          id: row.id,
-          courseId: row.course_id,
-          title: row.title,
-          author: row.courses?.instructor_name ?? 'JMONEY',
-          duration: formatDuration(row.duration_minutes),
-        }))
-      );
-    }
+    const [{ data: progressData }, { count: totalCount }, { data: progressRows }] =
+      await Promise.all([
+        supabase
+          .from('user_course_progress')
+          .select('course_id, updated_at, courses(title)')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase.from('courses').select('id', { count: 'exact', head: true }),
+        supabase.from('user_course_progress').select('course_id'),
+      ]);
 
     const progressRow = progressData as any;
     setContinueCourse(
@@ -253,6 +213,7 @@ export default function HomeScreen({ navigation }: Props) {
   const promoItems = [
     {
       icon: 'target' as const,
+      image: require('../../assets/aiscanner.png'),
       title: 'Scan any chart',
       subtitle: 'Let AI mark key levels and call the trend instantly.',
       gradient: iconTileGradients.purple,
@@ -260,6 +221,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'send' as const,
+      image: require('../../assets/telegram.png'),
       title: 'Join the community',
       subtitle: 'Live trade alerts and mentorship, the moment you\'re funded.',
       gradient: iconTileGradients.teal,
@@ -268,6 +230,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'award' as const,
+      image: require('../../assets/leaderboard.png'),
       title: 'Climb the leaderboard',
       subtitle: 'Compete with other traders for real prizes.',
       gradient: iconTileGradients.gold,
@@ -275,6 +238,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'book-open' as const,
+      image: require('../../assets/courses.png'),
       title: 'Keep learning',
       subtitle: "New lessons added regularly — pick up where you left off.",
       gradient: iconTileGradients.blue,
@@ -455,6 +419,17 @@ export default function HomeScreen({ navigation }: Props) {
           filledColor={colors.warning}
           style={styles.progressBarSpaced}
         />
+        <PrimaryButton
+          label={continueCourse ? 'Continue Course' : 'Start Course'}
+          icon="book-open"
+          variant="flat"
+          onPress={() =>
+            continueCourse
+              ? openCourse(continueCourse.courseId)
+              : navigation.navigate('Courses', { screen: 'CoursesHome' })
+          }
+          style={styles.fieldSpaced}
+        />
       </SurfaceCard>
 
       <View style={[styles.statsRow, styles.cardSpaced]}>
@@ -492,77 +467,6 @@ export default function HomeScreen({ navigation }: Props) {
           sublabel="Active traders"
         />
       </View>
-
-      {continueCourse ? (
-        <EmptyStateCard
-          icon="book"
-          title="Continue learning"
-          subtitle={continueCourse.title}
-          buttonLabel="Resume Course"
-          onPress={() => openCourse(continueCourse.courseId)}
-          style={styles.cardSpaced}
-        />
-      ) : (
-        <EmptyStateCard
-          icon="book"
-          title="No Course Started"
-          subtitle="Start learning by enrolling in a course"
-          buttonLabel="Browse Courses"
-          onPress={() =>
-            navigation.navigate('Courses', { screen: 'CoursesHome' })
-          }
-          style={styles.cardSpaced}
-        />
-      )}
-
-      {videos.length > 0 && (
-        <>
-          <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
-            <View>
-              <Text style={styles.sectionTitle}>Latest Videos</Text>
-              <Text style={styles.sectionSubtitle}>
-                Fresh content from our mentors
-              </Text>
-            </View>
-            <Pressable
-              style={styles.viewAllRow}
-              onPress={() =>
-                navigation.navigate('Courses', { screen: 'CoursesHome' })
-              }
-            >
-              <Text style={styles.viewAllText}>View All</Text>
-              <Feather name="clock" size={13} color={colors.link} />
-            </Pressable>
-          </View>
-
-          <View style={[styles.videoRow, styles.fieldSpaced]}>
-            {videos.slice(0, 2).map((video) => (
-              <VideoCard
-                key={video.id}
-                eyebrow="LATEST LESSON"
-                title={video.title}
-                author={video.author}
-                duration={video.duration}
-                onPress={() => openCourse(video.courseId, video.id)}
-              />
-            ))}
-          </View>
-          {videos.length > 2 && (
-            <View style={[styles.videoRow, styles.fieldSpaced]}>
-              {videos.slice(2, 4).map((video) => (
-                <VideoCard
-                  key={video.id}
-                  eyebrow="LATEST LESSON"
-                  title={video.title}
-                  author={video.author}
-                  duration={video.duration}
-                  onPress={() => openCourse(video.courseId, video.id)}
-                />
-              ))}
-            </View>
-          )}
-        </>
-      )}
 
       <DisclaimerCard style={styles.cardSpaced} />
 
@@ -692,13 +596,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   countPill: {
-    backgroundColor: colors.warningDim,
+    backgroundColor: colors.accentBlueDim,
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   countPillText: {
-    color: colors.warning,
+    color: colors.accentBlue,
     fontSize: 13,
     fontWeight: '800',
   },
@@ -749,38 +653,5 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  sectionSpaced: {
-    marginTop: 28,
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  sectionSubtitle: {
-    color: colors.textFaint,
-    fontSize: 13,
-    marginTop: 2,
-  },
-  viewAllRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 4,
-  },
-  viewAllText: {
-    color: colors.link,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  videoRow: {
-    flexDirection: 'row',
-    gap: 14,
   },
 });

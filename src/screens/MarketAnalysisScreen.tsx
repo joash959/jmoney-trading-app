@@ -13,6 +13,7 @@ import TopBar from '../components/TopBar';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 import FloatingChatButton from '../components/FloatingChatButton';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MarketAnalysis'>;
 
@@ -122,6 +123,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
             onPress={() => tabNavigation?.navigate('Home')}
             style={styles.cardSpaced}
           />
+          <DisclaimerCard style={styles.cardSpaced} />
         </View>
         <FloatingChatButton />
       </SafeAreaView>
@@ -145,6 +147,9 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         scrollEnabled
         originWhitelist={['*']}
       />
+      <View style={styles.disclaimerWrap}>
+        <DisclaimerCard />
+      </View>
       <FloatingChatButton />
     </SafeAreaView>
   );
@@ -171,5 +176,9 @@ const styles = StyleSheet.create({
   webview: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  disclaimerWrap: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 });

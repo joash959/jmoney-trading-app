@@ -15,6 +15,7 @@ import TopBar from '../components/TopBar';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 import FloatingChatButton from '../components/FloatingChatButton';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Notifications'>;
 
@@ -154,6 +155,8 @@ export default function NotificationsScreen({}: Props) {
           ))}
         </View>
       )}
+
+      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

@@ -19,6 +19,7 @@ import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
 import FloatingChatButton from '../components/FloatingChatButton';
 import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<CoursesStackParamList, 'CourseDetail'>;
 
@@ -267,6 +268,8 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
           </View>
         </>
       )}
+
+      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

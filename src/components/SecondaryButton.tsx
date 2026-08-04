@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   text: {
     color: colors.text,
     fontSize: 14,
-    lineHeight: 17,
     fontWeight: '700',
     textAlign: 'center',
     textAlignVertical: 'center',

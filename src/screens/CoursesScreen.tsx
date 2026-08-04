@@ -17,6 +17,7 @@ import SelectField from '../components/SelectField';
 import CourseCard from '../components/CourseCard';
 import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 function CourseCardSkeleton() {
   return (
@@ -153,6 +154,8 @@ export default function CoursesScreen({ navigation }: Props) {
           </View>
         </>
       )}
+
+      <DisclaimerCard style={styles.disclaimerSpaced} />
     </ScreenShell>
   );
 }
@@ -190,5 +193,8 @@ const styles = StyleSheet.create({
   },
   skeletonGapTop: {
     marginTop: 10,
+  },
+  disclaimerSpaced: {
+    marginTop: 24,
   },
 });

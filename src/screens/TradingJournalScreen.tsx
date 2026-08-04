@@ -19,6 +19,7 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import FloatingChatButton from '../components/FloatingChatButton';
+import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
@@ -327,6 +328,8 @@ export default function TradingJournalScreen({ navigation }: Props) {
           ))}
         </View>
       )}
+
+      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

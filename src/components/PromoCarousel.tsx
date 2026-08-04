@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
 import { IconTileGradient } from './IconTile';
 
 export type PromoItem = {
   icon: React.ComponentProps<typeof Feather>['name'];
+  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  image?: number;
   title: string;
   subtitle: string;
   gradient: IconTileGradient;
@@ -57,11 +58,29 @@ export default function PromoCarousel({ items }: Props) {
               end={{ x: 1, y: 1 }}
               style={styles.card}
             >
-              <View style={styles.iconCircle}>
-                <Feather name={item.icon} size={20} color={colors.text} />
+              <Feather
+                name="arrow-right"
+                size={20}
+                color={colors.text}
+                style={styles.arrow}
+              />
+              <View style={styles.row}>
+                <View style={styles.textCol}>
+                  <Text style={styles.title}>{item.title}</Text>
+                  <Text style={styles.subtitle}>{item.subtitle}</Text>
+                </View>
+                {item.image ? (
+                  <Image
+                    source={item.image}
+                    style={styles.icon}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.iconCircle}>
+                    <Feather name={item.icon} size={20} color={colors.text} />
+                  </View>
+                )}
               </View>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.subtitle}>{item.subtitle}</Text>
             </LinearGradient>
           </Pressable>
         ))}
@@ -89,24 +108,45 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     minHeight: 130,
     justifyContent: 'center',
+    position: 'relative',
+  },
+  arrow: {
+    position: 'absolute',
+    top: spacing.lg,
+    right: spacing.lg,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  textCol: {
+    flex: 1,
+    paddingRight: 16,
   },
   iconCircle: {
-    width: 40,
-    height: 40,
+    width: 56,
+    height: 56,
     borderRadius: radius.md,
     backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  icon: {
+    width: 64,
+    height: 64,
+  },
   title: {
     color: colors.text,
-    marginTop: spacing.sm,
-    ...typography.headline,
+    fontSize: 19,
+    fontWeight: '800',
+    lineHeight: 24,
+    paddingRight: 24,
   },
   subtitle: {
     color: 'rgba(255,255,255,0.85)',
-    marginTop: 4,
-    ...typography.footnote,
+    fontSize: 13,
+    marginTop: 6,
   },
   dots: {
     flexDirection: 'row',
