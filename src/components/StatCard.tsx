@@ -1,4 +1,4 @@
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -8,6 +8,8 @@ import { spacing } from '../theme/spacing';
 
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
+  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  image?: number;
   trendLabel?: string;
   value: string;
   label: string;
@@ -17,6 +19,7 @@ type Props = {
 
 export default function StatCard({
   icon,
+  image,
   trendLabel,
   value,
   label,
@@ -27,7 +30,11 @@ export default function StatCard({
     <View style={[styles.card, style]}>
       <View style={styles.topRow}>
         <View style={styles.iconCircle}>
-          <Feather name={icon} size={16} color={colors.link} />
+          {image ? (
+            <Image source={image} style={styles.iconImage} resizeMode="contain" />
+          ) : (
+            <Feather name={icon} size={16} color={colors.link} />
+          )}
         </View>
         {trendLabel && (
           <View style={styles.trendPill}>
@@ -54,7 +61,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.lg,
-    padding: spacing.sm + 2,
+    padding: spacing.md,
     ...shadows.sm,
   },
   topRow: {
@@ -63,12 +70,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: 'rgba(78,140,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  iconImage: {
+    width: 26,
+    height: 26,
   },
   trendPill: {
     flexDirection: 'row',

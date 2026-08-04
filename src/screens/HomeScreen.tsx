@@ -457,34 +457,17 @@ export default function HomeScreen({ navigation }: Props) {
         />
       </SurfaceCard>
 
-      <SurfaceCard style={[styles.cardSpaced, styles.accentBorder]}>
-        <View style={styles.cardHeadingRow}>
-          <Feather name="send" size={18} color={colors.link} />
-          <Text style={styles.cardHeading}>Private members channel</Text>
-        </View>
-        <Text style={styles.cardDescription}>
-          Live trade alerts and mentorship on Telegram — for funded members
-          only.
-        </Text>
-        <View style={styles.lockRow}>
-          <Feather name="lock" size={14} color={colors.textFaint} />
-          <Text style={styles.lockText}>
-            Connect and fund your PrimeXBT account above (minimum R500).
-            Your Telegram invite unlocks here automatically the moment it's
-            verified.
-          </Text>
-        </View>
-      </SurfaceCard>
-
       <View style={[styles.statsRow, styles.cardSpaced]}>
         <StatCard
           icon="video"
+          image={require('../../assets/livesessions.png')}
           value="No sessions"
           label="Next Live Session"
           sublabel="Check back soon"
         />
         <StatCard
           icon="sliders"
+          image={require('../../assets/marketanalysis.png')}
           trendLabel="4 Days To Go"
           value="Aug 7, 2026"
           label="Next NFP"
@@ -494,6 +477,7 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={[styles.statsRow, styles.fieldSpaced]}>
         <StatCard
           icon="bar-chart-2"
+          image={require('../../assets/marketanalysis.png')}
           trendLabel="9 Days To Go"
           value="Aug 12, 2026"
           label="Next CPI"
@@ -501,6 +485,7 @@ export default function HomeScreen({ navigation }: Props) {
         />
         <StatCard
           icon="award"
+          image={require('../../assets/dashboard.png')}
           trendLabel="+Growing daily"
           value="22,099"
           label="Community Members"
@@ -652,10 +637,6 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
-  accentBorder: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accentBlue,
-  },
   connectCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
@@ -764,17 +745,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     marginTop: 14,
-  },
-  lockRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
-  },
-  lockText: {
-    flex: 1,
-    color: colors.textFaint,
-    fontSize: 12,
-    lineHeight: 17,
   },
   statsRow: {
     flexDirection: 'row',
