@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,6 +15,7 @@ type Props = {
   duration: string;
   lessons: number;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 function getInitials(name: string) {
@@ -36,10 +37,15 @@ export default function CourseCard({
   duration,
   lessons,
   onPress,
+  style,
 }: Props) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.cardShadow, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.cardShadow,
+        style,
+        pressed && styles.pressed,
+      ]}
       onPress={onPress}
     >
       <View style={styles.card}>
@@ -55,31 +61,37 @@ export default function CourseCard({
               <Text style={styles.avatarText}>{getInitials(instructor)}</Text>
             </LinearGradient>
             <View style={styles.playBadge}>
-              <Feather name="play" size={12} color={colors.text} />
+              <Feather name="play" size={11} color={colors.text} />
             </View>
           </View>
         </LinearGradient>
 
         <View style={styles.body}>
-          <Text style={styles.category}>{category}</Text>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.category} numberOfLines={1}>
+            {category}
+          </Text>
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
           <Text style={styles.description} numberOfLines={2}>
             {description}
           </Text>
 
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Feather name="clock" size={13} color={colors.textFaint} />
+              <Feather name="clock" size={11} color={colors.textFaint} />
               <Text style={styles.metaText}>{duration}</Text>
             </View>
             <View style={styles.metaItem}>
-              <Feather name="book" size={13} color={colors.textFaint} />
+              <Feather name="book" size={11} color={colors.textFaint} />
               <Text style={styles.metaText}>{lessons} lessons</Text>
             </View>
           </View>
 
           <View style={styles.divider} />
-          <Text style={styles.instructor}>{instructor}</Text>
+          <Text style={styles.instructor} numberOfLines={1}>
+            {instructor}
+          </Text>
         </View>
       </View>
     </Pressable>
@@ -100,52 +112,52 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   thumb: {
-    aspectRatio: 1.7,
-    padding: 14,
+    aspectRatio: 1.3,
+    padding: 10,
   },
   levelPill: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(37,211,102,0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
   levelText: {
     color: colors.accentGreen,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
   },
   eyebrow: {
     color: colors.warning,
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: '800',
-    letterSpacing: 0.3,
-    marginTop: 10,
+    letterSpacing: 0.2,
+    marginTop: 8,
   },
   avatarWrap: {
     position: 'absolute',
-    bottom: 14,
-    right: 14,
+    bottom: 10,
+    right: 10,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '800',
   },
   playBadge: {
     position: 'absolute',
     bottom: -2,
     right: -2,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: colors.accentBlue,
     alignItems: 'center',
     justifyContent: 'center',
@@ -153,48 +165,50 @@ const styles = StyleSheet.create({
     borderColor: colors.background,
   },
   body: {
-    padding: 16,
+    padding: 12,
   },
   category: {
     color: colors.link,
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
   },
   title: {
     color: colors.text,
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: '800',
-    marginTop: 4,
+    marginTop: 3,
+    lineHeight: 18,
   },
   description: {
     color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 6,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 5,
   },
   metaRow: {
     flexDirection: 'row',
-    gap: 18,
-    marginTop: 12,
+    gap: 12,
+    marginTop: 10,
+    flexWrap: 'wrap',
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   metaText: {
     color: colors.textFaint,
-    fontSize: 12,
+    fontSize: 10,
   },
   divider: {
     height: 1,
     backgroundColor: colors.cardBorder,
-    marginTop: 14,
-    marginBottom: 12,
+    marginTop: 10,
+    marginBottom: 8,
   },
   instructor: {
     color: colors.text,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

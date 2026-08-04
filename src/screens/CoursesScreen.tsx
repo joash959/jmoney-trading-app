@@ -22,11 +22,11 @@ import DisclaimerCard from '../components/DisclaimerCard';
 function CourseCardSkeleton() {
   return (
     <View style={styles.skeletonCard}>
-      <Skeleton height={150} radius={20} />
+      <Skeleton height={110} radius={14} />
       <View style={styles.skeletonBody}>
-        <Skeleton width="40%" height={12} />
-        <Skeleton width="80%" height={18} style={styles.skeletonGapTop} />
-        <Skeleton width="95%" height={13} style={styles.skeletonGapTop} />
+        <Skeleton width="40%" height={10} />
+        <Skeleton width="80%" height={15} style={styles.skeletonGapTop} />
+        <Skeleton width="95%" height={11} style={styles.skeletonGapTop} />
       </View>
     </View>
   );
@@ -113,14 +113,21 @@ export default function CoursesScreen({ navigation }: Props) {
         placeholder="Search courses..."
         style={styles.searchBar}
       />
-      <SelectField placeholder="All" containerStyle={styles.fieldSpaced} />
-      <SelectField
-        placeholder="All Levels"
-        containerStyle={styles.fieldSpaced}
-      />
+      <View style={[styles.filterRow, styles.fieldSpaced]}>
+        <SelectField
+          icon="grid"
+          placeholder="All"
+          containerStyle={styles.filterField}
+        />
+        <SelectField
+          icon="trending-up"
+          placeholder="All Levels"
+          containerStyle={styles.filterField}
+        />
+      </View>
 
       {loading ? (
-        <View style={[styles.list, styles.fieldSpaced]}>
+        <View style={[styles.grid, styles.fieldSpaced]}>
           <CourseCardSkeleton />
           <CourseCardSkeleton />
         </View>
@@ -134,10 +141,11 @@ export default function CoursesScreen({ navigation }: Props) {
             Showing {filteredCourses.length} of {courses.length} courses
           </Text>
 
-          <View style={styles.list}>
+          <View style={styles.grid}>
             {filteredCourses.map((course) => (
               <CourseCard
                 key={course.id}
+                style={styles.gridItem}
                 level={course.level ?? 'Beginner'}
                 eyebrow={course.title.toUpperCase()}
                 instructor={course.instructor_name ?? 'JMONEY'}
@@ -167,14 +175,27 @@ const styles = StyleSheet.create({
   fieldSpaced: {
     marginTop: 12,
   },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  filterField: {
+    flex: 1,
+  },
   resultsText: {
     color: colors.textFaint,
     fontSize: 13,
     marginTop: 18,
   },
-  list: {
-    gap: 20,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 16,
     marginTop: 14,
+  },
+  gridItem: {
+    width: '48%',
   },
   errorText: {
     color: colors.accentRed,
@@ -182,6 +203,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   skeletonCard: {
+    width: '48%',
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -189,10 +211,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   skeletonBody: {
-    padding: 16,
+    padding: 12,
   },
   skeletonGapTop: {
-    marginTop: 10,
+    marginTop: 8,
   },
   disclaimerSpaced: {
     marginTop: 24,
