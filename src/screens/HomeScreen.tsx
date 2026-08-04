@@ -339,7 +339,7 @@ export default function HomeScreen({ navigation }: Props) {
       </SurfaceCard>
 
       <LinearGradient
-        colors={gradients.button}
+        colors={gradients.brand}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.connectCard, styles.cardSpaced]}
