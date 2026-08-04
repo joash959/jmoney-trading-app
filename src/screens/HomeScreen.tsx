@@ -396,6 +396,38 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
+      <Pressable
+        onPress={() => navigation.navigate('Alerts')}
+        style={({ pressed }) => [styles.cardSpaced, pressed && styles.connectPressed]}
+      >
+        <LinearGradient
+          colors={gradients.button}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.connectCard}
+        >
+          <Feather
+            name="arrow-right"
+            size={20}
+            color={colors.text}
+            style={styles.connectArrow}
+          />
+          <View style={styles.connectRow}>
+            <View style={styles.connectTextCol}>
+              <Text style={styles.connectTitle}>View JMONEY Trade Alerts</Text>
+              <Text style={styles.connectSubtitle}>
+                Real-time trade alert insights
+              </Text>
+            </View>
+            <Image
+              source={require('../../assets/tradealerts.png')}
+              style={styles.connectIcon}
+              resizeMode="contain"
+            />
+          </View>
+        </LinearGradient>
+      </Pressable>
+
       <View style={styles.cardSpaced}>
         <PromoCarousel items={promoItems} />
       </View>
