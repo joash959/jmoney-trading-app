@@ -343,7 +343,7 @@ export default function HomeScreen({ navigation }: Props) {
             variant="flat"
             style={styles.getStartedButton}
           />
-          <SecondaryButton label="WhatsApp" icon="message-circle" />
+          <SecondaryButton label="WhatsApp us" />
         </View>
       </SurfaceCard>
 
