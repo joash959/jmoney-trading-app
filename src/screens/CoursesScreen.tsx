@@ -14,6 +14,7 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import SearchBar from '../components/SearchBar';
 import SelectField from '../components/SelectField';
+import FilterSheet from '../components/FilterSheet';
 import CourseCard from '../components/CourseCard';
 import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
@@ -49,6 +50,10 @@ export default function CoursesScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [levelFilter, setLevelFilter] = useState<string | null>(null);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [levelModalVisible, setLevelModalVisible] = useState(false);
 
   const fetchCourses = useCallback(async () => {
     const { data, error: fetchError } = await supabase
@@ -73,15 +78,35 @@ export default function CoursesScreen({ navigation }: Props) {
     setRefreshing(false);
   };
 
+  const categoryOptions = useMemo(() => {
+    const unique = Array.from(
+      new Set(courses.map((c) => c.category).filter((v): v is string => !!v))
+    ).sort();
+    return [{ label: 'All', value: null }, ...unique.map((v) => ({ label: v, value: v }))];
+  }, [courses]);
+
+  const levelOptions = useMemo(() => {
+    const unique = Array.from(
+      new Set(courses.map((c) => c.level).filter((v): v is string => !!v))
+    ).sort();
+    return [
+      { label: 'All Levels', value: null },
+      ...unique.map((v) => ({ label: v, value: v })),
+    ];
+  }, [courses]);
+
   const filteredCourses = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return courses;
-    return courses.filter(
-      (course) =>
+    return courses.filter((course) => {
+      const matchesQuery =
+        !query ||
         course.title.toLowerCase().includes(query) ||
-        course.description?.toLowerCase().includes(query)
-    );
-  }, [courses, search]);
+        course.description?.toLowerCase().includes(query);
+      const matchesCategory = !categoryFilter || course.category === categoryFilter;
+      const matchesLevel = !levelFilter || course.level === levelFilter;
+      return matchesQuery && matchesCategory && matchesLevel;
+    });
+  }, [courses, search, categoryFilter, levelFilter]);
 
   return (
     <ScreenShell
@@ -116,11 +141,15 @@ export default function CoursesScreen({ navigation }: Props) {
         <SelectField
           icon="grid"
           placeholder="All"
+          value={categoryFilter}
+          onPress={() => setCategoryModalVisible(true)}
           containerStyle={styles.filterField}
         />
         <SelectField
           icon="trending-up"
           placeholder="All Levels"
+          value={levelFilter}
+          onPress={() => setLevelModalVisible(true)}
           containerStyle={styles.filterField}
         />
       </View>
@@ -162,6 +191,23 @@ export default function CoursesScreen({ navigation }: Props) {
       )}
 
       <DisclaimerCard style={styles.disclaimerSpaced} />
+
+      <FilterSheet
+        visible={categoryModalVisible}
+        title="Category"
+        options={categoryOptions}
+        selected={categoryFilter}
+        onSelect={setCategoryFilter}
+        onClose={() => setCategoryModalVisible(false)}
+      />
+      <FilterSheet
+        visible={levelModalVisible}
+        title="Level"
+        options={levelOptions}
+        selected={levelFilter}
+        onSelect={setLevelFilter}
+        onClose={() => setLevelModalVisible(false)}
+      />
     </ScreenShell>
   );
 }

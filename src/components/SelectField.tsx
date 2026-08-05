@@ -8,7 +8,7 @@ type Props = {
   label?: string;
   icon?: React.ComponentProps<typeof Feather>['name'];
   placeholder: string;
-  value?: string;
+  value?: string | null;
   onPress?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
 };
@@ -21,20 +21,39 @@ export default function SelectField({
   onPress,
   containerStyle,
 }: Props) {
+  const isActive = !!value;
+
   return (
     <View style={containerStyle}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <Pressable style={styles.wrapper} onPress={onPress}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.wrapper,
+          isActive && styles.wrapperActive,
+          pressed && styles.wrapperPressed,
+        ]}
+        onPress={onPress}
+      >
         <View style={styles.left}>
-          {icon && <Feather name={icon} size={16} color={colors.textFaint} />}
+          {icon && (
+            <Feather
+              name={icon}
+              size={14}
+              color={isActive ? colors.accentBlue : colors.textFaint}
+            />
+          )}
           <Text
-            style={value ? styles.value : styles.placeholder}
+            style={isActive ? styles.value : styles.placeholder}
             numberOfLines={1}
           >
             {value ?? placeholder}
           </Text>
         </View>
-        <Feather name="chevron-down" size={18} color={colors.textFaint} />
+        <Feather
+          name="chevron-down"
+          size={16}
+          color={isActive ? colors.accentBlue : colors.textFaint}
+        />
       </Pressable>
     </View>
   );
@@ -52,27 +71,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.inputBackground,
-    borderWidth: 1.5,
-    borderColor: colors.inputBorder,
-    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.pill,
     paddingHorizontal: 14,
-    height: 48,
+    height: 38,
+  },
+  wrapperActive: {
+    backgroundColor: colors.accentBlueDim,
+  },
+  wrapperPressed: {
+    opacity: 0.8,
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     flex: 1,
   },
   placeholder: {
     flex: 1,
     color: colors.textFaint,
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '600',
   },
   value: {
     flex: 1,
-    color: colors.text,
-    fontSize: 14,
+    color: colors.accentBlue,
+    fontSize: 13,
+    fontWeight: '700',
   },
 });
