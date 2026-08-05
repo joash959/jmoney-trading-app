@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -36,15 +36,32 @@ function formatRelativeTime(iso: string) {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-function formatTimestamp(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+function formatShortTime(iso: string) {
+  return new Date(iso).toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    second: '2-digit',
     hour12: true,
+  });
+}
+
+function formatDateLabel(iso: string) {
+  const date = new Date(iso);
+  const now = new Date();
+  const isSameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+
+  if (isSameDay(date, now)) return 'Today';
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (isSameDay(date, yesterday)) return 'Yesterday';
+
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric',
   });
 }
 
@@ -97,6 +114,59 @@ export default function AlertsScreen({ navigation }: Props) {
     fetchAlerts().then(() => setLoading(false));
   }, [fetchAlerts]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('trade_alerts_live')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'trade_alerts' },
+        (payload) => {
+          const row = payload.new as TradeAlert;
+          setAlerts((prev) =>
+            prev.some((a) => a.id === row.id) ? prev : [row, ...prev].slice(0, 30)
+          );
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'trading_signals' },
+        (payload) => {
+          const type = (payload.new?.signal_type ?? '').toLowerCase();
+          if (type.includes('buy') || type.includes('long')) {
+            setLongCount((count) => count + 1);
+          } else if (type.includes('sell') || type.includes('short')) {
+            setShortCount((count) => count + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const livePulse = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(livePulse, {
+          toValue: 0.3,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(livePulse, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [livePulse]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchAlerts();
@@ -112,6 +182,20 @@ export default function AlertsScreen({ navigation }: Props) {
       created.getDate() === now.getDate()
     );
   }).length;
+
+  const groupedAlerts = useMemo(() => {
+    const groups: { label: string; items: TradeAlert[] }[] = [];
+    alerts.forEach((alert) => {
+      const label = formatDateLabel(alert.created_at);
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && lastGroup.label === label) {
+        lastGroup.items.push(alert);
+      } else {
+        groups.push({ label, items: [alert] });
+      }
+    });
+    return groups;
+  }, [alerts]);
 
   return (
     <ScreenShell
@@ -136,8 +220,11 @@ export default function AlertsScreen({ navigation }: Props) {
         title="Trade Alerts"
         subtitle="Real-time Trade Alert Insights with JMONEY"
         rightElement={
-          <View style={styles.countPill}>
-            <Text style={styles.countText}>{alerts.length}</Text>
+          <View style={styles.livePill}>
+            <Animated.View
+              style={[styles.liveDot, { opacity: livePulse }]}
+            />
+            <Text style={styles.liveText}>LIVE</Text>
           </View>
         }
       />
@@ -203,13 +290,21 @@ export default function AlertsScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.list}>
-            {alerts.map((alert) => (
-              <AlertCard
-                key={alert.id}
-                relativeTime={formatRelativeTime(alert.created_at)}
-                message={alert.message}
-                timestamp={formatTimestamp(alert.created_at)}
-              />
+            {groupedAlerts.map((group) => (
+              <View key={group.label} style={styles.group}>
+                <View style={styles.dateRow}>
+                  <Text style={styles.dateLabel}>{group.label}</Text>
+                </View>
+                <View style={styles.groupList}>
+                  {group.items.map((alert) => (
+                    <AlertCard
+                      key={alert.id}
+                      message={alert.message}
+                      time={formatShortTime(alert.created_at)}
+                    />
+                  ))}
+                </View>
+              </View>
             ))}
             {alerts.length === 0 && (
               <Text style={styles.emptyText}>No alerts yet.</Text>
@@ -224,17 +319,28 @@ export default function AlertsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  countPill: {
+  livePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
+    borderColor: 'rgba(37,211,102,0.35)',
+    backgroundColor: 'rgba(37,211,102,0.12)',
     borderRadius: 12,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 5,
   },
-  countText: {
-    color: colors.textMuted,
-    fontSize: 13,
-    fontWeight: '700',
+  liveDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: colors.accentGreen,
+  },
+  liveText: {
+    color: colors.accentGreen,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   errorText: {
     color: colors.accentRed,
@@ -263,8 +369,27 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   list: {
-    gap: 14,
+    gap: 20,
     marginTop: 16,
+  },
+  group: {
+    gap: 10,
+  },
+  dateRow: {
+    alignItems: 'center',
+  },
+  dateLabel: {
+    color: colors.textFaint,
+    fontSize: 12,
+    fontWeight: '700',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    overflow: 'hidden',
+  },
+  groupList: {
+    gap: 10,
   },
   emptyText: {
     color: colors.textMuted,

@@ -1,63 +1,55 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 
 type Props = {
-  relativeTime: string;
   message: string;
-  timestamp: string;
+  time: string;
 };
 
-export default function AlertCard({ relativeTime, message, timestamp }: Props) {
+export default function AlertCard({ message, time }: Props) {
   return (
-    <View style={styles.card}>
-      <View style={styles.iconCircle}>
-        <Feather name="message-circle" size={16} color={colors.link} />
-      </View>
-      <View style={styles.body}>
-        <Text style={styles.relativeTime}>{relativeTime}</Text>
-        <Text style={styles.message}>{message}</Text>
-        <Text style={styles.timestamp}>{timestamp}</Text>
+    <View style={styles.row}>
+      <View style={styles.bubble}>
+        <Text style={styles.sender}>JMONEY Signals</Text>
+        <Text style={styles.message}>
+          {message}
+          <Text style={styles.time}>{'  '}{time}</Text>
+        </Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  row: {
     flexDirection: 'row',
-    gap: 12,
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 16,
+    justifyContent: 'flex-start',
+  },
+  bubble: {
+    maxWidth: '86%',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: 16,
+    borderBottomLeftRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     ...shadows.sm,
   },
-  iconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  body: {
-    flex: 1,
-  },
-  relativeTime: {
-    color: colors.textFaint,
+  sender: {
+    color: colors.accentBlue,
     fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 3,
   },
   message: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 4,
+    fontSize: 15,
+    lineHeight: 21,
   },
-  timestamp: {
+  time: {
     color: colors.textFaint,
-    fontSize: 12,
-    marginTop: 8,
+    fontSize: 11,
+    fontWeight: '400',
   },
 });
