@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import YoutubePlayer, {
   PLAYER_STATES,
   YoutubeIframeRef,
@@ -48,45 +49,85 @@ function formatTime(seconds: number) {
 
 export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const playerRef = useRef<YoutubeIframeRef>(null);
-  const [playing, setPlaying] = useState(true);
+  // Starts paused - YouTube's embedded iframe can't autoplay in a WebView,
+  // so starting "playing" true left the UI stuck showing a pause icon over
+  // a video that was never actually running, and the first tap just
+  // silently confirmed that (already-false) state instead of starting it.
+  const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const resumeAtRef = useRef(0);
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
+  // A new lesson means a new video - don't carry over the previous one's
+  // playhead/playing state into it.
+  useEffect(() => {
+    setPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    resumeAtRef.current = 0;
+  }, [videoId]);
 
   useEffect(() => {
     if (!playing) return;
     const interval = setInterval(async () => {
       const time = await playerRef.current?.getCurrentTime();
-      if (typeof time === 'number') setCurrentTime(time);
+      if (typeof time === 'number') {
+        setCurrentTime(time);
+        resumeAtRef.current = time;
+      }
     }, 500);
     return () => clearInterval(interval);
   }, [playing]);
 
+  useEffect(() => {
+    return () => {
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+    };
+  }, []);
+
   const handleReady = async () => {
     const total = await playerRef.current?.getDuration();
     if (typeof total === 'number') setDuration(total);
+    if (resumeAtRef.current > 0) {
+      await playerRef.current?.seekTo(resumeAtRef.current, true);
+    }
   };
 
   const handleStateChange = (state: string) => {
     if (state === PLAYER_STATES.ENDED) {
       setPlaying(false);
       setCurrentTime(0);
+      resumeAtRef.current = 0;
     }
   };
 
   const handleSeek = async (fraction: number) => {
     if (!duration) return;
     const target = Math.max(0, Math.min(duration, fraction * duration));
+    resumeAtRef.current = target;
     await playerRef.current?.seekTo(target, true);
     setCurrentTime(target);
   };
 
-  return (
-    <View style={{ width, height }}>
+  const enterFullscreen = async () => {
+    setFullscreen(true);
+    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+  };
+
+  const exitFullscreen = async () => {
+    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+    setFullscreen(false);
+  };
+
+  const renderPlayer = (playerWidth: number, playerHeight: number, isFullscreen: boolean) => (
+    <View style={{ width: playerWidth, height: playerHeight }}>
       <YoutubePlayer
         ref={playerRef}
         key={videoId}
-        width={width}
-        height={height}
+        width={playerWidth}
+        height={playerHeight}
         videoId={videoId}
         play={playing}
         onReady={handleReady}
@@ -119,7 +160,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
           <Pressable
             style={styles.progressTrack}
             onPress={(event) =>
-              handleSeek(event.nativeEvent.locationX / (width - 90))
+              handleSeek(event.nativeEvent.locationX / (playerWidth - 90))
             }
           >
             <View style={styles.progressBg} />
@@ -132,13 +173,41 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
               ]}
             />
           </Pressable>
+          <Pressable
+            style={styles.fullscreenButton}
+            onPress={isFullscreen ? exitFullscreen : enterFullscreen}
+          >
+            <Feather
+              name={isFullscreen ? 'minimize' : 'maximize'}
+              size={16}
+              color={colors.text}
+            />
+          </Pressable>
         </View>
       </View>
     </View>
   );
+
+  return (
+    <>
+      {!fullscreen && renderPlayer(width, height, false)}
+
+      <Modal visible={fullscreen} animationType="fade" onRequestClose={exitFullscreen}>
+        <View style={styles.fullscreenModal}>
+          {fullscreen && renderPlayer(screenWidth, screenHeight, true)}
+        </View>
+      </Modal>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
+  fullscreenModal: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   tapArea: {
     flex: 1,
     alignItems: 'center',
@@ -181,5 +250,13 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: colors.accentBlue,
+  },
+  fullscreenButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

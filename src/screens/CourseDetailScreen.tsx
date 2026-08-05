@@ -2,11 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
+import { spacing } from '../theme/spacing';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { getYoutubeVideoId } from '../lib/youtube';
@@ -17,6 +20,7 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
+import GlassCard from '../components/GlassCard';
 import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
 
 type Props = NativeStackScreenProps<CoursesStackParamList, 'CourseDetail'>;
@@ -27,6 +31,15 @@ function formatDuration(minutes: number | null) {
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
   return rest ? `${hours}h ${rest}m` : `${hours}h`;
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 export default function CourseDetailScreen({ route, navigation }: Props) {
@@ -202,21 +215,39 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             </Text>
           )}
 
-          <Text style={styles.courseTitle}>{course.title}</Text>
-          <View style={styles.metaRow}>
-            {course.level && <Pill label={course.level} color={colors.accentGreen} />}
-            {course.category && <Pill label={course.category} color={colors.link} />}
-          </View>
-          {!!course.description && (
-            <Text style={styles.courseDescription}>{course.description}</Text>
-          )}
-          {!!course.instructor_name && (
-            <Text style={styles.instructor}>By {course.instructor_name}</Text>
-          )}
+          <GlassCard style={styles.cardSpaced}>
+            <View style={styles.metaRow}>
+              {course.level && <Pill label={course.level} color={colors.accentGreen} backgroundColor="rgba(37,211,102,0.12)" />}
+              {course.category && <Pill label={course.category} color={colors.link} backgroundColor="rgba(78,140,255,0.12)" />}
+            </View>
+            <Text style={styles.courseTitle}>{course.title}</Text>
+            {!!course.description && (
+              <Text style={styles.courseDescription}>{course.description}</Text>
+            )}
+            {!!course.instructor_name && (
+              <View style={styles.instructorRow}>
+                <LinearGradient colors={gradients.brand} style={styles.instructorAvatar}>
+                  <Text style={styles.instructorAvatarText}>
+                    {getInitials(course.instructor_name)}
+                  </Text>
+                </LinearGradient>
+                <View>
+                  <Text style={styles.instructorLabel}>Instructor</Text>
+                  <Text style={styles.instructorName}>{course.instructor_name}</Text>
+                </View>
+              </View>
+            )}
+          </GlassCard>
 
-          <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
-            Lessons
-          </Text>
+          <View style={[styles.sectionHeadingRow, styles.sectionSpaced]}>
+            <View style={styles.sectionHeadingLeft}>
+              <Feather name="list" size={18} color={colors.link} />
+              <Text style={styles.sectionTitle}>Lessons</Text>
+            </View>
+            <View style={styles.lessonCountPill}>
+              <Text style={styles.lessonCountText}>{lessons.length}</Text>
+            </View>
+          </View>
           <View style={styles.lessonsList}>
             {lessons.map((lesson, index) => {
               const isActive = lesson.id === activeLessonId;
@@ -227,11 +258,23 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                   style={[styles.lessonRow, isActive && styles.lessonRowActive]}
                   onPress={() => handleSelectLesson(lesson)}
                 >
-                  <View style={styles.lessonIcon}>
+                  <View
+                    style={[
+                      styles.lessonIcon,
+                      isActive && styles.lessonIconActive,
+                      locked && styles.lessonIconLocked,
+                    ]}
+                  >
                     <Feather
                       name={locked ? 'lock' : isActive ? 'play' : 'play-circle'}
                       size={16}
-                      color={locked ? colors.textFaint : colors.link}
+                      color={
+                        locked
+                          ? colors.textFaint
+                          : isActive
+                            ? colors.text
+                            : colors.link
+                      }
                     />
                   </View>
                   <View style={styles.lessonBody}>
@@ -280,8 +323,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   videoWrap: {
-    borderRadius: 14,
+    borderRadius: radius.xl,
     overflow: 'hidden',
+    ...shadows.sm,
   },
   video: {
     width: '100%',
@@ -303,27 +347,63 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 8,
   },
-  courseTitle: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '800',
-    marginTop: 18,
-  },
   metaRow: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 10,
+  },
+  courseTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 12,
   },
   courseDescription: {
     color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
-    marginTop: 12,
+    marginTop: 10,
   },
-  instructor: {
-    color: colors.textFaint,
+  instructorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+  },
+  instructorAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  instructorAvatarText: {
+    color: colors.text,
     fontSize: 13,
-    marginTop: 8,
+    fontWeight: '800',
+  },
+  instructorLabel: {
+    color: colors.textFaint,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  instructorName: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  sectionHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionHeadingLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   sectionTitle: {
     color: colors.text,
@@ -331,7 +411,18 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   sectionSpaced: {
-    marginTop: 24,
+    marginTop: 28,
+  },
+  lessonCountPill: {
+    backgroundColor: colors.accentBlueDim,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  lessonCountText: {
+    color: colors.accentBlue,
+    fontSize: 12,
+    fontWeight: '800',
   },
   lessonsList: {
     gap: 10,
@@ -342,8 +433,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 12,
+    borderRadius: radius.xl,
+    padding: spacing.sm,
     ...shadows.sm,
   },
   lessonRowActive: {
@@ -351,12 +442,18 @@ const styles = StyleSheet.create({
     borderColor: colors.accentBlue,
   },
   lessonIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 34,
+    height: 34,
+    borderRadius: radius.lg,
     backgroundColor: 'rgba(78,140,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  lessonIconActive: {
+    backgroundColor: colors.accentBlue,
+  },
+  lessonIconLocked: {
+    backgroundColor: colors.surfaceAlt,
   },
   lessonBody: {
     flex: 1,
