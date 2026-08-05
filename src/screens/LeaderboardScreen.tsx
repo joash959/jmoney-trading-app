@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
@@ -14,7 +15,6 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
-import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
@@ -158,9 +158,17 @@ export default function LeaderboardScreen({ navigation }: Props) {
       />
 
       {settings?.show_podium !== false && (
-        <AccentCard style={styles.cardSpaced}>
+        <LinearGradient
+          colors={gradients.brand}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.heroCard, styles.cardSpaced]}
+        >
+          <View style={styles.heroIconCircle}>
+            <Feather name="award" size={20} color={colors.text} />
+          </View>
           <Text style={styles.heroTitle}>
-            🏆 {settings?.competition_name ?? 'Enter The Millionaire League Challenge'}
+            {settings?.competition_name ?? 'Enter The Millionaire League Challenge'}
           </Text>
           <Text style={styles.heroSubtitle}>
             {settings?.banner_subtitle ??
@@ -169,13 +177,17 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
           <View style={styles.podiumRow}>
             <View style={styles.podiumColumn}>
-              <Text style={styles.podiumEmoji}>🥈</Text>
+              <View style={[styles.podiumMedal, styles.podiumMedalSilver]}>
+                <Feather name="award" size={18} color="#0A0D16" />
+              </View>
               <View style={[styles.podiumBar, styles.podiumSilver]}>
                 <Text style={styles.podiumNumber}>2</Text>
               </View>
             </View>
             <View style={styles.podiumColumn}>
-              <Text style={styles.podiumEmojiLarge}>🏆</Text>
+              <View style={[styles.podiumMedal, styles.podiumMedalGold]}>
+                <Feather name="award" size={20} color="#0A0D16" />
+              </View>
               <View
                 style={[styles.podiumBar, styles.podiumGold, styles.podiumTall]}
               >
@@ -183,13 +195,15 @@ export default function LeaderboardScreen({ navigation }: Props) {
               </View>
             </View>
             <View style={styles.podiumColumn}>
-              <Text style={styles.podiumEmoji}>🥉</Text>
+              <View style={[styles.podiumMedal, styles.podiumMedalBronze]}>
+                <Feather name="award" size={18} color="#0A0D16" />
+              </View>
               <View style={[styles.podiumBar, styles.podiumBronze]}>
                 <Text style={styles.podiumNumber}>3</Text>
               </View>
             </View>
           </View>
-        </AccentCard>
+        </LinearGradient>
       )}
 
       <GlassCard style={styles.cardSpaced}>
@@ -344,6 +358,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             return (
               <LeaderboardRow
                 key={participant.id}
+                rank={participant.rank}
                 rankIconColor={rankColor(participant.rank)}
                 name={participant.nickname || participant.name}
                 subtitle={participant.name}
@@ -367,13 +382,27 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
+  heroCard: {
+    borderRadius: 14,
+    padding: 20,
+    ...shadows.glow,
+  },
+  heroIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   heroTitle: {
     color: colors.text,
     fontSize: 20,
     fontWeight: '800',
+    marginTop: 14,
   },
   heroSubtitle: {
-    color: colors.textMuted,
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 14,
     marginTop: 6,
   },
@@ -387,13 +416,24 @@ const styles = StyleSheet.create({
   podiumColumn: {
     alignItems: 'center',
   },
-  podiumEmoji: {
-    fontSize: 28,
+  podiumMedal: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
-  podiumEmojiLarge: {
-    fontSize: 40,
-    marginBottom: 8,
+  podiumMedalGold: {
+    backgroundColor: GOLD,
+  },
+  podiumMedalSilver: {
+    backgroundColor: SILVER,
+  },
+  podiumMedalBronze: {
+    backgroundColor: BRONZE,
   },
   podiumBar: {
     width: 72,

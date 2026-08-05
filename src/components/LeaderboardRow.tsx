@@ -9,6 +9,7 @@ type Badge =
   | { type: 'up'; amount: number };
 
 type Props = {
+  rank: number | null;
   rankIconColor: string;
   name: string;
   subtitle: string;
@@ -17,16 +18,25 @@ type Props = {
 };
 
 export default function LeaderboardRow({
+  rank,
   rankIconColor,
   name,
   subtitle,
   lots,
   badge,
 }: Props) {
+  const isTopThree = !!rank && rank <= 3;
+
   return (
     <View style={styles.row}>
       <View style={styles.rankColumn}>
-        <Feather name="award" size={22} color={rankIconColor} />
+        {isTopThree ? (
+          <Feather name="award" size={22} color={rankIconColor} />
+        ) : (
+          <View style={styles.rankBadge}>
+            <Text style={styles.rankBadgeText}>{rank ?? '—'}</Text>
+          </View>
+        )}
         {badge?.type === 'new' && (
           <View style={styles.newBadge}>
             <Text style={styles.newBadgeText}>NEW</Text>
@@ -79,6 +89,19 @@ const styles = StyleSheet.create({
   rankColumn: {
     alignItems: 'center',
     width: 34,
+  },
+  rankBadge: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rankBadgeText: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '800',
   },
   newBadge: {
     backgroundColor: colors.accentBlueDim,
