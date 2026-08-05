@@ -1,7 +1,7 @@
 // Neutral dark-gray ladder (PrimeXBT-style): each step reads as a clear,
 // deliberate brightness bump from the one below it - not a blue-black tint.
 export const colors = {
-  background: '#0A0A0D',
+  background: '#131417',
   surface: '#17181C',
   surfaceAlt: '#202126',
   surfaceTrack: '#2B2C32',

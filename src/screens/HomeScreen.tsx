@@ -7,7 +7,6 @@ import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { radius } from '../theme/radius';
 import { fonts } from '../theme/fonts';
-import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
@@ -391,10 +390,6 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   heroCard: {
     marginTop: 16,
-    backgroundColor: colors.card,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    ...shadows.sm,
   },
   heroTopRow: {
     flexDirection: 'row',
