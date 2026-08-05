@@ -4,6 +4,7 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
@@ -23,8 +24,20 @@ const TYPE_ICON: Record<string, React.ComponentProps<typeof Feather>['name']> = 
   telegram_access: 'send',
 };
 
+const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
+  premium_unlocked: { fg: colors.warning, bg: colors.warningDim },
+  session_reminder: { fg: colors.accentGreen, bg: 'rgba(37,211,102,0.15)' },
+  telegram_access: { fg: '#22D3EE', bg: 'rgba(34,211,238,0.15)' },
+};
+
+const DEFAULT_ACCENT = { fg: colors.link, bg: 'rgba(78,140,255,0.12)' };
+
 function iconForType(type: string) {
   return TYPE_ICON[type] ?? 'bell';
+}
+
+function accentForType(type: string) {
+  return TYPE_ACCENT[type] ?? DEFAULT_ACCENT;
 }
 
 function formatRelativeTime(iso: string) {
@@ -102,7 +115,11 @@ export default function NotificationsScreen({}: Props) {
       />
 
       {unreadCount > 0 && (
-        <Pressable style={styles.markAllRow} onPress={handleMarkAllRead}>
+        <Pressable
+          style={({ pressed }) => [styles.markAllPill, pressed && styles.markAllPillPressed]}
+          onPress={handleMarkAllRead}
+        >
+          <Feather name="check" size={13} color={colors.text} />
           <Text style={styles.markAllText}>
             Mark all as read ({unreadCount})
           </Text>
@@ -124,7 +141,9 @@ export default function NotificationsScreen({}: Props) {
         />
       ) : (
         <View style={[styles.list, styles.cardSpaced]}>
-          {notifications.map((notification) => (
+          {notifications.map((notification) => {
+            const accent = accentForType(notification.type);
+            return (
             <Pressable
               key={notification.id}
               style={[
@@ -133,11 +152,11 @@ export default function NotificationsScreen({}: Props) {
               ]}
               onPress={() => handlePressNotification(notification)}
             >
-              <View style={styles.rowIcon}>
+              <View style={[styles.rowIcon, { backgroundColor: accent.bg }]}>
                 <Feather
                   name={iconForType(notification.type)}
                   size={18}
-                  color={colors.link}
+                  color={accent.fg}
                 />
               </View>
               <View style={styles.rowBody}>
@@ -149,7 +168,8 @@ export default function NotificationsScreen({}: Props) {
               </View>
               {!notification.read && <View style={styles.unreadDot} />}
             </Pressable>
-          ))}
+            );
+          })}
         </View>
       )}
     </ScreenShell>
@@ -157,12 +177,22 @@ export default function NotificationsScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  markAllRow: {
+  markAllPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     marginTop: 14,
     alignSelf: 'flex-start',
+    backgroundColor: colors.accentBlue,
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  markAllPillPressed: {
+    opacity: 0.85,
   },
   markAllText: {
-    color: colors.link,
+    color: colors.text,
     fontSize: 13,
     fontWeight: '700',
   },

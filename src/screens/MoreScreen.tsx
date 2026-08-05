@@ -174,7 +174,7 @@ export default function MoreScreen({ navigation }: Props) {
 
       <SectionLabel>MAIN MENU</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
+        <View style={[styles.grid, styles.gridThreeCol]}>
           {mainMenu.map((item) => (
             <IconTile
               key={item.label}
@@ -183,6 +183,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
+              style={styles.tileThreeCol}
             />
           ))}
         </View>
@@ -190,7 +191,7 @@ export default function MoreScreen({ navigation }: Props) {
 
       <SectionLabel>TRADING TOOLS</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
+        <View style={[styles.grid, styles.gridTwoCol]}>
           {tradingTools.map((item) => (
             <IconTile
               key={item.label}
@@ -199,6 +200,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
+              style={styles.tileTwoCol}
             />
           ))}
         </View>
@@ -206,7 +208,7 @@ export default function MoreScreen({ navigation }: Props) {
 
       <SectionLabel>ACCOUNT</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
+        <View style={[styles.grid, styles.gridTwoCol]}>
           {account.map((item) => (
             <IconTile
               key={item.label}
@@ -215,6 +217,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
+              style={styles.tileTwoCol}
             />
           ))}
         </View>
@@ -285,8 +288,19 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    columnGap: spacing.md,
     rowGap: 18,
+  },
+  gridThreeCol: {
+    justifyContent: 'space-between',
+  },
+  gridTwoCol: {
+    justifyContent: 'space-around',
+  },
+  tileThreeCol: {
+    width: '30%',
+  },
+  tileTwoCol: {
+    width: '45%',
   },
   signOutCard: {
     marginTop: 20,

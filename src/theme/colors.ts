@@ -37,4 +37,6 @@ export const gradients = {
   brand: ['#7C3AED', '#2F6FEF'] as const,
   button: ['#3B82F6', '#2F6FEF'] as const,
   premiumGlow: ['rgba(124,58,237,0.35)', 'rgba(47,111,239,0)'] as const,
+  whatsapp: ['#34D399', '#128C7E'] as const,
+  telegram: ['#3B82F6', '#2F6FEF'] as const,
 };

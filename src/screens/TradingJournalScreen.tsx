@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
+import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
@@ -18,6 +21,7 @@ import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
+import GlassCard from '../components/GlassCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
@@ -205,33 +209,34 @@ export default function TradingJournalScreen({ navigation }: Props) {
         title="Trading Journal"
       />
 
-      <View style={[styles.summaryBar, styles.cardSpaced]}>
-        <Text style={styles.summaryLabel}>Monthly:</Text>
-        <View style={styles.summaryPills}>
-          <View
-            style={[
-              styles.pnlPill,
-              monthlyPnl < 0 && styles.pnlPillNegative,
-            ]}
-          >
-            <Text
-              style={[
-                styles.pnlText,
-                monthlyPnl < 0 && styles.pnlTextNegative,
-              ]}
-            >
-              {monthlyPnl >= 0 ? '$' : '-$'}
-              {Math.abs(monthlyPnl).toFixed(2)}
-            </Text>
+      <LinearGradient
+        colors={gradients.button}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.summaryCard, styles.cardSpaced]}
+      >
+        <View style={styles.summaryTopRow}>
+          <View style={styles.summaryIconCircle}>
+            <Feather name="trending-up" size={20} color={colors.text} />
           </View>
           <View style={styles.daysPill}>
             <Text style={styles.daysText}>
               {monthlyEntries.length} day
-              {monthlyEntries.length === 1 ? '' : 's'}
+              {monthlyEntries.length === 1 ? '' : 's'} logged
             </Text>
           </View>
         </View>
-      </View>
+        <Text style={styles.summaryLabel}>Monthly P&L</Text>
+        <Text
+          style={[
+            styles.summaryValue,
+            monthlyPnl < 0 && styles.summaryValueNegative,
+          ]}
+        >
+          {monthlyPnl >= 0 ? '+$' : '-$'}
+          {Math.abs(monthlyPnl).toFixed(2)}
+        </Text>
+      </LinearGradient>
 
       <View style={styles.cardSpaced}>
         <Calendar
@@ -246,7 +251,11 @@ export default function TradingJournalScreen({ navigation }: Props) {
         />
       </View>
 
-      <View style={[styles.entryCard, styles.cardSpaced]}>
+      <GlassCard style={styles.cardSpaced}>
+        <View style={styles.sectionHeadingRow}>
+          <Feather name="edit-3" size={18} color={colors.link} />
+          <Text style={styles.sectionHeading}>Log Entry</Text>
+        </View>
         <Text style={styles.entryDate}>{formatDayLabel(selectedDate)}</Text>
         <View style={styles.entryRow}>
           <FormInput
@@ -290,7 +299,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
             />
           )}
         </View>
-      </View>
+      </GlassCard>
 
       <SectionLabel>WEEKLY SUMMARY</SectionLabel>
       {weeklyEntries.length === 0 ? (
@@ -305,13 +314,27 @@ export default function TradingJournalScreen({ navigation }: Props) {
               style={styles.weekRow}
               onPress={() => setSelectedDate(new Date(entry.trade_date))}
             >
-              <Text style={styles.weekDate}>
-                {new Date(entry.trade_date).toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </Text>
+              <View style={styles.weekLeft}>
+                <View
+                  style={[
+                    styles.weekIndicator,
+                    entry.profit_loss < 0 && styles.weekIndicatorNegative,
+                  ]}
+                >
+                  <Feather
+                    name={entry.profit_loss < 0 ? 'arrow-down-right' : 'arrow-up-right'}
+                    size={13}
+                    color={entry.profit_loss < 0 ? colors.accentRed : colors.accentGreen}
+                  />
+                </View>
+                <Text style={styles.weekDate}>
+                  {new Date(entry.trade_date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </Text>
+              </View>
               <Text
                 style={[
                   styles.weekPnl,
@@ -333,67 +356,68 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
-  summaryBar: {
+  summaryCard: {
+    borderRadius: radius.xl,
+    padding: 18,
+    ...shadows.glow,
+  },
+  summaryTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    ...shadows.sm,
+  },
+  summaryIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   summaryLabel: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  summaryPills: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  pnlPill: {
-    backgroundColor: 'rgba(37,211,102,0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  pnlPillNegative: {
-    backgroundColor: 'rgba(239,68,68,0.15)',
-  },
-  pnlText: {
-    color: colors.accentGreen,
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
+    marginTop: 16,
   },
-  pnlTextNegative: {
-    color: colors.accentRed,
+  summaryValue: {
+    color: colors.text,
+    fontSize: 30,
+    fontWeight: '800',
+    marginTop: 4,
+  },
+  summaryValueNegative: {
+    color: '#FFD7D7',
   },
   daysPill: {
-    backgroundColor: colors.inputBackground,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
+    backgroundColor: 'rgba(255,255,255,0.16)',
     paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
   },
   daysText: {
     color: colors.text,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
   },
   fieldSpaced: {
     marginTop: 12,
   },
-  entryCard: {
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 16,
-    ...shadows.sm,
+  sectionHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  sectionHeading: {
+    color: colors.text,
+    fontSize: 17,
+    fontWeight: '800',
   },
   entryDate: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '800',
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: 14,
   },
   entryRow: {
     flexDirection: 'row',
@@ -439,6 +463,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     ...shadows.sm,
+  },
+  weekLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  weekIndicator: {
+    width: 28,
+    height: 28,
+    borderRadius: radius.md,
+    backgroundColor: 'rgba(37,211,102,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weekIndicatorNegative: {
+    backgroundColor: 'rgba(239,68,68,0.15)',
   },
   weekDate: {
     color: colors.text,

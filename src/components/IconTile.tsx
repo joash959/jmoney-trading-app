@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,6 +25,8 @@ type Props = {
   /** Optional real icon artwork - overrides the Feather glyph when provided. */
   image?: number;
   onPress?: () => void;
+  /** Overrides the default width, letting callers control per-row column count. */
+  style?: StyleProp<ViewStyle>;
 };
 
 export default function IconTile({
@@ -33,6 +35,7 @@ export default function IconTile({
   gradient = iconTileGradients.blue,
   image,
   onPress,
+  style,
 }: Props) {
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -41,7 +44,7 @@ export default function IconTile({
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.wrap, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.wrap, style, pressed && styles.pressed]}
       onPress={handlePress}
     >
       {image ? (
