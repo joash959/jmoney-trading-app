@@ -3,8 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 import { radius } from '../theme/radius';
@@ -227,24 +226,21 @@ export default function HomeScreen({ navigation }: Props) {
         }
       />
 
-      <LinearGradient
-        colors={gradients.brand}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.heroCard}
-      >
+      <View style={styles.heroCard}>
         <View style={styles.heroTopRow}>
           <View style={styles.greetingPill}>
-            <Feather name="star" size={12} color={colors.text} />
+            <Feather name="star" size={12} color={colors.warning} />
             <Text style={styles.greetingPillText}>{getGreeting()}</Text>
           </View>
           <View style={styles.tierPill}>
             <Feather
               name={isPremium ? 'award' : 'lock'}
               size={11}
-              color={colors.text}
+              color={isPremium ? colors.warning : colors.textFaint}
             />
-            <Text style={styles.tierPillText}>
+            <Text
+              style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
+            >
               {isPremium ? 'PREMIUM' : 'FREE PLAN'}
             </Text>
           </View>
@@ -261,7 +257,7 @@ export default function HomeScreen({ navigation }: Props) {
           Discover the secrets of Forex Markets and become the NEXT
           MILLIONAIRE!
         </Text>
-      </LinearGradient>
+      </View>
 
       <GradientLinkCard
         title="Connect your PrimeXBT account"
@@ -387,9 +383,16 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   heroCard: {
     marginTop: 16,
+    backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.lg,
-    ...shadows.glow,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.warning,
+    shadowColor: colors.warning,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 6,
   },
   heroTopRow: {
     flexDirection: 'row',
@@ -403,10 +406,10 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: colors.warningDim,
   },
   greetingPillText: {
-    color: colors.text,
+    color: colors.warning,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -417,13 +420,16 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: colors.surfaceAlt,
   },
   tierPillText: {
-    color: colors.text,
+    color: colors.textFaint,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.5,
+  },
+  tierPillTextPremium: {
+    color: colors.warning,
   },
   quickActionsGrid: {
     flexDirection: 'row',
@@ -437,7 +443,7 @@ const styles = StyleSheet.create({
     ...typography.display,
   },
   greetingSubtitle: {
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textMuted,
     fontSize: 14,
     marginTop: 8,
     lineHeight: 20,
