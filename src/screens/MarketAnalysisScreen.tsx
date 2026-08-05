@@ -68,7 +68,6 @@ function getWidgetHtml(symbol: string) {
             "enable_publishing": false,
             "allow_symbol_change": false,
             "hide_side_toolbar": true,
-            "withdateranges": true,
             "container_id": "tradingview_chart"
           });
         </script>
@@ -86,7 +85,8 @@ function getWidgetHtml(symbol: string) {
           "width": "100%",
           "height": "500",
           "locale": "en",
-          "importanceFilter": "1"
+          "importanceFilter": "1",
+          "currencyFilter": "USD"
         }
         </script>
       </div>
