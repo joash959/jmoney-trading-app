@@ -149,7 +149,7 @@ export default function AlertsScreen({ navigation }: Props) {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchAlerts();
-    }, 15000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [fetchAlerts]);
 
