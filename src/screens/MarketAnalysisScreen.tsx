@@ -9,8 +9,10 @@ import { colors } from '../theme/colors';
 import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import GlowBackground from '../components/GlowBackground';
 import TopBar from '../components/TopBar';
+import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 
@@ -98,6 +100,7 @@ function getWidgetHtml(symbol: string) {
 
 export default function MarketAnalysisScreen({ navigation }: Props) {
   const { profile } = useAuth();
+  const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
 
@@ -142,7 +145,14 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <GlowBackground />
         <View style={styles.gatedContent}>
-          <TopBar />
+          <TopBar
+            rightElement={
+              <NotificationBell
+                count={unreadCount}
+                onPress={() => navigation.navigate('Notifications')}
+              />
+            }
+          />
           <ScreenHeader
             icon="bar-chart-2"
             image={require('../../assets/marketanalysis.png')}
@@ -165,7 +175,14 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <GlowBackground />
       <View style={styles.headerWrap}>
-        <TopBar />
+        <TopBar
+          rightElement={
+            <NotificationBell
+              count={unreadCount}
+              onPress={() => navigation.navigate('Notifications')}
+            />
+          }
+        />
         <ScreenHeader
           icon="bar-chart-2"
           image={require('../../assets/marketanalysis.png')}

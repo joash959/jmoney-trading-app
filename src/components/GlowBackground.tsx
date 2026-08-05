@@ -1,42 +1,17 @@
 import { StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { colors } from '../theme/colors';
 
+/** Flat solid fill - kept as its own component so every screen that
+ * already renders <GlowBackground /> doesn't need to change. Previously
+ * rendered blurred purple/blue "glow" orbs, which read as an unwanted
+ * blue color cast against the app's neutral gray theme - removed. */
 export default function GlowBackground() {
-  return (
-    <View style={styles.base} pointerEvents="none">
-      <LinearGradient
-        colors={['#7C3AED', 'transparent']}
-        style={[styles.orb, styles.orbTop]}
-      />
-      <LinearGradient
-        colors={['#2F6FEF', 'transparent']}
-        style={[styles.orb, styles.orbBottom]}
-      />
-      <BlurView intensity={55} tint="dark" style={StyleSheet.absoluteFill} />
-    </View>
-  );
+  return <View style={styles.base} pointerEvents="none" />;
 }
 
 const styles = StyleSheet.create({
   base: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.background,
-  },
-  orb: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    opacity: 0.16,
-  },
-  orbTop: {
-    top: -120,
-    left: -110,
-  },
-  orbBottom: {
-    top: 300,
-    right: -150,
   },
 });
