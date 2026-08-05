@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
@@ -248,10 +248,16 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
 
       <GradientLinkCard
-        title="Connect your PrimeXBT account"
-        subtitle="Unlock premium features and trade alerts"
+        title={isPremium ? 'PrimeXBT Account Connected' : 'Connect your PrimeXBT account'}
+        subtitle={
+          isPremium
+            ? 'Your account is verified and funded'
+            : 'Unlock premium features and trade alerts'
+        }
         icon={require('../../assets/broker.png')}
         onPress={connect.open}
+        gradient={isPremium ? gradients.whatsapp : undefined}
+        glyph={isPremium ? 'check-circle' : 'arrow-right'}
         style={styles.cardSpaced}
       />
 

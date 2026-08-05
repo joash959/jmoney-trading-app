@@ -15,6 +15,8 @@ type Props = {
   onPress: () => void;
   /** Defaults to the app's standard blue button gradient. */
   gradient?: readonly [string, string, ...string[]];
+  /** Top-right glyph - defaults to a link arrow, pass "check-circle" etc. for a status card. */
+  glyph?: React.ComponentProps<typeof Feather>['name'];
   style?: StyleProp<ViewStyle>;
 };
 
@@ -25,6 +27,7 @@ export default function GradientLinkCard({
   icon,
   onPress,
   gradient = gradients.button,
+  glyph = 'arrow-right',
   style,
 }: Props) {
   return (
@@ -38,7 +41,7 @@ export default function GradientLinkCard({
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
-        <Feather name="arrow-right" size={20} color={colors.text} style={styles.arrow} />
+        <Feather name={glyph} size={20} color={colors.text} style={styles.arrow} />
         <View style={styles.row}>
           <View style={styles.textCol}>
             <Text style={styles.title}>{title}</Text>
