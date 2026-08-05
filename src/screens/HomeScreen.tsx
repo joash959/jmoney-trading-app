@@ -223,17 +223,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={styles.heroCard}>
         <View style={styles.heroTopRow}>
-          <View style={styles.heroHeadingTextWrap}>
-            <Text style={styles.greetingLabel}>{getGreeting()}</Text>
-            <Text
-              style={styles.greetingHeading}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.5}
-            >
-              Welcome back, {firstName}!
-            </Text>
-          </View>
+          <Text style={styles.greetingLabel}>{getGreeting()}</Text>
           <View style={styles.tierPill}>
             <Feather
               name={isPremium ? 'award' : 'lock'}
@@ -247,6 +237,14 @@ export default function HomeScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
+        <Text
+          style={styles.greetingHeading}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.5}
+        >
+          Welcome back, {firstName}!
+        </Text>
       </View>
 
       <GradientLinkCard
@@ -377,14 +375,11 @@ const styles = StyleSheet.create({
   heroTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-  },
-  heroHeadingTextWrap: {
-    flex: 1,
+    justifyContent: 'space-between',
   },
   greetingLabel: {
     color: colors.textMuted,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   tierPill: {
@@ -413,10 +408,10 @@ const styles = StyleSheet.create({
   },
   greetingHeading: {
     color: colors.text,
-    fontSize: 20,
-    lineHeight: 25,
+    fontSize: 30,
+    lineHeight: 36,
     fontWeight: '800',
-    marginTop: 1,
+    marginTop: 10,
   },
   cardSpaced: {
     marginTop: 20,
