@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
 import AccentCard from './AccentCard';
 import Pill from './Pill';
@@ -9,6 +10,7 @@ import Pill from './Pill';
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
   iconColor?: string;
+  iconBackground?: string;
   title: string;
   titleColor?: string;
   tagLabel: string;
@@ -25,6 +27,7 @@ type Props = {
 export default function ChannelCard({
   icon,
   iconColor = colors.link,
+  iconBackground = 'rgba(47,111,239,0.15)',
   title,
   titleColor = colors.text,
   tagLabel,
@@ -41,8 +44,8 @@ export default function ChannelCard({
   return (
     <Card style={styles.card}>
       <View style={styles.topRow}>
-        <View style={styles.iconCircle}>
-          <Feather name={icon} size={20} color={iconColor} />
+        <View style={[styles.iconCircle, { backgroundColor: iconBackground }]}>
+          <Feather name={icon} size={22} color={iconColor} />
         </View>
         {locked ? (
           <Pill label="Premium" color={colors.warning} backgroundColor={colors.warningDim} />
@@ -52,21 +55,30 @@ export default function ChannelCard({
       </View>
 
       <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
+      <Text style={styles.description} numberOfLines={2}>
+        {description}
+      </Text>
 
       <View style={styles.footerRow}>
         <View style={styles.membersRow}>
-          <Feather name="users" size={14} color={colors.textFaint} />
+          <Feather name="users" size={13} color={colors.textFaint} />
           <Text style={styles.membersText}>{members} members</Text>
         </View>
-        <Pressable style={styles.joinRow} onPress={onJoinPress}>
-          <Text style={[styles.joinText, locked && styles.joinTextLocked]}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.joinButton,
+            locked && styles.joinButtonLocked,
+            pressed && styles.joinButtonPressed,
+          ]}
+          onPress={onJoinPress}
+        >
+          <Text style={[styles.joinButtonText, locked && styles.joinButtonTextLocked]}>
             {locked ? 'Unlock' : 'Join'}
           </Text>
           <Feather
-            name={locked ? 'lock' : 'external-link'}
-            size={14}
-            color={locked ? colors.warning : colors.link}
+            name={locked ? 'lock' : 'arrow-right'}
+            size={13}
+            color={locked ? colors.warning : colors.text}
           />
         </Pressable>
       </View>
@@ -84,10 +96,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(47,111,239,0.15)',
+    width: 48,
+    height: 48,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -106,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 18,
   },
   membersRow: {
     flexDirection: 'row',
@@ -117,17 +128,27 @@ const styles = StyleSheet.create({
     color: colors.textFaint,
     fontSize: 13,
   },
-  joinRow: {
+  joinButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    backgroundColor: colors.accentBlue,
+    borderRadius: radius.pill,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
   },
-  joinText: {
-    color: colors.link,
-    fontSize: 14,
+  joinButtonLocked: {
+    backgroundColor: colors.warningDim,
+  },
+  joinButtonPressed: {
+    opacity: 0.85,
+  },
+  joinButtonText: {
+    color: colors.text,
+    fontSize: 13,
     fontWeight: '700',
   },
-  joinTextLocked: {
+  joinButtonTextLocked: {
     color: colors.warning,
   },
 });

@@ -25,6 +25,22 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
+const CATEGORY_ACCENTS = [
+  { bg: 'rgba(47,111,239,0.15)', fg: colors.link },
+  { bg: 'rgba(139,124,255,0.15)', fg: colors.accentPurple },
+  { bg: 'rgba(37,211,102,0.15)', fg: colors.accentGreen },
+  { bg: 'rgba(34,211,238,0.15)', fg: '#22D3EE' },
+  { bg: 'rgba(245,197,24,0.15)', fg: colors.warning },
+];
+
+function categoryAccent(category: string) {
+  let hash = 0;
+  for (let i = 0; i < category.length; i += 1) {
+    hash = (hash * 31 + category.charCodeAt(i)) >>> 0;
+  }
+  return CATEGORY_ACCENTS[hash % CATEGORY_ACCENTS.length];
+}
+
 export default function TelegramChannelsScreen({ navigation }: Props) {
   const { profile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
@@ -130,38 +146,53 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                     'Live trade alerts and mentorship, for premium members only.'}
                 </Text>
 
-                <View style={styles.featuredFooterRow}>
-                  <View style={styles.featuredMembersRow}>
-                    <Feather name="users" size={13} color="rgba(255,255,255,0.85)" />
-                    <Text style={styles.featuredMembersText}>
-                      {featured.member_count ?? '—'} members
-                    </Text>
-                  </View>
-                  <View style={styles.featuredCta}>
-                    <Text style={styles.featuredCtaText}>
-                      {isPremium ? 'Join Channel' : 'Unlock with Premium'}
-                    </Text>
-                    <Feather name="arrow-right" size={14} color={colors.text} />
-                  </View>
+                <View style={styles.featuredMembersRow}>
+                  <Feather name="users" size={13} color="rgba(255,255,255,0.85)" />
+                  <Text style={styles.featuredMembersText}>
+                    {featured.member_count ?? '—'} members
+                  </Text>
+                </View>
+
+                <View style={styles.featuredCta}>
+                  <Text style={styles.featuredCtaText}>
+                    {isPremium ? 'Join Channel' : 'Unlock with Premium'}
+                  </Text>
+                  <Feather
+                    name={isPremium ? 'arrow-right' : 'lock'}
+                    size={15}
+                    color={colors.accentBlue}
+                  />
                 </View>
               </LinearGradient>
             </Pressable>
           )}
 
-          {rest.map((community) => (
-            <ChannelCard
-              key={community.id}
-              icon={toFeatherIcon(community.icon_name)}
-              title={community.name}
-              tagLabel={community.category}
-              tagColor={colors.link}
-              tagBackground={colors.accentBlueDim}
-              description={community.description ?? ''}
-              members={community.member_count ?? ''}
-              locked={community.tier === 'premium' && !isPremium}
-              onJoinPress={() => openCommunity(community)}
-            />
-          ))}
+          {rest.length > 0 && (
+            <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
+              <Text style={styles.sectionTitle}>All Channels</Text>
+              <Text style={styles.sectionCount}>{rest.length}</Text>
+            </View>
+          )}
+
+          {rest.map((community) => {
+            const accent = categoryAccent(community.category);
+            return (
+              <ChannelCard
+                key={community.id}
+                icon={toFeatherIcon(community.icon_name)}
+                iconColor={accent.fg}
+                iconBackground={accent.bg}
+                title={community.name}
+                tagLabel={community.category}
+                tagColor={accent.fg}
+                tagBackground={accent.bg}
+                description={community.description ?? ''}
+                members={community.member_count ?? ''}
+                locked={community.tier === 'premium' && !isPremium}
+                onJoinPress={() => openCommunity(community)}
+              />
+            );
+          })}
 
           <GlassCard style={styles.cardSpaced}>
             <View style={styles.tipRow}>
@@ -246,16 +277,11 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     marginTop: 6,
   },
-  featuredFooterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 18,
-  },
   featuredMembersRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginTop: 14,
   },
   featuredMembersText: {
     color: 'rgba(255,255,255,0.85)',
@@ -264,10 +290,33 @@ const styles = StyleSheet.create({
   featuredCta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.text,
+    borderRadius: radius.pill,
+    height: 46,
+    marginTop: 16,
   },
   featuredCtaText: {
+    color: colors.accentBlue,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionSpaced: {
+    marginTop: 28,
+  },
+  sectionTitle: {
     color: colors.text,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  sectionCount: {
+    color: colors.textFaint,
     fontSize: 13,
     fontWeight: '700',
   },
