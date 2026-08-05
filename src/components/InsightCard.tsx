@@ -27,8 +27,10 @@ export default function InsightCard({
   return (
     <View style={[styles.card, style]}>
       <View style={styles.headerRow}>
-        <Feather name={icon} size={16} color={iconColor} />
-        <Text style={styles.label}>{label}</Text>
+        <Feather name={icon} size={13} color={iconColor} />
+        <Text style={styles.label} numberOfLines={1}>
+          {label}
+        </Text>
       </View>
       <Text style={[styles.value, { color: valueColor }]} numberOfLines={1}>
         {value}
@@ -49,27 +51,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.lg,
-    padding: 14,
+    padding: 10,
     ...shadows.sm,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   label: {
     color: colors.textMuted,
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
   },
   value: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '800',
-    marginTop: 10,
+    marginTop: 6,
   },
   sublabel: {
     color: colors.textFaint,
-    fontSize: 12,
-    marginTop: 2,
+    fontSize: 10,
+    marginTop: 1,
   },
 });

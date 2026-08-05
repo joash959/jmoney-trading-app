@@ -16,6 +16,7 @@ import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
 import DisclaimerCard from '../components/DisclaimerCard';
+import { detectAlertDirection } from '../lib/tradeAlertParser';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
 
@@ -75,21 +76,11 @@ export default function AlertsScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchAlerts = useCallback(async () => {
-    const [{ data: alertData, error: alertError }, { data: signalData }] =
-      await Promise.all([
-        supabase
-          .from('trade_alerts')
-          .select('id, message, created_at')
-          .order('created_at', { ascending: false })
-          .limit(30),
-        supabase
-          .from('trading_signals')
-          .select('signal_type')
-          .gte(
-            'created_at',
-            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-          ),
-      ]);
+    const { data: alertData, error: alertError } = await supabase
+      .from('trade_alerts')
+      .select('id, message, created_at')
+      .order('created_at', { ascending: false })
+      .limit(30);
 
     if (alertError) {
       setError(alertError.message);
@@ -97,14 +88,15 @@ export default function AlertsScreen({ navigation }: Props) {
     }
 
     setError(null);
-    setAlerts((alertData as TradeAlert[]) ?? []);
+    const rows = (alertData as TradeAlert[]) ?? [];
+    setAlerts(rows);
 
     let long = 0;
     let short = 0;
-    (signalData ?? []).forEach((row: any) => {
-      const type = (row.signal_type ?? '').toLowerCase();
-      if (type.includes('buy') || type.includes('long')) long += 1;
-      else if (type.includes('sell') || type.includes('short')) short += 1;
+    rows.forEach((alert) => {
+      const direction = detectAlertDirection(alert.message);
+      if (direction === 'long') long += 1;
+      else if (direction === 'short') short += 1;
     });
     setLongCount(long);
     setShortCount(short);
@@ -122,21 +114,13 @@ export default function AlertsScreen({ navigation }: Props) {
         { event: 'INSERT', schema: 'public', table: 'trade_alerts' },
         (payload) => {
           const row = payload.new as TradeAlert;
-          setAlerts((prev) =>
-            prev.some((a) => a.id === row.id) ? prev : [row, ...prev].slice(0, 30)
-          );
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'trading_signals' },
-        (payload) => {
-          const type = (payload.new?.signal_type ?? '').toLowerCase();
-          if (type.includes('buy') || type.includes('long')) {
-            setLongCount((count) => count + 1);
-          } else if (type.includes('sell') || type.includes('short')) {
-            setShortCount((count) => count + 1);
-          }
+          setAlerts((prev) => {
+            if (prev.some((a) => a.id === row.id)) return prev;
+            return [row, ...prev].slice(0, 30);
+          });
+          const direction = detectAlertDirection(row.message);
+          if (direction === 'long') setLongCount((count) => count + 1);
+          else if (direction === 'short') setShortCount((count) => count + 1);
         }
       )
       .subscribe((status, err) => {
@@ -241,12 +225,12 @@ export default function AlertsScreen({ navigation }: Props) {
       {loading ? (
         <View style={styles.fieldSpaced}>
           <View style={styles.statsRow}>
-            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
-            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
+            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
           </View>
           <View style={[styles.statsRow, styles.fieldSpaced]}>
-            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
-            <Skeleton height={92} radius={18} style={styles.skeletonFlex} />
+            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
+            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
           </View>
           <View style={[styles.list, styles.sectionSpaced]}>
             <Skeleton height={68} radius={16} />
@@ -265,7 +249,7 @@ export default function AlertsScreen({ navigation }: Props) {
               icon="activity"
               label="Today"
               value={String(todayCount)}
-              sublabel="Market Alert Insights"
+              sublabel="Alerts today"
             />
             <InsightCard
               icon="trending-up"
@@ -273,7 +257,7 @@ export default function AlertsScreen({ navigation }: Props) {
               label="Long"
               value={String(longCount)}
               valueColor={colors.accentGreen}
-              sublabel="Insights"
+              sublabel="Last 30 alerts"
             />
           </View>
           <View style={[styles.statsRow, styles.fieldSpaced]}>
@@ -283,7 +267,7 @@ export default function AlertsScreen({ navigation }: Props) {
               label="Short"
               value={String(shortCount)}
               valueColor={colors.accentRed}
-              sublabel="Insights"
+              sublabel="Last 30 alerts"
             />
             <InsightCard
               icon="clock"
@@ -358,11 +342,11 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
+    gap: 8,
+    marginTop: 14,
   },
   fieldSpaced: {
-    marginTop: 12,
+    marginTop: 8,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
