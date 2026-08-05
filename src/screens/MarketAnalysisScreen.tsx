@@ -95,7 +95,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
   if (checkingAccess) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <GlowBackground />
         <ActivityIndicator color={colors.accentBlue} style={styles.loader} />
       </SafeAreaView>
@@ -104,7 +104,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
   if (locked) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <GlowBackground />
         <View style={styles.gatedContent}>
           <TopBar />

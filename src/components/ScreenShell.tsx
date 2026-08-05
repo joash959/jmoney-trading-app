@@ -61,7 +61,7 @@ export default function ScreenShell({
   });
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <GlowBackground />
       <KeyboardAvoidingView
         style={styles.flex}
