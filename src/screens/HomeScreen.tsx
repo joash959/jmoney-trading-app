@@ -4,7 +4,6 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 import { radius } from '../theme/radius';
 import { fonts } from '../theme/fonts';
@@ -41,6 +40,13 @@ function getGreeting() {
   if (hour < 12) return 'Good morning';
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
+}
+
+function getGreetingIcon(): React.ComponentProps<typeof Feather>['name'] {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'sunrise';
+  if (hour < 18) return 'sun';
+  return 'moon';
 }
 
 export default function HomeScreen({ navigation }: Props) {
@@ -228,9 +234,19 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={styles.heroCard}>
         <View style={styles.heroTopRow}>
-          <View style={styles.greetingPill}>
-            <Feather name="star" size={12} color={colors.warning} />
-            <Text style={styles.greetingPillText}>{getGreeting()}</Text>
+          <View style={styles.greetingIconBadge}>
+            <Feather name={getGreetingIcon()} size={18} color={colors.link} />
+          </View>
+          <View style={styles.heroHeadingTextWrap}>
+            <Text style={styles.greetingLabel}>{getGreeting()}</Text>
+            <Text
+              style={styles.greetingHeading}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.55}
+            >
+              Welcome back, {firstName}!
+            </Text>
           </View>
           <View style={styles.tierPill}>
             <Feather
@@ -245,14 +261,6 @@ export default function HomeScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-        <Text
-          style={styles.greetingHeading}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.55}
-        >
-          Welcome back, {firstName}!
-        </Text>
         <Text style={styles.greetingSubtitle}>
           Discover the secrets of Forex Markets and become the NEXT
           MILLIONAIRE!
@@ -386,32 +394,28 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.lg,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.warning,
-    shadowColor: colors.warning,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 6,
+    ...shadows.sm,
   },
   heroTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
   },
-  greetingPill: {
-    flexDirection: 'row',
+  greetingIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.lg,
+    backgroundColor: colors.accentBlueDim,
     alignItems: 'center',
-    gap: 6,
-    borderRadius: radius.pill,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: colors.warningDim,
+    justifyContent: 'center',
   },
-  greetingPillText: {
-    color: colors.warning,
+  heroHeadingTextWrap: {
+    flex: 1,
+  },
+  greetingLabel: {
+    color: colors.textMuted,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   tierPill: {
     flexDirection: 'row',
@@ -439,13 +443,15 @@ const styles = StyleSheet.create({
   },
   greetingHeading: {
     color: colors.text,
-    marginTop: spacing.md,
-    ...typography.display,
+    fontSize: 20,
+    lineHeight: 25,
+    fontWeight: '800',
+    marginTop: 1,
   },
   greetingSubtitle: {
     color: colors.textMuted,
     fontSize: 14,
-    marginTop: 8,
+    marginTop: 14,
     lineHeight: 20,
     fontFamily: fonts.poppinsSemiBold,
   },
