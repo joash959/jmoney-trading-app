@@ -1,9 +1,14 @@
-import { StyleSheet } from 'react-native';
+import { StyleProp, StyleSheet, TextStyle } from 'react-native';
 import Text from './AppText';
 import { colors } from '../theme/colors';
 
-export default function SectionLabel({ children }: { children: string }) {
-  return <Text style={styles.label}>{children}</Text>;
+type Props = {
+  children: string;
+  style?: StyleProp<TextStyle>;
+};
+
+export default function SectionLabel({ children, style }: Props) {
+  return <Text style={[styles.label, style]}>{children}</Text>;
 }
 
 const styles = StyleSheet.create({

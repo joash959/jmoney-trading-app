@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -19,6 +19,18 @@ import SectionLabel from '../components/SectionLabel';
 import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
+
+// ScreenShell's scroll content padding (20/side) + SurfaceCard's own
+// padding (spacing.lg = 20/side) eaten out of the screen width, so
+// percentage-based tile widths can't be trusted to land on exact row
+// counts - compute pixel widths instead so rows never wrap unexpectedly.
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const GRID_WIDTH = SCREEN_WIDTH - 20 * 2 - spacing.lg * 2;
+const TILE_GAP = spacing.md;
+
+function tileWidth(columns: number) {
+  return (GRID_WIDTH - TILE_GAP * (columns - 1)) / columns;
+}
 
 function getInitials(name: string) {
   return name
@@ -172,9 +184,9 @@ export default function MoreScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <SectionLabel>MAIN MENU</SectionLabel>
+      <SectionLabel style={styles.headingWhite}>MAIN MENU</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={[styles.grid, styles.gridThreeCol]}>
+        <View style={styles.grid}>
           {mainMenu.map((item) => (
             <IconTile
               key={item.label}
@@ -183,15 +195,15 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
-              style={styles.tileThreeCol}
+              style={{ width: tileWidth(3) }}
             />
           ))}
         </View>
       </SurfaceCard>
 
-      <SectionLabel>TRADING TOOLS</SectionLabel>
+      <SectionLabel style={styles.headingWhite}>TRADING TOOLS</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={[styles.grid, styles.gridTwoCol]}>
+        <View style={styles.grid}>
           {tradingTools.map((item) => (
             <IconTile
               key={item.label}
@@ -200,15 +212,15 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
-              style={styles.tileTwoCol}
+              style={{ width: tileWidth(2) }}
             />
           ))}
         </View>
       </SurfaceCard>
 
-      <SectionLabel>ACCOUNT</SectionLabel>
+      <SectionLabel style={styles.headingWhite}>ACCOUNT</SectionLabel>
       <SurfaceCard style={styles.sectionCard}>
-        <View style={[styles.grid, styles.gridTwoCol]}>
+        <View style={styles.grid}>
           {account.map((item) => (
             <IconTile
               key={item.label}
@@ -217,7 +229,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
-              style={styles.tileTwoCol}
+              style={{ width: tileWidth(2) }}
             />
           ))}
         </View>
@@ -285,22 +297,14 @@ const styles = StyleSheet.create({
   sectionCard: {
     marginTop: 6,
   },
+  headingWhite: {
+    color: colors.text,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    columnGap: TILE_GAP,
     rowGap: 18,
-  },
-  gridThreeCol: {
-    justifyContent: 'space-between',
-  },
-  gridTwoCol: {
-    justifyContent: 'space-around',
-  },
-  tileThreeCol: {
-    width: '30%',
-  },
-  tileTwoCol: {
-    width: '45%',
   },
   signOutCard: {
     marginTop: 20,
