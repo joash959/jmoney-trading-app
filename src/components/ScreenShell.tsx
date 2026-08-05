@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
-  ScrollView,
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +17,8 @@ type Props = {
   onRefresh?: () => void;
 };
 
+const PULL_RANGE = 100;
+
 export default function ScreenShell({
   children,
   overlay,
@@ -26,6 +27,7 @@ export default function ScreenShell({
 }: Props) {
   const opacity = useRef(new Animated.Value(0)).current;
   const offset = useRef(new Animated.Value(24)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -42,6 +44,22 @@ export default function ScreenShell({
     ]).start();
   }, [opacity, offset]);
 
+  const pullLogoHeight = scrollY.interpolate({
+    inputRange: [-PULL_RANGE, 0],
+    outputRange: [88, 0],
+    extrapolate: 'clamp',
+  });
+  const pullLogoOpacity = scrollY.interpolate({
+    inputRange: [-PULL_RANGE, -20, 0],
+    outputRange: [1, 0.4, 0],
+    extrapolate: 'clamp',
+  });
+  const pullLogoScale = scrollY.interpolate({
+    inputRange: [-PULL_RANGE, 0],
+    outputRange: [1, 0.5],
+    extrapolate: 'clamp',
+  });
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <GlowBackground />
@@ -49,26 +67,47 @@ export default function ScreenShell({
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView
+        <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
           refreshControl={
             onRefresh ? (
               <RefreshControl
                 refreshing={!!refreshing}
                 onRefresh={onRefresh}
-                tintColor={colors.accentBlue}
-                colors={[colors.accentBlue]}
+                tintColor="transparent"
+                colors={['transparent']}
+                progressBackgroundColor="transparent"
               />
             ) : undefined
           }
         >
           <Animated.View
+            style={[
+              styles.pullLogoWrap,
+              { height: pullLogoHeight, opacity: pullLogoOpacity },
+            ]}
+          >
+            <Animated.Image
+              source={require('../../assets/jmoney-mark.png')}
+              style={[
+                styles.pullLogo,
+                { transform: [{ scale: pullLogoScale }] },
+              ]}
+              resizeMode="contain"
+            />
+          </Animated.View>
+          <Animated.View
             style={{ opacity, transform: [{ translateY: offset }] }}
           >
             {children}
           </Animated.View>
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
       {overlay}
     </SafeAreaView>
@@ -86,5 +125,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 110,
+  },
+  pullLogoWrap: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  pullLogo: {
+    width: 44,
+    height: 44,
   },
 });
