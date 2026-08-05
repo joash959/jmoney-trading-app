@@ -16,7 +16,6 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 import Skeleton from '../components/Skeleton';
 
@@ -201,8 +200,6 @@ export default function LiveScreen({ navigation }: Props) {
           )}
         </>
       )}
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

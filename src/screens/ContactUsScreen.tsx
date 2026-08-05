@@ -11,7 +11,6 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import AccentCard from '../components/AccentCard';
 import PrimaryButton from '../components/PrimaryButton';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'ContactUs'>;
@@ -81,8 +80,6 @@ export default function ContactUsScreen({ navigation }: Props) {
           style={styles.fieldSpaced}
         />
       </AccentCard>
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

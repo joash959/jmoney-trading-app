@@ -15,7 +15,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import RatingCard from '../components/RatingCard';
 import FeatureCard from '../components/FeatureCard';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
@@ -234,8 +233,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
           style={styles.fieldSpaced}
         />
       </GlassCard>
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

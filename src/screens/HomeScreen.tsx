@@ -27,7 +27,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
 import IconTile, { iconTileGradients } from '../components/IconTile';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
@@ -467,8 +466,6 @@ export default function HomeScreen({ navigation }: Props) {
           sublabel="Active traders"
         />
       </View>
-
-      <DisclaimerCard style={styles.cardSpaced} />
 
       <PrimeXBTConnectModal
         visible={connectModalVisible}

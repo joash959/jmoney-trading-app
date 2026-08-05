@@ -19,7 +19,6 @@ import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
 import PrimaryButton from '../components/PrimaryButton';
 import ChannelCard from '../components/ChannelCard';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
@@ -217,8 +216,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
           </View>
         </View>
       </GlassCard>
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

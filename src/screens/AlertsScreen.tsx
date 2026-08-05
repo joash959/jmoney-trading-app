@@ -14,7 +14,6 @@ import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
-import DisclaimerCard from '../components/DisclaimerCard';
 import { detectAlertDirection } from '../lib/tradeAlertParser';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
@@ -294,8 +293,6 @@ export default function AlertsScreen({ navigation }: Props) {
           </View>
         </>
       )}
-
-      <DisclaimerCard style={styles.sectionSpaced} />
     </ScreenShell>
   );
 }

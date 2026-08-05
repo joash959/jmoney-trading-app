@@ -22,7 +22,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import UploadDropzone from '../components/UploadDropzone';
 import EmptyStateCard from '../components/EmptyStateCard';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'AIScanner'>;
@@ -315,8 +314,6 @@ export default function AISuperScannerScreen({ navigation }: Props) {
           />
         </>
       )}
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

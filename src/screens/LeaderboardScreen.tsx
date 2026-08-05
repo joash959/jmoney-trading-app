@@ -20,7 +20,6 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
-import DisclaimerCard from '../components/DisclaimerCard';
 import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
@@ -362,8 +361,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
           )}
         </View>
       </GlassCard>
-
-      <DisclaimerCard style={styles.cardSpaced} />
     </ScreenShell>
   );
 }

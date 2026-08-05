@@ -18,7 +18,6 @@ import FilterSheet from '../components/FilterSheet';
 import CourseCard from '../components/CourseCard';
 import Skeleton from '../components/Skeleton';
 import FloatingChatButton from '../components/FloatingChatButton';
-import DisclaimerCard from '../components/DisclaimerCard';
 
 function CourseCardSkeleton() {
   return (
@@ -190,8 +189,6 @@ export default function CoursesScreen({ navigation }: Props) {
         </>
       )}
 
-      <DisclaimerCard style={styles.disclaimerSpaced} />
-
       <FilterSheet
         visible={categoryModalVisible}
         title="Category"
@@ -259,8 +256,5 @@ const styles = StyleSheet.create({
   },
   skeletonGapTop: {
     marginTop: 8,
-  },
-  disclaimerSpaced: {
-    marginTop: 24,
   },
 });
