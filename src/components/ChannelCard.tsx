@@ -17,6 +17,8 @@ type Props = {
   description: string;
   members: string;
   featured?: boolean;
+  /** Premium-tier channel the user hasn't unlocked yet. */
+  locked?: boolean;
   onJoinPress?: () => void;
 };
 
@@ -31,6 +33,7 @@ export default function ChannelCard({
   description,
   members,
   featured,
+  locked,
   onJoinPress,
 }: Props) {
   const Card = featured ? AccentCard : GlassCard;
@@ -41,7 +44,11 @@ export default function ChannelCard({
         <View style={styles.iconCircle}>
           <Feather name={icon} size={20} color={iconColor} />
         </View>
-        <Pill label={tagLabel} color={tagColor} backgroundColor={tagBackground} />
+        {locked ? (
+          <Pill label="Premium" color={colors.warning} backgroundColor={colors.warningDim} />
+        ) : (
+          <Pill label={tagLabel} color={tagColor} backgroundColor={tagBackground} />
+        )}
       </View>
 
       <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
@@ -53,8 +60,14 @@ export default function ChannelCard({
           <Text style={styles.membersText}>{members} members</Text>
         </View>
         <Pressable style={styles.joinRow} onPress={onJoinPress}>
-          <Text style={styles.joinText}>Join</Text>
-          <Feather name="external-link" size={14} color={colors.link} />
+          <Text style={[styles.joinText, locked && styles.joinTextLocked]}>
+            {locked ? 'Unlock' : 'Join'}
+          </Text>
+          <Feather
+            name={locked ? 'lock' : 'external-link'}
+            size={14}
+            color={locked ? colors.warning : colors.link}
+          />
         </Pressable>
       </View>
     </Card>
@@ -113,5 +126,8 @@ const styles = StyleSheet.create({
     color: colors.link,
     fontSize: 14,
     fontWeight: '700',
+  },
+  joinTextLocked: {
+    color: colors.warning,
   },
 });

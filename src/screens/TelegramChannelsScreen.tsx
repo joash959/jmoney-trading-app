@@ -1,64 +1,48 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
+import { shadows } from '../theme/shadows';
+import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { toFeatherIcon } from '../lib/icons';
-import { parseFunctionError } from '../lib/functionError';
-import { Community, TelegramAccessStatus } from '../types/database';
+import { useAuth } from '../contexts/AuthContext';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
+import { Community } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
-import AccentCard from '../components/AccentCard';
 import GlassCard from '../components/GlassCard';
-import Pill from '../components/Pill';
-import PrimaryButton from '../components/PrimaryButton';
 import ChannelCard from '../components/ChannelCard';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
-const REASON_TEXT: Record<string, string> = {
-  not_funded:
-    'Connect and fund your PrimeXBT account (minimum R500) on the Home tab to unlock this channel.',
-  not_approved: 'Your account is pending approval.',
-  expired: 'Your access has expired. Fund your account to restore it.',
-  eligible_removed:
-    'You were removed from the channel, but you\'re eligible to rejoin.',
-  not_joined: 'You haven\'t joined the channel yet.',
-};
-
 export default function TelegramChannelsScreen({ navigation }: Props) {
+  const { profile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const connect = usePrimeXBTConnect();
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [status, setStatus] = useState<TelegramAccessStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
 
-  const fetchStatus = useCallback(async () => {
-    const { data } = await supabase.functions.invoke('telegram-access', {
-      body: { action: 'status' },
-    });
-    setStatus((data as TelegramAccessStatus) ?? null);
-  }, []);
+  const isPremium = profile?.tier === 'premium';
 
   const fetchAll = useCallback(async () => {
-    const [{ data }] = await Promise.all([
-      supabase
-        .from('communities')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true }),
-      fetchStatus(),
-    ]);
+    const { data } = await supabase
+      .from('communities')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
     setCommunities((data as Community[]) ?? []);
-  }, [fetchStatus]);
+  }, []);
 
   useEffect(() => {
     fetchAll().then(() => setLoading(false));
@@ -70,31 +54,26 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
     setRefreshing(false);
   };
 
-  const handleAction = async (action: 'start_link' | 'self_invite') => {
-    setActionError(null);
-    setActionLoading(true);
-    const { data, error } = await supabase.functions.invoke('telegram-access', {
-      body: { action },
-    });
-    setActionLoading(false);
+  const { featured, rest } = useMemo(() => {
+    const premiumIndex = communities.findIndex((c) => c.tier === 'premium');
+    if (premiumIndex === -1) {
+      return { featured: null as Community | null, rest: communities };
+    }
+    const featuredCommunity = communities[premiumIndex];
+    const others = communities.filter((_, i) => i !== premiumIndex);
+    return { featured: featuredCommunity, rest: others };
+  }, [communities]);
 
-    if (error) {
-      setActionError(await parseFunctionError(error));
+  const openCommunity = (community: Community) => {
+    if (community.tier === 'premium' && !isPremium) {
+      connect.open();
       return;
     }
-
-    const url = data?.url ?? data?.invite;
-    if (url) Linking.openURL(url);
-    fetchStatus();
+    Linking.openURL(community.telegram_link);
   };
 
-  const joined = status?.link?.status === 'joined' && status?.link?.in_channel;
-
   return (
-    <ScreenShell
-      refreshing={refreshing}
-      onRefresh={handleRefresh}
-    >
+    <ScreenShell refreshing={refreshing} onRefresh={handleRefresh}>
       <TopBar
         rightElement={
           <NotificationBell
@@ -111,109 +90,107 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
       />
 
       {loading ? (
-        <ActivityIndicator
-          color={colors.accentBlue}
-          style={styles.cardSpaced}
-        />
+        <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
       ) : (
-        <AccentCard style={styles.cardSpaced}>
-          <View style={styles.privateHeaderRow}>
-            <View style={styles.privateTitleRow}>
-              <Feather name="send" size={18} color={colors.link} />
-              <Text style={styles.privateTitle}>Private members channel</Text>
-            </View>
-            <Pill
-              label={
-                status?.canRecover
-                  ? 'Ready to restore'
-                  : joined
-                    ? 'Active'
-                    : status?.accessActive
-                      ? 'Unlocked'
-                      : 'Locked'
-              }
-              color={
-                joined || status?.accessActive
-                  ? colors.accentGreen
-                  : colors.link
-              }
+        <>
+          {featured && (
+            <Pressable
+              onPress={() => openCommunity(featured)}
+              style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
+            >
+              <LinearGradient
+                colors={gradients.brand}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.featuredCard}
+              >
+                <View style={styles.featuredTopRow}>
+                  <View style={styles.featuredIconCircle}>
+                    <Feather
+                      name={toFeatherIcon(featured.icon_name)}
+                      size={20}
+                      color={colors.text}
+                    />
+                  </View>
+                  <View style={styles.featuredBadge}>
+                    <Feather
+                      name={isPremium ? 'unlock' : 'lock'}
+                      size={11}
+                      color={colors.text}
+                    />
+                    <Text style={styles.featuredBadgeText}>
+                      {isPremium ? 'Unlocked' : 'Premium'}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.featuredTitle}>{featured.name}</Text>
+                <Text style={styles.featuredDescription}>
+                  {featured.description ??
+                    'Live trade alerts and mentorship, for premium members only.'}
+                </Text>
+
+                <View style={styles.featuredFooterRow}>
+                  <View style={styles.featuredMembersRow}>
+                    <Feather name="users" size={13} color="rgba(255,255,255,0.85)" />
+                    <Text style={styles.featuredMembersText}>
+                      {featured.member_count ?? '—'} members
+                    </Text>
+                  </View>
+                  <View style={styles.featuredCta}>
+                    <Text style={styles.featuredCtaText}>
+                      {isPremium ? 'Join Channel' : 'Unlock with Premium'}
+                    </Text>
+                    <Feather name="arrow-right" size={14} color={colors.text} />
+                  </View>
+                </View>
+              </LinearGradient>
+            </Pressable>
+          )}
+
+          {rest.map((community) => (
+            <ChannelCard
+              key={community.id}
+              icon={toFeatherIcon(community.icon_name)}
+              title={community.name}
+              tagLabel={community.category}
+              tagColor={colors.link}
+              tagBackground={colors.accentBlueDim}
+              description={community.description ?? ''}
+              members={community.member_count ?? ''}
+              locked={community.tier === 'premium' && !isPremium}
+              onJoinPress={() => openCommunity(community)}
             />
-          </View>
-          <Text style={styles.description}>
-            Live trade alerts and mentorship on Telegram — for funded members
-            only.
-          </Text>
+          ))}
 
-          {!status?.accessActive && status?.reason && (
-            <Text style={styles.reasonText}>
-              {REASON_TEXT[status.reason] ?? 'This channel isn\'t unlocked yet.'}
-            </Text>
-          )}
-
-          {joined ? (
-            <View style={styles.joinedRow}>
-              <Feather name="check" size={16} color={colors.accentGreen} />
-              <Text style={styles.joinedText}>You're in the channel</Text>
+          <GlassCard style={styles.cardSpaced}>
+            <View style={styles.tipRow}>
+              <View style={styles.tipIcon}>
+                <Feather name="message-circle" size={18} color={colors.link} />
+              </View>
+              <View style={styles.tipBody}>
+                <Text style={styles.tipTitle}>New to Telegram?</Text>
+                <Text style={styles.tipDescription}>
+                  Download the Telegram app on your phone or desktop, then tap
+                  any community above to join. It's free and takes just a few
+                  seconds to get started!
+                </Text>
+              </View>
             </View>
-          ) : (
-            status?.accessActive && (
-              <PrimaryButton
-                label={
-                  actionLoading
-                    ? 'Please wait...'
-                    : status.canRecover
-                      ? 'Restore access'
-                      : !status.link
-                        ? 'Start on Telegram'
-                        : 'Join via Telegram bot'
-                }
-                icon="refresh-cw"
-                variant="flat"
-                disabled={actionLoading}
-                onPress={() =>
-                  handleAction(status.link ? 'self_invite' : 'start_link')
-                }
-                style={styles.fieldSpaced}
-              />
-            )
-          )}
-
-          {actionError && (
-            <Text style={styles.errorText}>{actionError}</Text>
-          )}
-        </AccentCard>
+          </GlassCard>
+        </>
       )}
 
-      {communities.map((community) => (
-        <ChannelCard
-          key={community.id}
-          icon={toFeatherIcon(community.icon_name)}
-          title={community.name}
-          tagLabel={community.category}
-          tagColor={colors.link}
-          tagBackground={colors.accentBlueDim}
-          description={community.description ?? ''}
-          members={community.member_count ?? ''}
-          featured={community.tier === 'premium'}
-          onJoinPress={() => Linking.openURL(community.telegram_link)}
-        />
-      ))}
-
-      <GlassCard style={styles.cardSpaced}>
-        <View style={styles.tipRow}>
-          <View style={styles.tipIcon}>
-            <Feather name="message-circle" size={18} color={colors.link} />
-          </View>
-          <View style={styles.tipBody}>
-            <Text style={styles.tipTitle}>New to Telegram?</Text>
-            <Text style={styles.tipDescription}>
-              Download the Telegram app on your phone or desktop, then tap
-              any community above to join. It's free and takes just a few
-              seconds to get started!
-            </Text>
-          </View>
-        </View>
-      </GlassCard>
+      <PrimeXBTConnectModal
+        visible={connect.visible}
+        onClose={connect.close}
+        clientId={connect.clientId}
+        onChangeClientId={connect.setClientId}
+        onConnect={connect.handleConnect}
+        loading={connect.loading}
+        successMessage={connect.successMessage}
+        errorMessage={connect.errorMessage}
+      />
     </ScreenShell>
   );
 }
@@ -222,51 +199,76 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
-  privateHeaderRow: {
+  pressed: {
+    opacity: 0.85,
+  },
+  featuredCard: {
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    ...shadows.glow,
+  },
+  featuredTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  privateTitleRow: {
+  featuredIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
-  privateTitle: {
+  featuredBadgeText: {
     color: colors.text,
-    fontSize: 17,
+    fontSize: 11,
     fontWeight: '800',
   },
-  description: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 10,
-  },
-  reasonText: {
-    color: colors.textFaint,
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 10,
-  },
-  fieldSpaced: {
-    marginTop: 18,
-  },
-  errorText: {
-    color: colors.accentRed,
-    fontSize: 12,
-    marginTop: 10,
-    textAlign: 'center',
-  },
-  joinedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  featuredTitle: {
+    color: colors.text,
+    fontSize: 19,
+    fontWeight: '800',
     marginTop: 14,
   },
-  joinedText: {
-    color: colors.accentGreen,
-    fontSize: 14,
+  featuredDescription: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+  featuredFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 18,
+  },
+  featuredMembersRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  featuredMembersText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 12,
+  },
+  featuredCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  featuredCtaText: {
+    color: colors.text,
+    fontSize: 13,
     fontWeight: '700',
   },
   tipRow: {

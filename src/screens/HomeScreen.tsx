@@ -11,9 +11,9 @@ import { fonts } from '../theme/fonts';
 import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { parseFunctionError } from '../lib/functionError';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
@@ -48,16 +48,12 @@ function getGreeting() {
 export default function HomeScreen({ navigation }: Props) {
   const { profile, refreshProfile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
-  const [clientId, setClientId] = useState('');
-  const [connectModalVisible, setConnectModalVisible] = useState(false);
+  const connect = usePrimeXBTConnect();
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
     null
   );
   const [coursesTotal, setCoursesTotal] = useState(0);
   const [coursesStarted, setCoursesStarted] = useState(0);
-  const [verifyLoading, setVerifyLoading] = useState(false);
-  const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
-  const [verifyError, setVerifyError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
@@ -107,43 +103,6 @@ export default function HomeScreen({ navigation }: Props) {
       screen: 'CourseDetail',
       params: { courseId, lessonId },
     });
-  };
-
-  const handleConnect = async () => {
-    if (!clientId.trim()) return;
-    setVerifyError(null);
-    setVerifyMessage(null);
-    setVerifyLoading(true);
-
-    const { data, error } = await supabase.functions.invoke(
-      'primexbt-verify',
-      { body: { action: 'verify', brokerId: clientId.trim() } }
-    );
-
-    setVerifyLoading(false);
-
-    if (error) {
-      setVerifyError(await parseFunctionError(error));
-      return;
-    }
-    if (!data?.found) {
-      setVerifyError(
-        "We couldn't find that PrimeXBT client ID. Double-check it's your 7-digit client ID, not your MT5 account number."
-      );
-      return;
-    }
-    if (data.funded) {
-      setVerifyMessage(
-        data.upgraded
-          ? 'Account verified and funded — premium unlocked! 🎉'
-          : 'Account verified and funded.'
-      );
-      refreshProfile();
-    } else {
-      setVerifyMessage(
-        'Account found, but not yet funded. Fund your account (minimum R500) to unlock premium features.'
-      );
-    }
   };
 
   const quickActions = [
@@ -312,7 +271,7 @@ export default function HomeScreen({ navigation }: Props) {
         title="Connect your PrimeXBT account"
         subtitle="Unlock premium features and trade alerts"
         icon={require('../../assets/broker.png')}
-        onPress={() => setConnectModalVisible(true)}
+        onPress={connect.open}
         style={styles.cardSpaced}
       />
 
@@ -416,14 +375,14 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
 
       <PrimeXBTConnectModal
-        visible={connectModalVisible}
-        onClose={() => setConnectModalVisible(false)}
-        clientId={clientId}
-        onChangeClientId={setClientId}
-        onConnect={handleConnect}
-        loading={verifyLoading}
-        successMessage={verifyMessage}
-        errorMessage={verifyError}
+        visible={connect.visible}
+        onClose={connect.close}
+        clientId={connect.clientId}
+        onChangeClientId={connect.setClientId}
+        onConnect={connect.handleConnect}
+        loading={connect.loading}
+        successMessage={connect.successMessage}
+        errorMessage={connect.errorMessage}
       />
     </ScreenShell>
   );
