@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -16,6 +16,7 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
+import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from '../components/Skeleton';
 
 function formatSessionDate(dateStr: string, timeStr: string | null) {
@@ -122,13 +123,14 @@ export default function LiveScreen({ navigation }: Props) {
         <>
           <View style={styles.statsRow}>
             <InsightCard
+              variant="gradient"
               icon="calendar"
               label="This Week"
               value={String(thisWeekCount)}
             />
             <InsightCard
+              variant="gradient"
               icon="clock"
-              iconColor={colors.accentGreen}
               label="Next Session"
               value={
                 nextSession
@@ -138,7 +140,6 @@ export default function LiveScreen({ navigation }: Props) {
                     )
                   : 'None'
               }
-              valueColor={colors.accentGreen}
             />
           </View>
 
@@ -157,9 +158,19 @@ export default function LiveScreen({ navigation }: Props) {
                 return (
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
-                      <Text style={styles.sessionTitle} numberOfLines={2}>
-                        {session.title}
-                      </Text>
+                      <View style={styles.sessionIconCircle}>
+                        <Feather name="video" size={16} color={colors.link} />
+                      </View>
+                      <View style={styles.sessionTitleCol}>
+                        <Text style={styles.sessionTitle} numberOfLines={2}>
+                          {session.title}
+                        </Text>
+                        {!!session.host && (
+                          <Text style={styles.sessionHost}>
+                            Hosted by {session.host}
+                          </Text>
+                        )}
+                      </View>
                       {locked && (
                         <View style={styles.premiumPill}>
                           <Feather name="lock" size={11} color={colors.warning} />
@@ -167,30 +178,25 @@ export default function LiveScreen({ navigation }: Props) {
                         </View>
                       )}
                     </View>
-                    {!!session.host && (
-                      <Text style={styles.sessionHost}>
-                        Hosted by {session.host}
+
+                    <View style={styles.sessionDateRow}>
+                      <Feather name="calendar" size={12} color={colors.textFaint} />
+                      <Text style={styles.sessionDate}>
+                        {formatSessionDate(
+                          session.session_date,
+                          session.session_time
+                        )}
                       </Text>
-                    )}
-                    <Text style={styles.sessionDate}>
-                      {formatSessionDate(
-                        session.session_date,
-                        session.session_time
-                      )}
-                    </Text>
-                    <Pressable
-                      style={[
-                        styles.joinButton,
-                        (locked || !session.zoom_link) && styles.joinButtonDisabled,
-                      ]}
+                    </View>
+
+                    <PrimaryButton
+                      label={locked ? 'Premium only' : 'Join session'}
+                      icon="video"
+                      variant="flat"
                       disabled={locked || !session.zoom_link}
                       onPress={() => handleJoin(session)}
-                    >
-                      <Feather name="video" size={14} color={colors.text} />
-                      <Text style={styles.joinButtonText}>
-                        {locked ? 'Premium only' : 'Join session'}
-                      </Text>
-                    </Pressable>
+                      style={styles.joinButton}
+                    />
                   </View>
                 );
               })}
@@ -228,11 +234,20 @@ const styles = StyleSheet.create({
   sessionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 10,
+    gap: 12,
+  },
+  sessionIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(78,140,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sessionTitleCol: {
+    flex: 1,
   },
   sessionTitle: {
-    flex: 1,
     color: colors.text,
     fontSize: 16,
     fontWeight: '800',
@@ -254,29 +269,20 @@ const styles = StyleSheet.create({
   sessionHost: {
     color: colors.textMuted,
     fontSize: 13,
-    marginTop: 4,
+    marginTop: 2,
+  },
+  sessionDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 14,
   },
   sessionDate: {
     color: colors.textFaint,
     fontSize: 13,
-    marginTop: 2,
   },
   joinButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.accentBlue,
-    borderRadius: 14,
     height: 44,
     marginTop: 14,
-  },
-  joinButtonDisabled: {
-    backgroundColor: colors.inputBackground,
-  },
-  joinButtonText: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: '700',
   },
 });
