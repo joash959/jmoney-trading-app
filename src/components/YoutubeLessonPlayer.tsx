@@ -47,6 +47,19 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+// expo-screen-orientation throws if the requested orientation isn't one
+// the app's config allows (or on platforms/hosts that don't support
+// locking at all) - swallow that instead of taking the whole app down.
+async function safeLockOrientation(
+  orientation: ScreenOrientation.OrientationLock
+) {
+  try {
+    await ScreenOrientation.lockAsync(orientation);
+  } catch (err) {
+    console.log('[video] orientation lock failed', err);
+  }
+}
+
 export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const playerRef = useRef<YoutubeIframeRef>(null);
   // Starts paused - YouTube's embedded iframe can't autoplay in a WebView,
@@ -83,7 +96,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
 
   useEffect(() => {
     return () => {
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      safeLockOrientation(ScreenOrientation.OrientationLock.PORTRAIT_UP);
     };
   }, []);
 
@@ -111,13 +124,32 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     setCurrentTime(target);
   };
 
+  const handleTogglePlay = async () => {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    setPlaying(true);
+    // The play/pause bridge (react-native-youtube-iframe's postMessage
+    // channel into the WebView) is unreliable on some devices - seekTo
+    // uses injectJavaScript directly and reliably reaches the player, and
+    // re-seeking to the current position also resumes playback, so use it
+    // as the actual "start playing" trigger instead of relying on the
+    // `play` prop alone.
+    const time = await playerRef.current?.getCurrentTime();
+    await playerRef.current?.seekTo(
+      typeof time === 'number' ? time : resumeAtRef.current,
+      true
+    );
+  };
+
   const enterFullscreen = async () => {
     setFullscreen(true);
-    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    await safeLockOrientation(ScreenOrientation.OrientationLock.LANDSCAPE);
   };
 
   const exitFullscreen = async () => {
-    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+    await safeLockOrientation(ScreenOrientation.OrientationLock.PORTRAIT_UP);
     setFullscreen(false);
   };
 
@@ -140,10 +172,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
       />
 
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-        <Pressable
-          style={styles.tapArea}
-          onPress={() => setPlaying((prev) => !prev)}
-        >
+        <Pressable style={styles.tapArea} onPress={handleTogglePlay}>
           <View style={styles.playButton}>
             <Feather
               name={playing ? 'pause' : 'play'}
