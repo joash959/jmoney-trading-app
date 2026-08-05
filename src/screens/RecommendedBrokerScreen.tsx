@@ -1,4 +1,4 @@
-import { Linking, StyleSheet, View } from 'react-native';
+import { Image, Linking, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -9,10 +9,10 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
-import AccentCard from '../components/AccentCard';
-import GlassCard from '../components/GlassCard';
+import SurfaceCard from '../components/SurfaceCard';
+import GradientLinkCard from '../components/GradientLinkCard';
+import InsightCard from '../components/InsightCard';
 import PrimaryButton from '../components/PrimaryButton';
-import SecondaryButton from '../components/SecondaryButton';
 import RatingCard from '../components/RatingCard';
 import FeatureCard from '../components/FeatureCard';
 
@@ -21,7 +21,7 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 const STATS = [
   { icon: 'clock' as const, value: '2018+', label: 'Operating Since' },
   { icon: 'trending-up' as const, value: '100+', label: 'Markets' },
-  { icon: 'zap' as const, value: 'Up to 1:1000', label: 'Leverage' },
+  { icon: 'zap' as const, value: '1:1000', label: 'Max Leverage' },
   { icon: 'headphones' as const, value: '24/7', label: 'Support' },
 ];
 
@@ -62,11 +62,13 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         title="Recommended Broker"
       />
 
-      <AccentCard style={styles.cardSpaced}>
+      <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.brokerHeader}>
-          <View style={styles.brokerLogo}>
-            <Text style={styles.brokerLogoText}>PX</Text>
-          </View>
+          <Image
+            source={require('../../assets/broker.png')}
+            style={styles.brokerLogo}
+            resizeMode="contain"
+          />
           <View style={styles.brokerHeaderText}>
             <Text style={styles.brokerName}>PrimeXBT Trading Broker</Text>
             <Text style={styles.brokerTagline}>
@@ -90,47 +92,38 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
             <Text style={styles.badgeText}>Secure Platform</Text>
           </View>
         </View>
+      </SurfaceCard>
 
-        <PrimaryButton
-          label="Start Trading"
-          icon="external-link"
-          variant="flat"
-          onPress={openAffiliateLink}
-          style={styles.fieldSpaced}
-        />
-        <SecondaryButton
-          label="Visit PrimeXBT"
-          onPress={openAffiliateLink}
-          style={styles.fieldSpaced}
-        />
-      </AccentCard>
+      <GradientLinkCard
+        title="Open a PrimeXBT Account"
+        subtitle="Trade crypto, forex, indices & commodities"
+        icon={require('../../assets/broker.png')}
+        onPress={openAffiliateLink}
+        style={styles.cardSpaced}
+      />
 
-      <GlassCard style={styles.cardSpaced} contentStyle={styles.statsCard}>
-        <View style={styles.statsRow}>
-          {STATS.slice(0, 2).map((stat, i) => (
-            <View
-              key={stat.label}
-              style={[styles.statCell, i === 0 && styles.statCellBorder]}
-            >
-              <Feather name={stat.icon} size={20} color={colors.link} />
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={[styles.statsRow, styles.statsRowBorder]}>
-          {STATS.slice(2, 4).map((stat, i) => (
-            <View
-              key={stat.label}
-              style={[styles.statCell, i === 0 && styles.statCellBorder]}
-            >
-              <Feather name={stat.icon} size={20} color={colors.link} />
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
-          ))}
-        </View>
-      </GlassCard>
+      <View style={[styles.row, styles.cardSpaced]}>
+        {STATS.slice(0, 2).map((stat) => (
+          <InsightCard
+            key={stat.label}
+            variant="gradient"
+            icon={stat.icon}
+            label={stat.label}
+            value={stat.value}
+          />
+        ))}
+      </View>
+      <View style={[styles.row, styles.fieldSpaced]}>
+        {STATS.slice(2, 4).map((stat) => (
+          <InsightCard
+            key={stat.label}
+            variant="gradient"
+            icon={stat.icon}
+            label={stat.label}
+            value={stat.value}
+          />
+        ))}
+      </View>
 
       <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
         Trusted by Traders Worldwide
@@ -211,7 +204,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         style={styles.fieldSpaced}
       />
 
-      <GlassCard style={styles.cardSpaced} contentStyle={styles.ctaCard}>
+      <SurfaceCard style={[styles.cardSpaced, styles.ctaCard]}>
         <Feather name="globe" size={30} color={colors.link} />
         <Text style={styles.ctaTitle}>Ready to Start Trading?</Text>
         <Text style={styles.ctaDescription}>
@@ -221,17 +214,10 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         <PrimaryButton
           label="Open Live Account"
           icon="external-link"
-          variant="flat"
           onPress={openAffiliateLink}
           style={styles.fieldSpaced}
         />
-        <SecondaryButton
-          label="Visit PrimeXBT Website"
-          icon="external-link"
-          onPress={openAffiliateLink}
-          style={styles.fieldSpaced}
-        />
-      </GlassCard>
+      </SurfaceCard>
     </ScreenShell>
   );
 }
@@ -248,15 +234,6 @@ const styles = StyleSheet.create({
   brokerLogo: {
     width: 52,
     height: 52,
-    borderRadius: 14,
-    backgroundColor: colors.accentBlue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brokerLogoText: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '800',
   },
   brokerHeaderText: {
     flex: 1,
@@ -299,36 +276,6 @@ const styles = StyleSheet.create({
   },
   fieldSpaced: {
     marginTop: 14,
-  },
-  statsCard: {
-    padding: 0,
-  },
-  statsRow: {
-    flexDirection: 'row',
-  },
-  statsRowBorder: {
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  statCell: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  statCellBorder: {
-    borderRightWidth: 1,
-    borderRightColor: colors.cardBorder,
-  },
-  statValue: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
-    marginTop: 8,
-  },
-  statLabel: {
-    color: colors.textMuted,
-    fontSize: 12,
-    marginTop: 2,
   },
   sectionTitle: {
     color: colors.text,

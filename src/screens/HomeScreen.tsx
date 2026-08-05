@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 import { radius } from '../theme/radius';
@@ -28,6 +27,7 @@ import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
 import IconTile, { iconTileGradients } from '../components/IconTile';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
+import GradientLinkCard from '../components/GradientLinkCard';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
@@ -308,39 +308,13 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <Pressable
+      <GradientLinkCard
+        title="Connect your PrimeXBT account"
+        subtitle="Unlock premium features and trade alerts"
+        icon={require('../../assets/broker.png')}
         onPress={() => setConnectModalVisible(true)}
-        style={({ pressed }) => [styles.cardSpaced, pressed && styles.connectPressed]}
-      >
-        <LinearGradient
-          colors={gradients.button}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.connectCard}
-        >
-          <Feather
-            name="arrow-right"
-            size={20}
-            color={colors.text}
-            style={styles.connectArrow}
-          />
-          <View style={styles.connectRow}>
-            <View style={styles.connectTextCol}>
-              <Text style={styles.connectTitle}>
-                Connect your PrimeXBT account
-              </Text>
-              <Text style={styles.connectSubtitle}>
-                Unlock premium features and trade alerts
-              </Text>
-            </View>
-            <Image
-              source={require('../../assets/broker.png')}
-              style={styles.connectIcon}
-              resizeMode="contain"
-            />
-          </View>
-        </LinearGradient>
-      </Pressable>
+        style={styles.cardSpaced}
+      />
 
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.quickActionsGrid}>
@@ -357,37 +331,13 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <Pressable
+      <GradientLinkCard
+        title="View JMONEY Trade Alerts"
+        subtitle="Real-time trade alert insights"
+        icon={require('../../assets/tradealerts.png')}
         onPress={() => navigation.navigate('Alerts')}
-        style={({ pressed }) => [styles.cardSpaced, pressed && styles.connectPressed]}
-      >
-        <LinearGradient
-          colors={gradients.button}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.connectCard}
-        >
-          <Feather
-            name="arrow-right"
-            size={20}
-            color={colors.text}
-            style={styles.connectArrow}
-          />
-          <View style={styles.connectRow}>
-            <View style={styles.connectTextCol}>
-              <Text style={styles.connectTitle}>View JMONEY Trade Alerts</Text>
-              <Text style={styles.connectSubtitle}>
-                Real-time trade alert insights
-              </Text>
-            </View>
-            <Image
-              source={require('../../assets/tradealerts.png')}
-              style={styles.connectIcon}
-              resizeMode="contain"
-            />
-          </View>
-        </LinearGradient>
-      </Pressable>
+        style={styles.cardSpaced}
+      />
 
       <View style={styles.cardSpaced}>
         <PromoCarousel items={promoItems} />
@@ -535,45 +485,6 @@ const styles = StyleSheet.create({
   },
   cardSpaced: {
     marginTop: 20,
-  },
-  connectCard: {
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    position: 'relative',
-    ...shadows.glow,
-  },
-  connectPressed: {
-    opacity: 0.85,
-  },
-  connectArrow: {
-    position: 'absolute',
-    top: spacing.lg,
-    right: spacing.lg,
-  },
-  connectRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  connectTextCol: {
-    flex: 1,
-    paddingRight: 16,
-  },
-  connectTitle: {
-    color: colors.text,
-    fontSize: 19,
-    fontWeight: '800',
-    lineHeight: 24,
-    paddingRight: 24,
-  },
-  connectSubtitle: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 13,
-    marginTop: 6,
-  },
-  connectIcon: {
-    width: 72,
-    height: 72,
   },
   progressHeaderRow: {
     flexDirection: 'row',
