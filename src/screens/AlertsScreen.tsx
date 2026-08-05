@@ -139,7 +139,9 @@ export default function AlertsScreen({ navigation }: Props) {
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('[alerts] realtime status:', status, err ?? '');
+      });
 
     return () => {
       supabase.removeChannel(channel);
