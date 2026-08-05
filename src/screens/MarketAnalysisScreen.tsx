@@ -18,9 +18,6 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'MarketAnalysis'>;
 
 const MARKETS = [
   { label: 'Gold', symbol: 'OANDA:XAUUSD' },
-  { label: 'EUR/USD', symbol: 'OANDA:EURUSD' },
-  { label: 'GBP/USD', symbol: 'OANDA:GBPUSD' },
-  { label: 'BTC/USD', symbol: 'BINANCE:BTCUSDT' },
   { label: 'US30', symbol: 'OANDA:US30USD' },
   { label: 'NAS100', symbol: 'OANDA:NAS100USD' },
 ];
@@ -89,7 +86,7 @@ function getWidgetHtml(symbol: string) {
           "width": "100%",
           "height": "500",
           "locale": "en",
-          "importanceFilter": "-1,0,1"
+          "importanceFilter": "1"
         }
         </script>
       </div>
@@ -178,6 +175,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
       <ScrollView
         horizontal
+        style={styles.marketScroll}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.marketRow}
       >
@@ -231,16 +229,23 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
+  marketScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+    height: 60,
+  },
   marketRow: {
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 12,
     gap: 8,
   },
   marketPill: {
+    height: 36,
+    justifyContent: 'center',
     backgroundColor: colors.surfaceAlt,
     borderRadius: 999,
     paddingHorizontal: 14,
-    paddingVertical: 8,
   },
   marketPillActive: {
     backgroundColor: colors.accentBlue,
