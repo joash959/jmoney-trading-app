@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
@@ -43,13 +45,15 @@ export default function LiveScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
     const { data, error: fetchError } = await supabase
       .from('live_sessions')
       .select('*')
       .eq('is_active', true)
-      .order('session_date', { ascending: true });
+      .order('session_date', { ascending: true })
+      .order('session_time', { ascending: true });
     if (fetchError) {
       setError(fetchError.message);
     } else {
@@ -62,10 +66,35 @@ export default function LiveScreen({ navigation }: Props) {
     fetchSessions().then(() => setLoading(false));
   }, [fetchSessions]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('live_sessions_live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'live_sessions' },
+        () => {
+          fetchSessions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchSessions]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchSessions();
     setRefreshing(false);
+  };
+
+  const handleCopyPassword = async (session: LiveSession) => {
+    if (!session.zoom_password) return;
+    await Clipboard.setStringAsync(session.zoom_password);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCopiedId(session.id);
+    setTimeout(() => setCopiedId((current) => (current === session.id ? null : current)), 1500);
   };
 
   const now = new Date();
@@ -179,6 +208,12 @@ export default function LiveScreen({ navigation }: Props) {
                       )}
                     </View>
 
+                    {!!session.description && (
+                      <Text style={styles.sessionDescription} numberOfLines={3}>
+                        {session.description}
+                      </Text>
+                    )}
+
                     <View style={styles.sessionDateRow}>
                       <Feather name="calendar" size={12} color={colors.textFaint} />
                       <Text style={styles.sessionDate}>
@@ -186,8 +221,34 @@ export default function LiveScreen({ navigation }: Props) {
                           session.session_date,
                           session.session_time
                         )}
+                        {session.duration ? ` • ${session.duration} min` : ''}
                       </Text>
                     </View>
+
+                    {!!session.zoom_password && !locked && (
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.passwordChip,
+                          copiedId === session.id && styles.passwordChipCopied,
+                          pressed && styles.passwordChipPressed,
+                        ]}
+                        onPress={() => handleCopyPassword(session)}
+                      >
+                        <Text style={styles.passwordLabel}>Passcode</Text>
+                        <Text style={styles.passwordValue}>
+                          {session.zoom_password}
+                        </Text>
+                        <Feather
+                          name={copiedId === session.id ? 'check' : 'copy'}
+                          size={12}
+                          color={
+                            copiedId === session.id
+                              ? colors.accentGreen
+                              : colors.textFaint
+                          }
+                        />
+                      </Pressable>
+                    )}
 
                     <PrimaryButton
                       label={locked ? 'Premium only' : 'Join session'}
@@ -271,15 +332,51 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
+  sessionDescription: {
+    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 10,
+  },
   sessionDateRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 14,
+    marginTop: 10,
   },
   sessionDate: {
     color: colors.textFaint,
     fontSize: 13,
+  },
+  passwordChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    backgroundColor: colors.inputBackground,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 10,
+  },
+  passwordChipCopied: {
+    borderColor: 'rgba(37,211,102,0.4)',
+    backgroundColor: 'rgba(37,211,102,0.1)',
+  },
+  passwordChipPressed: {
+    opacity: 0.7,
+  },
+  passwordLabel: {
+    color: colors.textFaint,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  passwordValue: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '700',
   },
   joinButton: {
     height: 44,
