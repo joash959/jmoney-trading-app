@@ -19,7 +19,6 @@ import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
 import PrimaryButton from '../components/PrimaryButton';
 import ChannelCard from '../components/ChannelCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
@@ -93,7 +92,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

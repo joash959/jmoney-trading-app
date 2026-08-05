@@ -16,7 +16,6 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 import Skeleton from '../components/Skeleton';
 
 function formatSessionDate(dateStr: string, timeStr: string | null) {
@@ -89,7 +88,6 @@ export default function LiveScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

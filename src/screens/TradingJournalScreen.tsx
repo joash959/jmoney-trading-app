@@ -18,7 +18,6 @@ import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
@@ -190,7 +189,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
   );
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell>
       <TopBar
         rightElement={
           <NotificationBell

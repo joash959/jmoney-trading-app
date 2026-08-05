@@ -20,7 +20,6 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
@@ -140,7 +139,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

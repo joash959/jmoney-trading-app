@@ -17,7 +17,6 @@ import SelectField from '../components/SelectField';
 import FilterSheet from '../components/FilterSheet';
 import CourseCard from '../components/CourseCard';
 import Skeleton from '../components/Skeleton';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 function CourseCardSkeleton() {
   return (
@@ -109,7 +108,6 @@ export default function CoursesScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

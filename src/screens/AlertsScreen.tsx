@@ -13,7 +13,6 @@ import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
-import FloatingChatButton from '../components/FloatingChatButton';
 import { detectAlertDirection } from '../lib/tradeAlertParser';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
@@ -190,7 +189,6 @@ export default function AlertsScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

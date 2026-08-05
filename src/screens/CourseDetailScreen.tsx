@@ -17,7 +17,6 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
-import FloatingChatButton from '../components/FloatingChatButton';
 import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
 
 type Props = NativeStackScreenProps<CoursesStackParamList, 'CourseDetail'>;
@@ -143,7 +142,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
   };
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell>
       <TopBar
         rightElement={
           <NotificationBell

@@ -22,7 +22,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import UploadDropzone from '../components/UploadDropzone';
 import EmptyStateCard from '../components/EmptyStateCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'AIScanner'>;
 
@@ -139,7 +138,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell>
       <TopBar
         rightElement={
           <NotificationBell

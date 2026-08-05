@@ -14,7 +14,6 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Notifications'>;
 
@@ -91,7 +90,6 @@ export default function NotificationsScreen({}: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

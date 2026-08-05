@@ -15,7 +15,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import RatingCard from '../components/RatingCard';
 import FeatureCard from '../components/FeatureCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 
@@ -47,7 +46,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
   const openAffiliateLink = () => Linking.openURL(AFFILIATE_LINK);
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell>
       <TopBar
         rightElement={
           <NotificationBell

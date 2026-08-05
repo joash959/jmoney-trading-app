@@ -27,7 +27,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import StatCard from '../components/StatCard';
 import IconTile, { iconTileGradients } from '../components/IconTile';
-import FloatingChatButton from '../components/FloatingChatButton';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
@@ -256,7 +255,6 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <ScreenShell
-      overlay={<FloatingChatButton />}
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >

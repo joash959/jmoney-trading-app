@@ -12,7 +12,6 @@ import GlowBackground from '../components/GlowBackground';
 import TopBar from '../components/TopBar';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MarketAnalysis'>;
 
@@ -123,7 +122,6 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
             style={styles.cardSpaced}
           />
         </View>
-        <FloatingChatButton />
       </SafeAreaView>
     );
   }
@@ -145,7 +143,6 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         scrollEnabled
         originWhitelist={['*']}
       />
-      <FloatingChatButton />
     </SafeAreaView>
   );
 }

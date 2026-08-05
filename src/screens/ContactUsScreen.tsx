@@ -11,7 +11,6 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import AccentCard from '../components/AccentCard';
 import PrimaryButton from '../components/PrimaryButton';
-import FloatingChatButton from '../components/FloatingChatButton';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'ContactUs'>;
 
@@ -23,7 +22,7 @@ export default function ContactUsScreen({ navigation }: Props) {
   const { count: unreadCount } = useUnreadNotificationsCount();
 
   return (
-    <ScreenShell overlay={<FloatingChatButton />}>
+    <ScreenShell>
       <TopBar
         rightElement={
           <NotificationBell
