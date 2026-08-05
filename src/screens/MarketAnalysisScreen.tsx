@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Text from '../components/AppText';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,54 +16,88 @@ import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MarketAnalysis'>;
 
-const WIDGET_HTML = `
+const MARKETS = [
+  { label: 'Gold', symbol: 'OANDA:XAUUSD' },
+  { label: 'EUR/USD', symbol: 'OANDA:EURUSD' },
+  { label: 'GBP/USD', symbol: 'OANDA:GBPUSD' },
+  { label: 'BTC/USD', symbol: 'BINANCE:BTCUSDT' },
+  { label: 'US30', symbol: 'OANDA:US30USD' },
+  { label: 'NAS100', symbol: 'OANDA:NAS100USD' },
+];
+
+function getWidgetHtml(symbol: string) {
+  return `
 <!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <style>
       html, body { margin: 0; padding: 0; background: #0A0A0D; }
-      .tradingview-widget-container { margin-bottom: 12px; }
+      .section-label {
+        color: #FFFFFF;
+        font-size: 15px;
+        font-weight: 800;
+        font-family: -apple-system, Roboto, sans-serif;
+        padding: 14px 14px 10px 14px;
+      }
+      .widget-card {
+        background: #17181C;
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 0 12px 20px 12px;
+      }
+      .tradingview-widget-container { width: 100%; }
     </style>
   </head>
   <body>
-    <div class="tradingview-widget-container">
-      <div id="tradingview_chart"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-      <script type="text/javascript">
-        new TradingView.widget({
-          "width": "100%",
-          "height": 420,
-          "symbol": "OANDA:XAUUSD",
-          "interval": "60",
-          "timezone": "Etc/UTC",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "toolbar_bg": "#0A0A0D",
-          "enable_publishing": false,
-          "allow_symbol_change": true,
-          "hide_side_toolbar": true,
-          "container_id": "tradingview_chart"
-        });
-      </script>
+    <div class="widget-card">
+      <div class="section-label">Live Chart</div>
+      <div class="tradingview-widget-container">
+        <div id="tradingview_chart"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": "100%",
+            "height": 420,
+            "symbol": "${symbol}",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "backgroundColor": "#17181C",
+            "gridColor": "rgba(255,255,255,0.06)",
+            "toolbar_bg": "#17181C",
+            "enable_publishing": false,
+            "allow_symbol_change": false,
+            "hide_side_toolbar": true,
+            "withdateranges": true,
+            "container_id": "tradingview_chart"
+          });
+        </script>
+      </div>
     </div>
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-      {
-        "colorTheme": "dark",
-        "isTransparent": false,
-        "width": "100%",
-        "height": "500",
-        "locale": "en",
-        "importanceFilter": "-1,0,1"
-      }
-      </script>
+
+    <div class="widget-card">
+      <div class="section-label">Economic Calendar</div>
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+        {
+          "colorTheme": "dark",
+          "isTransparent": true,
+          "width": "100%",
+          "height": "500",
+          "locale": "en",
+          "importanceFilter": "-1,0,1"
+        }
+        </script>
+      </div>
     </div>
   </body>
 </html>
 `;
+}
 
 export default function MarketAnalysisScreen({ navigation }: Props) {
   const { profile } = useAuth();
@@ -71,6 +106,9 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [locked, setLocked] = useState(false);
+  const [symbol, setSymbol] = useState(MARKETS[0].symbol);
+
+  const widgetHtml = useMemo(() => getWidgetHtml(symbol), [symbol]);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,7 +165,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <GlowBackground />
       <View style={styles.headerWrap}>
         <TopBar />
@@ -137,8 +175,36 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
           title="Market Analysis"
         />
       </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.marketRow}
+      >
+        {MARKETS.map((market) => {
+          const active = market.symbol === symbol;
+          return (
+            <Pressable
+              key={market.symbol}
+              style={[styles.marketPill, active && styles.marketPillActive]}
+              onPress={() => setSymbol(market.symbol)}
+            >
+              <Text
+                style={[
+                  styles.marketPillText,
+                  active && styles.marketPillTextActive,
+                ]}
+              >
+                {market.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
       <WebView
-        source={{ html: WIDGET_HTML }}
+        key={symbol}
+        source={{ html: widgetHtml }}
         style={styles.webview}
         scrollEnabled
         originWhitelist={['*']}
@@ -164,6 +230,28 @@ const styles = StyleSheet.create({
   },
   cardSpaced: {
     marginTop: 20,
+  },
+  marketRow: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  marketPill: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  marketPillActive: {
+    backgroundColor: colors.accentBlue,
+  },
+  marketPillText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  marketPillTextActive: {
+    color: colors.text,
   },
   webview: {
     flex: 1,
