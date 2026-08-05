@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
@@ -211,7 +210,6 @@ export default function AlertsScreen({ navigation }: Props) {
         icon="bell"
         image={require('../../assets/tradealerts.png')}
         title="Trade Alerts"
-        subtitle="Real-time Trade Alert Insights with JMONEY"
         rightElement={
           <View style={styles.livePill}>
             <Animated.View
@@ -225,12 +223,10 @@ export default function AlertsScreen({ navigation }: Props) {
       {loading ? (
         <View style={styles.fieldSpaced}>
           <View style={styles.statsRow}>
-            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
-            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
-          </View>
-          <View style={[styles.statsRow, styles.fieldSpaced]}>
-            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
-            <Skeleton height={68} radius={14} style={styles.skeletonFlex} />
+            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
           </View>
           <View style={[styles.list, styles.sectionSpaced]}>
             <Skeleton height={68} radius={16} />
@@ -246,40 +242,33 @@ export default function AlertsScreen({ navigation }: Props) {
         <>
           <View style={styles.statsRow}>
             <InsightCard
+              compact
               icon="activity"
               label="Today"
               value={String(todayCount)}
-              sublabel="Alerts today"
             />
             <InsightCard
+              compact
               icon="trending-up"
               iconColor={colors.accentGreen}
               label="Long"
               value={String(longCount)}
               valueColor={colors.accentGreen}
-              sublabel="Last 30 alerts"
             />
-          </View>
-          <View style={[styles.statsRow, styles.fieldSpaced]}>
             <InsightCard
+              compact
               icon="trending-down"
               iconColor={colors.accentRed}
               label="Short"
               value={String(shortCount)}
               valueColor={colors.accentRed}
-              sublabel="Last 30 alerts"
             />
             <InsightCard
+              compact
               icon="clock"
               label="Last Alert"
               value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
-              sublabel="most recent"
             />
-          </View>
-
-          <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
-            <Feather name="clock" size={16} color={colors.text} />
-            <Text style={styles.sectionTitle}>Recent Alerts</Text>
           </View>
 
           <View style={styles.list}>
@@ -348,18 +337,8 @@ const styles = StyleSheet.create({
   fieldSpaced: {
     marginTop: 8,
   },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
   sectionSpaced: {
     marginTop: 28,
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 19,
-    fontWeight: '800',
   },
   list: {
     gap: 20,

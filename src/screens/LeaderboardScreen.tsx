@@ -134,7 +134,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
           icon="award"
           image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
-          subtitle="The leaderboard is currently inactive. Check back soon."
         />
       </ScreenShell>
     );
@@ -159,7 +158,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         icon="award"
         image={require('../../assets/leaderboard.png')}
         title="Leaderboard"
-        subtitle={`Challenge yourself with other traders and win your share of ${currency}${totalPool.toLocaleString()}`}
       />
 
       {settings?.show_podium !== false && (

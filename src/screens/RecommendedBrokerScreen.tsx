@@ -62,7 +62,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         icon="briefcase"
         image={require('../../assets/broker.png')}
         title="Recommended Broker"
-        subtitle="Our trusted partner for your trading journey."
       />
 
       <AccentCard style={styles.cardSpaced}>

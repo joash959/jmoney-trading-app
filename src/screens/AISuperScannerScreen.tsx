@@ -154,7 +154,6 @@ export default function AISuperScannerScreen({ navigation }: Props) {
         icon="target"
         image={require('../../assets/aiscanner.png')}
         title="AI Super Scanner"
-        subtitle="Upload any chart and let AI mark key levels, call the trend, and hand you a kill plan."
       />
 
       {!isPremium ? (

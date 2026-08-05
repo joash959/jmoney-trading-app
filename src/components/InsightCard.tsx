@@ -12,6 +12,8 @@ type Props = {
   value: string;
   valueColor?: string;
   sublabel?: string;
+  /** Tighter padding, smaller type, no sublabel - for dense multi-card rows. */
+  compact?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -22,20 +24,31 @@ export default function InsightCard({
   value,
   valueColor = colors.text,
   sublabel,
+  compact = false,
   style,
 }: Props) {
   return (
-    <View style={[styles.card, style]}>
+    <View style={[styles.card, compact && styles.cardCompact, style]}>
       <View style={styles.headerRow}>
-        <Feather name={icon} size={13} color={iconColor} />
-        <Text style={styles.label} numberOfLines={1}>
+        <Feather name={icon} size={compact ? 11 : 13} color={iconColor} />
+        <Text
+          style={[styles.label, compact && styles.labelCompact]}
+          numberOfLines={1}
+        >
           {label}
         </Text>
       </View>
-      <Text style={[styles.value, { color: valueColor }]} numberOfLines={1}>
+      <Text
+        style={[
+          styles.value,
+          compact && styles.valueCompact,
+          { color: valueColor },
+        ]}
+        numberOfLines={1}
+      >
         {value}
       </Text>
-      {sublabel && (
+      {sublabel && !compact && (
         <Text style={styles.sublabel} numberOfLines={1}>
           {sublabel}
         </Text>
@@ -54,6 +67,10 @@ const styles = StyleSheet.create({
     padding: 10,
     ...shadows.sm,
   },
+  cardCompact: {
+    padding: 7,
+    borderRadius: radius.md,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -64,10 +81,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  labelCompact: {
+    fontSize: 9,
+  },
   value: {
     fontSize: 16,
     fontWeight: '800',
     marginTop: 6,
+  },
+  valueCompact: {
+    fontSize: 13,
+    marginTop: 3,
   },
   sublabel: {
     color: colors.textFaint,

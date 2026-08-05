@@ -104,7 +104,6 @@ export default function CoursesScreen({ navigation }: Props) {
         icon="book-open"
         image={require('../../assets/courses.png')}
         title="Courses"
-        subtitle="Master trading with our comprehensive video courses"
       />
 
       <SearchBar
