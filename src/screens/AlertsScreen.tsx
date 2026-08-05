@@ -28,12 +28,12 @@ type TradeAlert = {
 function formatRelativeTime(iso: string) {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.round(diffMs / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  if (minutes < 1) return 'now';
+  if (minutes < 60) return `${minutes}m`;
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `about ${hours} hour${hours === 1 ? '' : 's'} ago`;
+  if (hours < 24) return `${hours}h`;
   const days = Math.round(hours / 24);
-  return `${days} day${days === 1 ? '' : 's'} ago`;
+  return `${days}d`;
 }
 
 function formatShortTime(iso: string) {
@@ -243,28 +243,28 @@ export default function AlertsScreen({ navigation }: Props) {
           <View style={styles.statsRow}>
             <InsightCard
               compact
+              variant="gradient"
               icon="activity"
               label="Today"
               value={String(todayCount)}
             />
             <InsightCard
               compact
+              variant="gradient"
               icon="trending-up"
-              iconColor={colors.accentGreen}
               label="Long"
               value={String(longCount)}
-              valueColor={colors.accentGreen}
             />
             <InsightCard
               compact
+              variant="gradient"
               icon="trending-down"
-              iconColor={colors.accentRed}
               label="Short"
               value={String(shortCount)}
-              valueColor={colors.accentRed}
             />
             <InsightCard
               compact
+              variant="gradient"
               icon="clock"
               label="Last Alert"
               value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}

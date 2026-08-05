@@ -1,7 +1,8 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 
@@ -14,6 +15,8 @@ type Props = {
   sublabel?: string;
   /** Tighter padding, smaller type, no sublabel - for dense multi-card rows. */
   compact?: boolean;
+  /** 'gradient' matches the blue gradient cards used on Home. */
+  variant?: 'flat' | 'gradient';
   style?: StyleProp<ViewStyle>;
 };
 
@@ -25,14 +28,25 @@ export default function InsightCard({
   valueColor = colors.text,
   sublabel,
   compact = false,
+  variant = 'flat',
   style,
 }: Props) {
-  return (
-    <View style={[styles.card, compact && styles.cardCompact, style]}>
+  const isGradient = variant === 'gradient';
+
+  const content = (
+    <>
       <View style={styles.headerRow}>
-        <Feather name={icon} size={compact ? 11 : 13} color={iconColor} />
+        <Feather
+          name={icon}
+          size={compact ? 11 : 13}
+          color={isGradient ? colors.text : iconColor}
+        />
         <Text
-          style={[styles.label, compact && styles.labelCompact]}
+          style={[
+            styles.label,
+            compact && styles.labelCompact,
+            isGradient && styles.labelGradient,
+          ]}
           numberOfLines={1}
         >
           {label}
@@ -42,17 +56,44 @@ export default function InsightCard({
         style={[
           styles.value,
           compact && styles.valueCompact,
-          { color: valueColor },
+          { color: isGradient ? colors.text : valueColor },
         ]}
         numberOfLines={1}
       >
         {value}
       </Text>
       {sublabel && !compact && (
-        <Text style={styles.sublabel} numberOfLines={1}>
+        <Text
+          style={[styles.sublabel, isGradient && styles.sublabelGradient]}
+          numberOfLines={1}
+        >
           {sublabel}
         </Text>
       )}
+    </>
+  );
+
+  if (isGradient) {
+    return (
+      <LinearGradient
+        colors={gradients.button}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[
+          styles.card,
+          compact && styles.cardCompact,
+          styles.cardGradient,
+          style,
+        ]}
+      >
+        {content}
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <View style={[styles.card, compact && styles.cardCompact, style]}>
+      {content}
     </View>
   );
 }
@@ -71,6 +112,10 @@ const styles = StyleSheet.create({
     padding: 7,
     borderRadius: radius.md,
   },
+  cardGradient: {
+    borderWidth: 0,
+    ...shadows.glow,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -83,6 +128,9 @@ const styles = StyleSheet.create({
   },
   labelCompact: {
     fontSize: 9,
+  },
+  labelGradient: {
+    color: 'rgba(255,255,255,0.85)',
   },
   value: {
     fontSize: 16,
@@ -97,5 +145,8 @@ const styles = StyleSheet.create({
     color: colors.textFaint,
     fontSize: 10,
     marginTop: 1,
+  },
+  sublabelGradient: {
+    color: 'rgba(255,255,255,0.75)',
   },
 });
