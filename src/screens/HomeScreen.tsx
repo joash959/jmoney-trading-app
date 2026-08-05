@@ -4,9 +4,6 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
-import { radius } from '../theme/radius';
-import { fonts } from '../theme/fonts';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
@@ -39,13 +36,6 @@ function getGreeting() {
   if (hour < 12) return 'Good morning';
   if (hour < 18) return 'Good afternoon';
   return 'Good evening';
-}
-
-function getGreetingIcon(): React.ComponentProps<typeof Feather>['name'] {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'sunrise';
-  if (hour < 18) return 'sun';
-  return 'moon';
 }
 
 export default function HomeScreen({ navigation }: Props) {
@@ -233,16 +223,13 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={styles.heroCard}>
         <View style={styles.heroTopRow}>
-          <View style={styles.greetingIconBadge}>
-            <Feather name={getGreetingIcon()} size={18} color={colors.link} />
-          </View>
           <View style={styles.heroHeadingTextWrap}>
             <Text style={styles.greetingLabel}>{getGreeting()}</Text>
             <Text
               style={styles.greetingHeading}
               numberOfLines={1}
               adjustsFontSizeToFit
-              minimumFontScale={0.55}
+              minimumFontScale={0.5}
             >
               Welcome back, {firstName}!
             </Text>
@@ -260,10 +247,6 @@ export default function HomeScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-        <Text style={styles.greetingSubtitle}>
-          Discover the secrets of Forex Markets and become the NEXT
-          MILLIONAIRE!
-        </Text>
       </View>
 
       <GradientLinkCard
@@ -396,14 +379,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  greetingIconBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.accentBlueDim,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   heroHeadingTextWrap: {
     flex: 1,
   },
@@ -442,13 +417,6 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     fontWeight: '800',
     marginTop: 1,
-  },
-  greetingSubtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 14,
-    lineHeight: 20,
-    fontFamily: fonts.poppinsSemiBold,
   },
   cardSpaced: {
     marginTop: 20,
