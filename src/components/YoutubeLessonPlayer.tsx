@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
-import * as ScreenOrientation from 'expo-screen-orientation';
+import { Accelerometer } from 'expo-sensors';
 import YoutubePlayer, {
   PLAYER_STATES,
   YoutubeIframeRef,
@@ -47,17 +47,10 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Swallow orientation errors instead of taking the whole app down -
-// lockAsync(LANDSCAPE) previously crashed at the native layer (not a
-// catchable JS rejection on its own), so fullscreen now only calls the
-// lighter unlockAsync/lockAsync(PORTRAIT_UP) pair, still guarded here.
-async function safeOrientationCall(call: () => Promise<void>) {
-  try {
-    await call();
-  } catch (err) {
-    console.log('[video] orientation call failed', err);
-  }
-}
+// Below this, the accelerometer reading is too ambiguous (device roughly
+// flat, or mid-turn) to confidently call it portrait vs landscape - keep
+// whatever the last confident reading was instead of flickering.
+const TILT_THRESHOLD = 0.65;
 
 export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const playerRef = useRef<YoutubeIframeRef>(null);
@@ -69,19 +62,48 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
+  // 0 = holding the phone upright, 90/-90 = turned on its side. The app
+  // itself stays portrait-locked (rotating the actual OS view crashed on
+  // some devices) - this just visually rotates the video to match how the
+  // phone is physically being held, read from the accelerometer directly.
+  const [rotationDeg, setRotationDeg] = useState(0);
   const resumeAtRef = useRef(0);
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
-  // Fit a 16:9 video into the current screen ("contain" sizing) instead of
-  // stretching it to the full (usually much taller, portrait) screen
-  // dimensions - that left the actual video in a small letterboxed strip
-  // at the top with a huge dead black area below it holding the controls.
-  const screenRatio = screenWidth / screenHeight;
+  useEffect(() => {
+    if (!fullscreen) {
+      setRotationDeg(0);
+      return;
+    }
+    Accelerometer.setUpdateInterval(300);
+    const subscription = Accelerometer.addListener(({ x, y }) => {
+      if (Math.abs(x) > Math.abs(y) && Math.abs(x) > TILT_THRESHOLD) {
+        // If landscape ends up upside down for one of the two directions,
+        // swap these two signs.
+        setRotationDeg(x > 0 ? -90 : 90);
+      } else if (Math.abs(y) > Math.abs(x) && Math.abs(y) > TILT_THRESHOLD) {
+        setRotationDeg(0);
+      }
+    });
+    return () => subscription.remove();
+  }, [fullscreen]);
+
+  const isLandscape = rotationDeg !== 0;
+  // The box the video gets fit into, in "as the phone is currently being
+  // held" terms - swapped from the (always-portrait) screen dimensions
+  // when turned sideways, since the phone itself never actually rotates.
+  const canvasWidth = isLandscape ? screenHeight : screenWidth;
+  const canvasHeight = isLandscape ? screenWidth : screenHeight;
+
+  // Fit a 16:9 video into that canvas ("contain" sizing) instead of
+  // stretching it to fill it - that left the actual video in a small
+  // letterboxed strip with a huge dead black area holding the controls.
+  const canvasRatio = canvasWidth / canvasHeight;
   const videoRatio = 16 / 9;
   const fullscreenWidth =
-    screenRatio > videoRatio ? screenHeight * videoRatio : screenWidth;
+    canvasRatio > videoRatio ? canvasHeight * videoRatio : canvasWidth;
   const fullscreenHeight =
-    screenRatio > videoRatio ? screenHeight : screenWidth / videoRatio;
+    canvasRatio > videoRatio ? canvasHeight : canvasWidth / videoRatio;
 
   // A new lesson means a new video - don't carry over the previous one's
   // playhead/playing state into it.
@@ -147,28 +169,8 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     );
   };
 
-  const enterFullscreen = () => {
-    setFullscreen(true);
-    safeOrientationCall(() => ScreenOrientation.unlockAsync());
-  };
-
-  const exitFullscreen = () => {
-    setFullscreen(false);
-    safeOrientationCall(() =>
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
-    );
-  };
-
-  // Defensive: if this unmounts (navigating away) while still fullscreen,
-  // make sure rotation doesn't stay unlocked for the rest of the app -
-  // harmless no-op if it was already locked back to portrait.
-  useEffect(() => {
-    return () => {
-      safeOrientationCall(() =>
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
-      );
-    };
-  }, []);
+  const enterFullscreen = () => setFullscreen(true);
+  const exitFullscreen = () => setFullscreen(false);
 
   const renderPlayer = (playerWidth: number, playerHeight: number, isFullscreen: boolean) => (
     <View style={{ width: playerWidth, height: playerHeight }}>
@@ -240,7 +242,19 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
 
       <Modal visible={fullscreen} animationType="fade" onRequestClose={exitFullscreen}>
         <View style={styles.fullscreenModal}>
-          {fullscreen && renderPlayer(fullscreenWidth, fullscreenHeight, true)}
+          {fullscreen && (
+            <View
+              style={{
+                width: canvasWidth,
+                height: canvasHeight,
+                transform: [{ rotate: `${rotationDeg}deg` }],
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {renderPlayer(fullscreenWidth, fullscreenHeight, true)}
+            </View>
+          )}
         </View>
       </Modal>
     </>
