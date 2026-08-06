@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import {
+  Animated,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
 import { Accelerometer } from 'expo-sensors';
@@ -60,6 +67,10 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   // silently confirmed that (already-false) state instead of starting it.
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  // A locally-ticked copy of currentTime for the scrubber/time label - the
+  // authoritative value only arrives every 500ms+ over the WebView bridge,
+  // which made the bar visibly "step" instead of gliding.
+  const [displayTime, setDisplayTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   // 0 = holding the phone upright, 90/-90 = turned on its side. The app
@@ -67,6 +78,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   // some devices) - this just visually rotates the video to match how the
   // phone is physically being held, read from the accelerometer directly.
   const [rotationDeg, setRotationDeg] = useState(0);
+  const rotateAnim = useRef(new Animated.Value(0)).current;
   const resumeAtRef = useRef(0);
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
@@ -87,6 +99,14 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     });
     return () => subscription.remove();
   }, [fullscreen]);
+
+  useEffect(() => {
+    Animated.timing(rotateAnim, {
+      toValue: rotationDeg,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [rotationDeg, rotateAnim]);
 
   const isLandscape = rotationDeg !== 0;
   // The box the video gets fit into, in "as the phone is currently being
@@ -110,21 +130,37 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   useEffect(() => {
     setPlaying(false);
     setCurrentTime(0);
+    setDisplayTime(0);
     setDuration(0);
     resumeAtRef.current = 0;
   }, [videoId]);
 
+  // Authoritative correction, polled over the WebView bridge - infrequent
+  // since each round trip has real latency.
   useEffect(() => {
     if (!playing) return;
     const interval = setInterval(async () => {
       const time = await playerRef.current?.getCurrentTime();
       if (typeof time === 'number') {
         setCurrentTime(time);
+        setDisplayTime(time);
         resumeAtRef.current = time;
       }
-    }, 500);
+    }, 1000);
     return () => clearInterval(interval);
   }, [playing]);
+
+  // Smooth local tick between corrections, purely visual - what the
+  // scrubber/time label actually render.
+  useEffect(() => {
+    if (!playing) return;
+    const ticker = setInterval(() => {
+      setDisplayTime((prev) =>
+        duration ? Math.min(duration, prev + 0.1) : prev + 0.1
+      );
+    }, 100);
+    return () => clearInterval(ticker);
+  }, [playing, duration]);
 
   const handleReady = async () => {
     const total = await playerRef.current?.getDuration();
@@ -138,6 +174,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     if (state === PLAYER_STATES.ENDED) {
       setPlaying(false);
       setCurrentTime(0);
+      setDisplayTime(0);
       resumeAtRef.current = 0;
     }
   };
@@ -146,8 +183,9 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     if (!duration) return;
     const target = Math.max(0, Math.min(duration, fraction * duration));
     resumeAtRef.current = target;
-    await playerRef.current?.seekTo(target, true);
     setCurrentTime(target);
+    setDisplayTime(target);
+    await playerRef.current?.seekTo(target, true);
   };
 
   const handleTogglePlay = async () => {
@@ -174,21 +212,27 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
 
   const renderPlayer = (playerWidth: number, playerHeight: number, isFullscreen: boolean) => (
     <View style={{ width: playerWidth, height: playerHeight }}>
-      <YoutubePlayer
-        ref={playerRef}
-        key={videoId}
-        width={playerWidth}
-        height={playerHeight}
-        videoId={videoId}
-        play={playing}
-        onReady={handleReady}
-        onChangeState={handleStateChange}
-        initialPlayerParams={{ controls: false, rel: false }}
-        webViewProps={{
-          onShouldStartLoadWithRequest: (request: ShouldStartLoadRequest) =>
-            isAllowedNavigation(request.mainDocumentURL || request.url),
-        }}
-      />
+      {/* controls:false hides YouTube's play bar, but its own share/watermark
+          UI can still render and be tappable - pointerEvents="none" blocks
+          ALL touches from ever reaching the embedded page's own DOM, so
+          every interaction has to go through our overlay below instead. */}
+      <View pointerEvents="none">
+        <YoutubePlayer
+          ref={playerRef}
+          key={videoId}
+          width={playerWidth}
+          height={playerHeight}
+          videoId={videoId}
+          play={playing}
+          onReady={handleReady}
+          onChangeState={handleStateChange}
+          initialPlayerParams={{ controls: false, rel: false }}
+          webViewProps={{
+            onShouldStartLoadWithRequest: (request: ShouldStartLoadRequest) =>
+              isAllowedNavigation(request.mainDocumentURL || request.url),
+          }}
+        />
+      </View>
 
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <Pressable style={styles.tapArea} onPress={handleTogglePlay}>
@@ -203,7 +247,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
 
         <View style={styles.scrubberRow} pointerEvents="box-none">
           <Text style={styles.timeText}>
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {formatTime(displayTime)} / {formatTime(duration)}
           </Text>
           <Pressable
             style={styles.progressTrack}
@@ -216,7 +260,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
               style={[
                 styles.progressFill,
                 {
-                  width: `${duration ? (currentTime / duration) * 100 : 0}%`,
+                  width: `${duration ? (displayTime / duration) * 100 : 0}%`,
                 },
               ]}
             />
@@ -243,17 +287,24 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
       <Modal visible={fullscreen} animationType="fade" onRequestClose={exitFullscreen}>
         <View style={styles.fullscreenModal}>
           {fullscreen && (
-            <View
+            <Animated.View
               style={{
                 width: canvasWidth,
                 height: canvasHeight,
-                transform: [{ rotate: `${rotationDeg}deg` }],
                 alignItems: 'center',
                 justifyContent: 'center',
+                transform: [
+                  {
+                    rotate: rotateAnim.interpolate({
+                      inputRange: [-90, 0, 90],
+                      outputRange: ['-90deg', '0deg', '90deg'],
+                    }),
+                  },
+                ],
               }}
             >
               {renderPlayer(fullscreenWidth, fullscreenHeight, true)}
-            </View>
+            </Animated.View>
           )}
         </View>
       </Modal>
