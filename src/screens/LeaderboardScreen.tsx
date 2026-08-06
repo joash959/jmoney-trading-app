@@ -21,6 +21,7 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
+import { iconTileGradients } from '../components/IconTile';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
@@ -251,6 +252,8 @@ export default function LeaderboardScreen({ navigation }: Props) {
             amountColor={GOLD}
             backgroundColor="rgba(245,197,24,0.1)"
             borderColor="rgba(245,197,24,0.3)"
+            featured
+            gradient={iconTileGradients.gold}
           />
           <PrizeTile
             icon="award"

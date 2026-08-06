@@ -1,7 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 
 type Props = {
@@ -12,6 +14,9 @@ type Props = {
   amountColor: string;
   backgroundColor: string;
   borderColor: string;
+  /** 1st place gets a gradient card + glow instead of a flat tinted tile. */
+  featured?: boolean;
+  gradient?: readonly [string, string, ...string[]];
 };
 
 export default function PrizeTile({
@@ -22,14 +27,55 @@ export default function PrizeTile({
   amountColor,
   backgroundColor,
   borderColor,
+  featured,
+  gradient,
 }: Props) {
-  return (
-    <View style={[styles.tile, { backgroundColor, borderColor }]}>
-      <Feather name={icon} size={22} color={iconColor} />
-      <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.amount, { color: amountColor }]} numberOfLines={1}>
+  const content = (
+    <>
+      <View
+        style={[
+          styles.iconCircle,
+          {
+            backgroundColor: featured
+              ? 'rgba(255,255,255,0.22)'
+              : `${iconColor}22`,
+          },
+        ]}
+      >
+        <Feather
+          name={icon}
+          size={20}
+          color={featured ? colors.text : iconColor}
+        />
+      </View>
+      <Text style={[styles.label, featured && styles.labelFeatured]}>
+        {label}
+      </Text>
+      <Text
+        style={[styles.amount, { color: featured ? colors.text : amountColor }]}
+        numberOfLines={1}
+      >
         {amount}
       </Text>
+    </>
+  );
+
+  if (featured && gradient) {
+    return (
+      <LinearGradient
+        colors={gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.tile, styles.tileFeatured]}
+      >
+        {content}
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <View style={[styles.tile, { backgroundColor, borderColor }]}>
+      {content}
     </View>
   );
 }
@@ -39,17 +85,32 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: radius.xl,
     paddingVertical: 16,
     paddingHorizontal: 6,
     ...shadows.sm,
+  },
+  tileFeatured: {
+    borderWidth: 0,
+    paddingVertical: 20,
+    ...shadows.glow,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   label: {
     color: colors.textMuted,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
-    marginTop: 8,
+    marginTop: 10,
+  },
+  labelFeatured: {
+    color: 'rgba(255,255,255,0.85)',
   },
   amount: {
     fontSize: 16,
