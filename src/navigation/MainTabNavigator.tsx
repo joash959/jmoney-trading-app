@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
@@ -11,15 +11,24 @@ import { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+// Ionicons ships matched outline/filled pairs (the same pattern iOS's own
+// tab bar icons use) - outline while inactive, filled when the tab is
+// selected, instead of a single fixed glyph for both states.
 const ICONS: Record<
   keyof MainTabParamList,
-  React.ComponentProps<typeof Feather>['name']
+  {
+    outline: React.ComponentProps<typeof Ionicons>['name'];
+    filled: React.ComponentProps<typeof Ionicons>['name'];
+  }
 > = {
-  Home: 'grid',
-  Courses: 'book-open',
-  Alerts: 'zap',
-  Live: 'video',
-  More: 'more-horizontal',
+  Home: { outline: 'home-outline', filled: 'home' },
+  Courses: { outline: 'book-outline', filled: 'book' },
+  Alerts: { outline: 'flash-outline', filled: 'flash' },
+  Live: { outline: 'videocam-outline', filled: 'videocam' },
+  More: {
+    outline: 'ellipsis-horizontal-circle-outline',
+    filled: 'ellipsis-horizontal-circle',
+  },
 };
 
 export default function MainTabNavigator() {
@@ -33,8 +42,12 @@ export default function MainTabNavigator() {
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarIcon: ({ focused, color, size }) => (
           <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-            <Feather
-              name={ICONS[route.name as keyof MainTabParamList]}
+            <Ionicons
+              name={
+                focused
+                  ? ICONS[route.name as keyof MainTabParamList].filled
+                  : ICONS[route.name as keyof MainTabParamList].outline
+              }
               size={size - 4}
               color={focused ? colors.text : color}
             />
