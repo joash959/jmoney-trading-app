@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
-import * as ScreenOrientation from 'expo-screen-orientation';
 import YoutubePlayer, {
   PLAYER_STATES,
   YoutubeIframeRef,
@@ -47,19 +46,6 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// expo-screen-orientation throws if the requested orientation isn't one
-// the app's config allows (or on platforms/hosts that don't support
-// locking at all) - swallow that instead of taking the whole app down.
-async function safeLockOrientation(
-  orientation: ScreenOrientation.OrientationLock
-) {
-  try {
-    await ScreenOrientation.lockAsync(orientation);
-  } catch (err) {
-    console.log('[video] orientation lock failed', err);
-  }
-}
-
 export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const playerRef = useRef<YoutubeIframeRef>(null);
   // Starts paused - YouTube's embedded iframe can't autoplay in a WebView,
@@ -93,12 +79,6 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     }, 500);
     return () => clearInterval(interval);
   }, [playing]);
-
-  useEffect(() => {
-    return () => {
-      safeLockOrientation(ScreenOrientation.OrientationLock.PORTRAIT_UP);
-    };
-  }, []);
 
   const handleReady = async () => {
     const total = await playerRef.current?.getDuration();
@@ -143,15 +123,12 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     );
   };
 
-  const enterFullscreen = async () => {
-    setFullscreen(true);
-    await safeLockOrientation(ScreenOrientation.OrientationLock.LANDSCAPE);
-  };
-
-  const exitFullscreen = async () => {
-    await safeLockOrientation(ScreenOrientation.OrientationLock.PORTRAIT_UP);
-    setFullscreen(false);
-  };
+  // No device-rotation lock here - expo-screen-orientation's native lock
+  // call crashed on some devices even wrapped in try/catch (a native-level
+  // failure, not a JS one). Fullscreen just fills whatever the current
+  // window size is; turning the phone sideways gets the wider view.
+  const enterFullscreen = () => setFullscreen(true);
+  const exitFullscreen = () => setFullscreen(false);
 
   const renderPlayer = (playerWidth: number, playerHeight: number, isFullscreen: boolean) => (
     <View style={{ width: playerWidth, height: playerHeight }}>
