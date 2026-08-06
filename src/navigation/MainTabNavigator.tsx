@@ -53,8 +53,6 @@ export default function MainTabNavigator() {
             />
           </View>
         ),
-        tabBarBadge: route.name === 'Alerts' ? 11 : undefined,
-        tabBarBadgeStyle: styles.badge,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -92,9 +90,6 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 11,
     fontWeight: '600',
-  },
-  badge: {
-    backgroundColor: colors.accentRed,
   },
   iconWrap: {
     width: 38,
