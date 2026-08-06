@@ -8,6 +8,7 @@ import { colors, gradients } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
+import { parseFunctionError } from '../lib/functionError';
 import { useAuth } from '../contexts/AuthContext';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -92,6 +93,35 @@ export default function LeaderboardScreen({ navigation }: Props) {
     }
     setSubmitError(null);
     setSubmitting(true);
+
+    // Verify the PrimeXBT client ID / MT5 number against the broker before
+    // letting anyone register for a real-money challenge - previously this
+    // just wrote whatever was typed straight into leaderboard_participants
+    // with no check that the account even exists.
+    const { data: verifyData, error: verifyError } =
+      await supabase.functions.invoke('primexbt-verify', {
+        body: { action: 'verify', brokerId: clientId.trim() },
+      });
+
+    if (verifyError) {
+      setSubmitting(false);
+      setSubmitError(await parseFunctionError(verifyError));
+      return;
+    }
+    if (!verifyData?.found) {
+      setSubmitting(false);
+      setSubmitError(
+        "We couldn't find that PrimeXBT client ID or MT5 number. Double-check it and try again."
+      );
+      return;
+    }
+    if (!verifyData.funded) {
+      setSubmitting(false);
+      setSubmitError(
+        'That account was found, but needs to be funded before you can enter the challenge.'
+      );
+      return;
+    }
 
     const { error } = await supabase.from('leaderboard_participants').upsert(
       {
