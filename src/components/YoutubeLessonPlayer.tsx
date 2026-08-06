@@ -59,6 +59,17 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
   const resumeAtRef = useRef(0);
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
+  // Fit a 16:9 video into the current screen ("contain" sizing) instead of
+  // stretching it to the full (usually much taller, portrait) screen
+  // dimensions - that left the actual video in a small letterboxed strip
+  // at the top with a huge dead black area below it holding the controls.
+  const screenRatio = screenWidth / screenHeight;
+  const videoRatio = 16 / 9;
+  const fullscreenWidth =
+    screenRatio > videoRatio ? screenHeight * videoRatio : screenWidth;
+  const fullscreenHeight =
+    screenRatio > videoRatio ? screenHeight : screenWidth / videoRatio;
+
   // A new lesson means a new video - don't carry over the previous one's
   // playhead/playing state into it.
   useEffect(() => {
@@ -200,7 +211,7 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
 
       <Modal visible={fullscreen} animationType="fade" onRequestClose={exitFullscreen}>
         <View style={styles.fullscreenModal}>
-          {fullscreen && renderPlayer(screenWidth, screenHeight, true)}
+          {fullscreen && renderPlayer(fullscreenWidth, fullscreenHeight, true)}
         </View>
       </Modal>
     </>
