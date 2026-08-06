@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import YoutubePlayer, {
   PLAYER_STATES,
   YoutubeIframeRef,
@@ -44,6 +45,18 @@ function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Swallow orientation errors instead of taking the whole app down -
+// lockAsync(LANDSCAPE) previously crashed at the native layer (not a
+// catchable JS rejection on its own), so fullscreen now only calls the
+// lighter unlockAsync/lockAsync(PORTRAIT_UP) pair, still guarded here.
+async function safeOrientationCall(call: () => Promise<void>) {
+  try {
+    await call();
+  } catch (err) {
+    console.log('[video] orientation call failed', err);
+  }
 }
 
 export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
@@ -134,12 +147,28 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
     );
   };
 
-  // No device-rotation lock here - expo-screen-orientation's native lock
-  // call crashed on some devices even wrapped in try/catch (a native-level
-  // failure, not a JS one). Fullscreen just fills whatever the current
-  // window size is; turning the phone sideways gets the wider view.
-  const enterFullscreen = () => setFullscreen(true);
-  const exitFullscreen = () => setFullscreen(false);
+  const enterFullscreen = () => {
+    setFullscreen(true);
+    safeOrientationCall(() => ScreenOrientation.unlockAsync());
+  };
+
+  const exitFullscreen = () => {
+    setFullscreen(false);
+    safeOrientationCall(() =>
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+    );
+  };
+
+  // Defensive: if this unmounts (navigating away) while still fullscreen,
+  // make sure rotation doesn't stay unlocked for the rest of the app -
+  // harmless no-op if it was already locked back to portrait.
+  useEffect(() => {
+    return () => {
+      safeOrientationCall(() =>
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+      );
+    };
+  }, []);
 
   const renderPlayer = (playerWidth: number, playerHeight: number, isFullscreen: boolean) => (
     <View style={{ width: playerWidth, height: playerHeight }}>

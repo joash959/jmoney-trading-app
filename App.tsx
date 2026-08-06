@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { useFonts } from 'expo-font';
 import {
   Inter_400Regular,
@@ -35,6 +36,16 @@ export default function App() {
   useEffect(() => {
     hideSplash();
   }, [hideSplash]);
+
+  useEffect(() => {
+    // The app is portrait-only everywhere except the lesson video's
+    // fullscreen mode, which unlocks rotation on its own and hands
+    // control back here on exit - "orientation" in app.json is left as
+    // "default" so that temporary unlock is actually allowed to happen.
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch(
+      () => {}
+    );
+  }, []);
 
   if (!fontsLoaded) return null;
 
