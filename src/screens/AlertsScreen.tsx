@@ -4,6 +4,7 @@ import Text from '../components/AppText';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
@@ -13,6 +14,7 @@ import ScreenHeader from '../components/ScreenHeader';
 import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
+import EmptyStateCard from '../components/EmptyStateCard';
 import { detectAlertDirection } from '../lib/tradeAlertParser';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
@@ -64,6 +66,7 @@ function formatDateLabel(iso: string) {
 }
 
 export default function AlertsScreen({ navigation }: Props) {
+  const { profile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [alerts, setAlerts] = useState<TradeAlert[]>([]);
   const [longCount, setLongCount] = useState(0);
@@ -71,6 +74,29 @@ export default function AlertsScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('feature_tier_settings')
+      .select('default_tier')
+      .eq('feature_key', 'trade_alerts')
+      .maybeSingle()
+      .then(({ data, error: settingsError }) => {
+        if (cancelled) return;
+        if (!settingsError && data?.default_tier === 'premium') {
+          setLocked(profile?.tier !== 'premium');
+        }
+        setCheckingAccess(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile]);
 
   const fetchAlerts = useCallback(async () => {
     const { data: alertData, error: alertError } = await supabase
@@ -186,6 +212,44 @@ export default function AlertsScreen({ navigation }: Props) {
     });
     return groups;
   }, [alerts]);
+
+  if (checkingAccess) {
+    return (
+      <ScreenShell>
+        <TopBar />
+      </ScreenShell>
+    );
+  }
+
+  if (locked) {
+    return (
+      <ScreenShell>
+        <TopBar
+          rightElement={
+            <NotificationBell
+              count={unreadCount}
+              onPress={() =>
+                navigation.navigate('More', { screen: 'Notifications' })
+              }
+            />
+          }
+        />
+        <ScreenHeader
+          icon="bell"
+          image={require('../../assets/tradealerts.png')}
+          title="Trade Alerts"
+        />
+        <EmptyStateCard
+          icon="lock"
+          title="Premium Feature"
+          subtitle="Connect and fund your PrimeXBT account to unlock real-time trade alerts."
+          buttonLabel="Go to Home"
+          onPress={() => navigation.navigate('Home')}
+          style={styles.cardSpaced}
+        />
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell
@@ -331,6 +395,9 @@ const styles = StyleSheet.create({
   },
   fieldSpaced: {
     marginTop: 8,
+  },
+  cardSpaced: {
+    marginTop: 20,
   },
   sectionSpaced: {
     marginTop: 28,
