@@ -46,6 +46,24 @@ export default function LiveScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  // Section-wide default from the admin panel - a session is locked if
+  // EITHER it's individually marked premium OR the whole section defaults
+  // to premium, so nothing slips through as free just because an item was
+  // never explicitly marked after the section default changed.
+  const [sectionPremium, setSectionPremium] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from('feature_tier_settings')
+      .select('default_tier')
+      .eq('feature_key', 'live_sessions')
+      .maybeSingle()
+      .then(({ data, error: settingsError }) => {
+        if (!settingsError && data?.default_tier === 'premium') {
+          setSectionPremium(true);
+        }
+      });
+  }, []);
 
   const fetchSessions = useCallback(async () => {
     const { data, error: fetchError } = await supabase
@@ -182,7 +200,9 @@ export default function LiveScreen({ navigation }: Props) {
           ) : (
             <View style={[styles.list, styles.cardSpaced]}>
               {upcoming.map((session) => {
-                const locked = session.tier === 'premium' && !hasPremiumAccess;
+                const locked =
+                  (session.tier === 'premium' || sectionPremium) &&
+                  !hasPremiumAccess;
                 return (
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
