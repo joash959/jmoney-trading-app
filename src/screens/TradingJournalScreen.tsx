@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
-import { MoreStackParamList } from '../navigation/types';
+import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { TradeJournalEntry } from '../types/database';
@@ -22,6 +23,7 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import GlassCard from '../components/GlassCard';
+import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
@@ -43,8 +45,10 @@ function formatDayLabel(date: Date) {
 }
 
 export default function TradingJournalScreen({ navigation }: Props) {
-  const { session } = useAuth();
+  const { session, isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const [viewDate, setViewDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
@@ -56,6 +60,29 @@ export default function TradingJournalScreen({ navigation }: Props) {
   const [notesInput, setNotesInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [entryError, setEntryError] = useState<string | null>(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('feature_tier_settings')
+      .select('default_tier')
+      .eq('feature_key', 'trading_journal')
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.default_tier === 'premium') {
+          setLocked(!isPremium);
+        }
+        setCheckingAccess(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPremium]);
 
   const selectedDateISO = toDateISO(selectedDate);
   const selectedEntry = entries.find((e) => e.trade_date === selectedDateISO);
@@ -191,6 +218,43 @@ export default function TradingJournalScreen({ navigation }: Props) {
           : ('flat' as const),
     ])
   );
+
+  if (checkingAccess) {
+    return (
+      <ScreenShell>
+        <TopBar />
+        <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
+      </ScreenShell>
+    );
+  }
+
+  if (locked) {
+    return (
+      <ScreenShell>
+        <TopBar
+          rightElement={
+            <NotificationBell
+              count={unreadCount}
+              onPress={() => navigation.navigate('Notifications')}
+            />
+          }
+        />
+        <ScreenHeader
+          icon="bookmark"
+          image={require('../../assets/tradingjournal.png')}
+          title="Trading Journal"
+        />
+        <EmptyStateCard
+          icon="lock"
+          title="Premium Feature"
+          subtitle="Connect and fund your PrimeXBT account to unlock the trading journal."
+          buttonLabel="Go to Home"
+          onPress={() => tabNavigation?.navigate('Home')}
+          style={styles.cardSpaced}
+        />
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell>

@@ -1,9 +1,13 @@
-import { Image, Linking, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Linking, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
-import { MoreStackParamList } from '../navigation/types';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
@@ -15,6 +19,7 @@ import InsightCard from '../components/InsightCard';
 import PrimaryButton from '../components/PrimaryButton';
 import RatingCard from '../components/RatingCard';
 import FeatureCard from '../components/FeatureCard';
+import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 
@@ -42,8 +47,72 @@ const AFFILIATE_LINK =
   'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt';
 
 export default function RecommendedBrokerScreen({ navigation }: Props) {
+  const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const openAffiliateLink = () => Linking.openURL(AFFILIATE_LINK);
+
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('feature_tier_settings')
+      .select('default_tier')
+      .eq('feature_key', 'recommended_broker')
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.default_tier === 'premium') {
+          setLocked(!isPremium);
+        }
+        setCheckingAccess(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPremium]);
+
+  if (checkingAccess) {
+    return (
+      <ScreenShell>
+        <TopBar />
+        <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
+      </ScreenShell>
+    );
+  }
+
+  if (locked) {
+    return (
+      <ScreenShell>
+        <TopBar
+          rightElement={
+            <NotificationBell
+              count={unreadCount}
+              onPress={() => navigation.navigate('Notifications')}
+            />
+          }
+        />
+        <ScreenHeader
+          icon="briefcase"
+          image={require('../../assets/broker.png')}
+          title="Recommended Broker"
+        />
+        <EmptyStateCard
+          icon="lock"
+          title="Premium Feature"
+          subtitle="Connect and fund your PrimeXBT account to unlock this page."
+          buttonLabel="Go to Home"
+          onPress={() => tabNavigation?.navigate('Home')}
+          style={styles.cardSpaced}
+        />
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell>

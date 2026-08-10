@@ -4,9 +4,10 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { shadows } from '../theme/shadows';
-import { MoreStackParamList } from '../navigation/types';
+import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { parseFunctionError } from '../lib/functionError';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,6 +23,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
 import { iconTileGradients } from '../components/IconTile';
+import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
@@ -37,8 +39,10 @@ function rankColor(rank: number | null) {
 }
 
 export default function LeaderboardScreen({ navigation }: Props) {
-  const { session } = useAuth();
+  const { session, isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const tabNavigation =
+    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
 
   const [settings, setSettings] = useState<LeaderboardSettings | null>(null);
   const [participants, setParticipants] = useState<LeaderboardParticipant[]>(
@@ -46,6 +50,8 @@ export default function LeaderboardScreen({ navigation }: Props) {
   );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [locked, setLocked] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -69,6 +75,27 @@ export default function LeaderboardScreen({ navigation }: Props) {
     setSettings((settingsData as LeaderboardSettings) ?? null);
     setParticipants((participantData as LeaderboardParticipant[]) ?? []);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    supabase
+      .from('feature_tier_settings')
+      .select('default_tier')
+      .eq('feature_key', 'leaderboard')
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.default_tier === 'premium') {
+          setLocked(!isPremium);
+        }
+        setCheckingAccess(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPremium]);
 
   useEffect(() => {
     fetchLeaderboard().then(() => setLoading(false));
@@ -143,12 +170,40 @@ export default function LeaderboardScreen({ navigation }: Props) {
     }
   };
 
-  if (loading) {
+  if (checkingAccess || loading) {
     return (
       <ScreenShell>
         <TopBar />
         <ActivityIndicator
           color={colors.accentBlue}
+          style={styles.cardSpaced}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (locked) {
+    return (
+      <ScreenShell>
+        <TopBar
+          rightElement={
+            <NotificationBell
+              count={unreadCount}
+              onPress={() => navigation.navigate('Notifications')}
+            />
+          }
+        />
+        <ScreenHeader
+          icon="award"
+          image={require('../../assets/leaderboard.png')}
+          title="Leaderboard"
+        />
+        <EmptyStateCard
+          icon="lock"
+          title="Premium Feature"
+          subtitle="Connect and fund your PrimeXBT account to unlock the leaderboard."
+          buttonLabel="Go to Home"
+          onPress={() => tabNavigation?.navigate('Home')}
           style={styles.cardSpaced}
         />
       </ScreenShell>
