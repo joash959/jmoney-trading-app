@@ -42,14 +42,12 @@ function categoryAccent(category: string) {
 }
 
 export default function TelegramChannelsScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const connect = usePrimeXBTConnect();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
-  const isPremium = profile?.tier === 'premium';
 
   const fetchAll = useCallback(async () => {
     const { data } = await supabase

@@ -44,7 +44,7 @@ function getInitials(name: string) {
 
 export default function CourseDetailScreen({ route, navigation }: Props) {
   const { courseId, lessonId: requestedLessonId } = route.params;
-  const { profile } = useAuth();
+  const { isPremium: hasPremiumAccess } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
@@ -75,8 +75,6 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
     );
     return () => subscription.remove();
   }, [player]);
-
-  const hasPremiumAccess = profile?.tier === 'premium';
 
   const canPlay = useCallback(
     (lesson: Lesson) =>

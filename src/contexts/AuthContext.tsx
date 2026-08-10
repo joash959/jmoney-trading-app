@@ -12,6 +12,11 @@ import { Profile } from '../types/database';
 type AuthContextValue = {
   session: Session | null;
   profile: Profile | null;
+  // The single source of truth for premium access app-wide - derived from
+  // profiles.membership_tier, the same field the web dashboard reads.
+  // profiles.tier is a separate, unrelated column that used to be checked
+  // here by mistake, which let free-tier users through to premium screens.
+  isPremium: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -76,9 +81,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const isPremium = profile?.membership_tier === 'premium';
+
   return (
     <AuthContext.Provider
-      value={{ session, profile, loading, signIn, signOut, refreshProfile }}
+      value={{
+        session,
+        profile,
+        isPremium,
+        loading,
+        signIn,
+        signOut,
+        refreshProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>

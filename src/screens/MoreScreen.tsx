@@ -42,14 +42,13 @@ function getInitials(name: string) {
 }
 
 export default function MoreScreen({ navigation }: Props) {
-  const { session, profile, signOut } = useAuth();
+  const { session, profile, isPremium, signOut } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
 
   const email = session?.user.email ?? '';
   const displayName = profile?.display_name || email || 'Trader';
-  const isPremium = profile?.tier === 'premium';
 
   const handleSignOut = () => {
     signOut();

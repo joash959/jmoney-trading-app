@@ -66,7 +66,7 @@ function formatDateLabel(iso: string) {
 }
 
 export default function AlertsScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [alerts, setAlerts] = useState<TradeAlert[]>([]);
   const [longCount, setLongCount] = useState(0);
@@ -88,7 +88,7 @@ export default function AlertsScreen({ navigation }: Props) {
       .then(({ data, error: settingsError }) => {
         if (cancelled) return;
         if (!settingsError && data?.default_tier === 'premium') {
-          setLocked(profile?.tier !== 'premium');
+          setLocked(!isPremium);
         }
         setCheckingAccess(false);
       });
@@ -96,7 +96,7 @@ export default function AlertsScreen({ navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [isPremium]);
 
   const fetchAlerts = useCallback(async () => {
     const { data: alertData, error: alertError } = await supabase

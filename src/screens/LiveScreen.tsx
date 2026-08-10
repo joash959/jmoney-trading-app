@@ -39,7 +39,7 @@ function formatSessionDate(dateStr: string, timeStr: string | null) {
 type Props = BottomTabScreenProps<MainTabParamList, 'Live'>;
 
 export default function LiveScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { isPremium: hasPremiumAccess } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +108,6 @@ export default function LiveScreen({ navigation }: Props) {
   ).length;
 
   const nextSession = upcoming[0];
-  const hasPremiumAccess = profile?.tier === 'premium';
 
   const handleJoin = (session: LiveSession) => {
     if (session.zoom_link) {

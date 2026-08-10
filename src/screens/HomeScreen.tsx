@@ -39,7 +39,7 @@ function getGreeting() {
 }
 
 export default function HomeScreen({ navigation }: Props) {
-  const { profile, refreshProfile } = useAuth();
+  const { profile, isPremium, refreshProfile } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const connect = usePrimeXBTConnect();
   const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
@@ -50,7 +50,6 @@ export default function HomeScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
-  const isPremium = profile?.tier === 'premium';
 
   const fetchData = async () => {
     const [{ data: progressData }, { count: totalCount }, { data: progressRows }] =

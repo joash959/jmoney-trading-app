@@ -63,7 +63,7 @@ const BIAS_COLOR: Record<ChartAnalysis['bias'], string> = {
 };
 
 export default function AISuperScannerScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
@@ -74,8 +74,6 @@ export default function AISuperScannerScreen({ navigation }: Props) {
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<ChartAnalysis | null>(null);
-
-  const isPremium = profile?.tier === 'premium';
 
   const handlePick = async () => {
     setPickError(null);

@@ -99,7 +99,7 @@ function getWidgetHtml(symbol: string) {
 }
 
 export default function MarketAnalysisScreen({ navigation }: Props) {
-  const { profile } = useAuth();
+  const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
@@ -121,7 +121,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       .then(({ data, error }) => {
         if (cancelled) return;
         if (!error && data?.default_tier === 'premium') {
-          setLocked(profile?.tier !== 'premium');
+          setLocked(!isPremium);
         }
         setCheckingAccess(false);
       });
@@ -129,7 +129,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [isPremium]);
 
   if (checkingAccess) {
     return (
