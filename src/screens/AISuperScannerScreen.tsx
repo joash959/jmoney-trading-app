@@ -4,11 +4,11 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
-import { MainTabParamList, MoreStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { parseFunctionError } from '../lib/functionError';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
@@ -22,6 +22,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import UploadDropzone from '../components/UploadDropzone';
 import EmptyStateCard from '../components/EmptyStateCard';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'AIScanner'>;
 
@@ -65,8 +66,7 @@ const BIAS_COLOR: Record<ChartAnalysis['bias'], string> = {
 export default function AISuperScannerScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
-  const tabNavigation =
-    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
+  const connect = usePrimeXBTConnect();
 
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
@@ -157,8 +157,8 @@ export default function AISuperScannerScreen({ navigation }: Props) {
           icon="lock"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock the AI Super Scanner."
-          buttonLabel="Go to Home"
-          onPress={() => tabNavigation?.navigate('Home')}
+          buttonLabel="Connect PrimeXBT"
+          onPress={connect.open}
           style={styles.cardSpaced}
         />
       ) : !imageUri ? (
@@ -311,6 +311,17 @@ export default function AISuperScannerScreen({ navigation }: Props) {
           />
         </>
       )}
+
+      <PrimeXBTConnectModal
+        visible={connect.visible}
+        onClose={connect.close}
+        clientId={connect.clientId}
+        onChangeClientId={connect.setClientId}
+        onConnect={connect.handleConnect}
+        loading={connect.loading}
+        successMessage={connect.successMessage}
+        errorMessage={connect.errorMessage}
+      />
     </ScreenShell>
   );
 }

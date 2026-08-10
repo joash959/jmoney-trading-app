@@ -4,13 +4,13 @@ import Text from '../components/AppText';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { shadows } from '../theme/shadows';
-import { MainTabParamList, MoreStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { parseFunctionError } from '../lib/functionError';
 import { useAuth } from '../contexts/AuthContext';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
@@ -24,6 +24,7 @@ import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
 import { iconTileGradients } from '../components/IconTile';
 import EmptyStateCard from '../components/EmptyStateCard';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
@@ -41,8 +42,7 @@ function rankColor(rank: number | null) {
 export default function LeaderboardScreen({ navigation }: Props) {
   const { session, isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
-  const tabNavigation =
-    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
+  const connect = usePrimeXBTConnect();
 
   const [settings, setSettings] = useState<LeaderboardSettings | null>(null);
   const [participants, setParticipants] = useState<LeaderboardParticipant[]>(
@@ -202,9 +202,19 @@ export default function LeaderboardScreen({ navigation }: Props) {
           icon="lock"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock the leaderboard."
-          buttonLabel="Go to Home"
-          onPress={() => tabNavigation?.navigate('Home')}
+          buttonLabel="Connect PrimeXBT"
+          onPress={connect.open}
           style={styles.cardSpaced}
+        />
+        <PrimeXBTConnectModal
+          visible={connect.visible}
+          onClose={connect.close}
+          clientId={connect.clientId}
+          onChangeClientId={connect.setClientId}
+          onConnect={connect.handleConnect}
+          loading={connect.loading}
+          successMessage={connect.successMessage}
+          errorMessage={connect.errorMessage}
         />
       </ScreenShell>
     );

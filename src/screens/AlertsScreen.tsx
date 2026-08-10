@@ -5,6 +5,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
@@ -15,6 +16,7 @@ import InsightCard from '../components/InsightCard';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
 import EmptyStateCard from '../components/EmptyStateCard';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import { detectAlertDirection } from '../lib/tradeAlertParser';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
@@ -68,6 +70,7 @@ function formatDateLabel(iso: string) {
 export default function AlertsScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const connect = usePrimeXBTConnect();
   const [alerts, setAlerts] = useState<TradeAlert[]>([]);
   const [longCount, setLongCount] = useState(0);
   const [shortCount, setShortCount] = useState(0);
@@ -243,9 +246,19 @@ export default function AlertsScreen({ navigation }: Props) {
           icon="lock"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock real-time trade alerts."
-          buttonLabel="Go to Home"
-          onPress={() => navigation.navigate('Home')}
+          buttonLabel="Connect PrimeXBT"
+          onPress={connect.open}
           style={styles.cardSpaced}
+        />
+        <PrimeXBTConnectModal
+          visible={connect.visible}
+          onClose={connect.close}
+          clientId={connect.clientId}
+          onChangeClientId={connect.setClientId}
+          onConnect={connect.handleConnect}
+          loading={connect.loading}
+          successMessage={connect.successMessage}
+          errorMessage={connect.errorMessage}
         />
       </ScreenShell>
     );
