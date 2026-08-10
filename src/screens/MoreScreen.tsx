@@ -124,13 +124,6 @@ export default function MoreScreen({ navigation }: Props) {
       image: require('../../assets/marketanalysis.png'),
       onPress: () => navigation.navigate('MarketAnalysis'),
     },
-    {
-      icon: 'award' as const,
-      label: 'Leaderboard',
-      gradient: iconTileGradients.red,
-      image: require('../../assets/leaderboard.png'),
-      onPress: () => navigation.navigate('Leaderboard'),
-    },
   ];
 
   const account = [
@@ -147,6 +140,13 @@ export default function MoreScreen({ navigation }: Props) {
       gradient: iconTileGradients.purple,
       image: require('../../assets/contactus.png'),
       onPress: () => navigation.navigate('ContactUs'),
+    },
+    {
+      icon: 'award' as const,
+      label: 'Leaderboard',
+      gradient: iconTileGradients.red,
+      image: require('../../assets/leaderboard.png'),
+      onPress: () => navigation.navigate('Leaderboard'),
     },
   ];
 
@@ -211,7 +211,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
-              style={{ width: tileWidth(2) }}
+              style={{ width: tileWidth(3) }}
             />
           ))}
         </View>
@@ -228,7 +228,7 @@ export default function MoreScreen({ navigation }: Props) {
               gradient={item.gradient}
               image={item.image}
               onPress={item.onPress}
-              style={{ width: tileWidth(2) }}
+              style={{ width: tileWidth(3) }}
             />
           ))}
         </View>
