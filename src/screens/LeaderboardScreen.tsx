@@ -24,12 +24,13 @@ import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
+import { iconTileGradients } from '../components/IconTile';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
 const GOLD = colors.warning;
-const SILVER = '#C4C9D4';
-const BRONZE = '#D97B3F';
+const SILVER = '#B8C4D9';
+const BRONZE = '#E08A4B';
 
 function rankColor(rank: number | null) {
   if (rank === 1) return GOLD;
@@ -310,24 +311,32 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <View style={styles.prizeRow}>
           <PrizeTile
             icon="award"
-            rank={1}
-            accentColor={GOLD}
+            iconColor={GOLD}
             label="1ST PLACE"
             amount={`${currency}${prize1.toLocaleString()}`}
+            amountColor={GOLD}
+            backgroundColor="rgba(245,197,24,0.1)"
+            borderColor="rgba(245,197,24,0.3)"
+            featured
+            gradient={iconTileGradients.gold}
           />
           <PrizeTile
             icon="award"
-            rank={2}
-            accentColor={SILVER}
+            iconColor={SILVER}
             label="2ND PLACE"
             amount={`${currency}${prize2.toLocaleString()}`}
+            amountColor={SILVER}
+            backgroundColor="rgba(184,196,217,0.1)"
+            borderColor="rgba(184,196,217,0.3)"
           />
           <PrizeTile
             icon="award"
-            rank={3}
-            accentColor={BRONZE}
+            iconColor={BRONZE}
             label="3RD PLACE"
             amount={`${currency}${prize3.toLocaleString()}`}
+            amountColor={BRONZE}
+            backgroundColor="rgba(224,138,75,0.1)"
+            borderColor="rgba(224,138,75,0.3)"
           />
         </View>
 

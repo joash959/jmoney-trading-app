@@ -1,31 +1,81 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 
 type Props = {
   icon: React.ComponentProps<typeof Feather>['name'];
-  rank: 1 | 2 | 3;
-  accentColor: string;
+  iconColor: string;
   label: string;
   amount: string;
+  amountColor: string;
+  backgroundColor: string;
+  borderColor: string;
+  /** 1st place gets a gradient card + glow instead of a flat tinted tile. */
+  featured?: boolean;
+  gradient?: readonly [string, string, ...string[]];
 };
 
-export default function PrizeTile({ icon, rank, accentColor, label, amount }: Props) {
-  return (
-    <View style={[styles.tile, { borderLeftColor: accentColor }]}>
-      <View style={[styles.rankBadge, { backgroundColor: accentColor }]}>
-        <Text style={styles.rankBadgeText}>{rank}</Text>
+export default function PrizeTile({
+  icon,
+  iconColor,
+  label,
+  amount,
+  amountColor,
+  backgroundColor,
+  borderColor,
+  featured,
+  gradient,
+}: Props) {
+  const content = (
+    <>
+      <View
+        style={[
+          styles.iconCircle,
+          {
+            backgroundColor: featured
+              ? 'rgba(255,255,255,0.22)'
+              : `${iconColor}22`,
+          },
+        ]}
+      >
+        <Feather
+          name={icon}
+          size={20}
+          color={featured ? colors.text : iconColor}
+        />
       </View>
-      <View style={[styles.iconCircle, { backgroundColor: `${accentColor}1F` }]}>
-        <Feather name={icon} size={20} color={accentColor} />
-      </View>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.amount, { color: accentColor }]} numberOfLines={1}>
+      <Text style={[styles.label, featured && styles.labelFeatured]}>
+        {label}
+      </Text>
+      <Text
+        style={[styles.amount, { color: featured ? colors.text : amountColor }]}
+        numberOfLines={1}
+      >
         {amount}
       </Text>
+    </>
+  );
+
+  if (featured && gradient) {
+    return (
+      <LinearGradient
+        colors={gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.tile, styles.tileFeatured]}
+      >
+        {content}
+      </LinearGradient>
+    );
+  }
+
+  return (
+    <View style={[styles.tile, { backgroundColor, borderColor }]}>
+      {content}
     </View>
   );
 }
@@ -34,27 +84,16 @@ const styles = StyleSheet.create({
   tile: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    borderWidth: 1,
     borderRadius: radius.xl,
-    borderLeftWidth: 3,
     paddingVertical: 16,
     paddingHorizontal: 6,
     ...shadows.sm,
   },
-  rankBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankBadgeText: {
-    color: '#0A0D16',
-    fontSize: 10,
-    fontWeight: '800',
+  tileFeatured: {
+    borderWidth: 0,
+    paddingVertical: 20,
+    ...shadows.glow,
   },
   iconCircle: {
     width: 40,
@@ -69,6 +108,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
     marginTop: 10,
+  },
+  labelFeatured: {
+    color: 'rgba(255,255,255,0.85)',
   },
   amount: {
     fontSize: 16,
