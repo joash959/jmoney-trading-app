@@ -9,6 +9,7 @@ import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { LiveSession } from '../types/database';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -20,6 +21,7 @@ import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from '../components/Skeleton';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 function formatSessionDate(dateStr: string, timeStr: string | null) {
   const date = new Date(`${dateStr}T${timeStr ?? '00:00:00'}`);
@@ -36,11 +38,20 @@ function formatSessionDate(dateStr: string, timeStr: string | null) {
   return `${dateLabel} • ${timeLabel}`;
 }
 
+function formatDateOnly(dateStr: string) {
+  return new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 type Props = BottomTabScreenProps<MainTabParamList, 'Live'>;
 
 export default function LiveScreen({ navigation }: Props) {
   const { isPremium: hasPremiumAccess } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const connect = usePrimeXBTConnect();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -178,14 +189,7 @@ export default function LiveScreen({ navigation }: Props) {
               variant="gradient"
               icon="clock"
               label="Next Session"
-              value={
-                nextSession
-                  ? formatSessionDate(
-                      nextSession.session_date,
-                      nextSession.session_time
-                    )
-                  : 'None'
-              }
+              value={nextSession ? formatDateOnly(nextSession.session_date) : 'None'}
             />
           </View>
 
@@ -270,11 +274,11 @@ export default function LiveScreen({ navigation }: Props) {
                     )}
 
                     <PrimaryButton
-                      label={locked ? 'Premium only' : 'Join session'}
-                      icon="video"
+                      label={locked ? 'Connect PrimeXBT' : 'Join session'}
+                      icon={locked ? 'lock' : 'video'}
                       variant="flat"
-                      disabled={locked || !session.zoom_link}
-                      onPress={() => handleJoin(session)}
+                      disabled={!locked && !session.zoom_link}
+                      onPress={() => (locked ? connect.open() : handleJoin(session))}
                       style={styles.joinButton}
                     />
                   </View>
@@ -284,6 +288,17 @@ export default function LiveScreen({ navigation }: Props) {
           )}
         </>
       )}
+
+      <PrimeXBTConnectModal
+        visible={connect.visible}
+        onClose={connect.close}
+        clientId={connect.clientId}
+        onChangeClientId={connect.setClientId}
+        onConnect={connect.handleConnect}
+        loading={connect.loading}
+        successMessage={connect.successMessage}
+        errorMessage={connect.errorMessage}
+      />
     </ScreenShell>
   );
 }
