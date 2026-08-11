@@ -48,24 +48,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  // Section-wide default from the admin panel - a channel is locked if
-  // EITHER it's individually marked premium OR the whole section defaults
-  // to premium, so nothing slips through as free just because an item was
-  // never explicitly marked after the section default changed.
-  const [sectionPremium, setSectionPremium] = useState(false);
-
-  useEffect(() => {
-    supabase
-      .from('feature_tier_settings')
-      .select('default_tier')
-      .eq('feature_key', 'communities')
-      .maybeSingle()
-      .then(({ data, error: settingsError }) => {
-        if (!settingsError && data?.default_tier === 'premium') {
-          setSectionPremium(true);
-        }
-      });
-  }, []);
 
   const fetchAll = useCallback(async () => {
     const { data } = await supabase
@@ -97,7 +79,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
   }, [communities]);
 
   const openCommunity = (community: Community) => {
-    if ((community.tier === 'premium' || sectionPremium) && !isPremium) {
+    if (community.tier === 'premium' && !isPremium) {
       connect.open();
       return;
     }
@@ -204,7 +186,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                 tagBackground={accent.bg}
                 description={community.description ?? ''}
                 members={community.member_count ?? ''}
-                locked={(community.tier === 'premium' || sectionPremium) && !isPremium}
+                locked={community.tier === 'premium' && !isPremium}
                 onJoinPress={() => openCommunity(community)}
               />
             );
