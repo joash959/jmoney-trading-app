@@ -22,7 +22,6 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
-import { iconTileGradients } from '../components/IconTile';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
@@ -311,32 +310,24 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <View style={styles.prizeRow}>
           <PrizeTile
             icon="award"
-            iconColor={GOLD}
+            rank={1}
+            accentColor={GOLD}
             label="1ST PLACE"
             amount={`${currency}${prize1.toLocaleString()}`}
-            amountColor={GOLD}
-            backgroundColor="rgba(245,197,24,0.1)"
-            borderColor="rgba(245,197,24,0.3)"
-            featured
-            gradient={iconTileGradients.gold}
           />
           <PrizeTile
             icon="award"
-            iconColor={SILVER}
+            rank={2}
+            accentColor={SILVER}
             label="2ND PLACE"
             amount={`${currency}${prize2.toLocaleString()}`}
-            amountColor={colors.text}
-            backgroundColor={colors.card}
-            borderColor={colors.cardBorder}
           />
           <PrizeTile
             icon="award"
-            iconColor={BRONZE}
+            rank={3}
+            accentColor={BRONZE}
             label="3RD PLACE"
             amount={`${currency}${prize3.toLocaleString()}`}
-            amountColor={BRONZE}
-            backgroundColor="rgba(217,123,63,0.1)"
-            borderColor="rgba(217,123,63,0.3)"
           />
         </View>
 
