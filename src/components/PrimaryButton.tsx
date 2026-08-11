@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Animated, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors, gradients } from '../theme/colors';
@@ -10,7 +10,7 @@ import { shadows } from '../theme/shadows';
 
 type Props = {
   label: string;
-  icon?: React.ComponentProps<typeof Feather>['name'] | null;
+  icon?: React.ComponentProps<typeof Ionicons>['name'] | null;
   onPress?: () => void;
   disabled?: boolean;
   variant?: 'gradient' | 'flat';
@@ -19,7 +19,7 @@ type Props = {
 
 export default function PrimaryButton({
   label,
-  icon = 'arrow-right',
+  icon = 'arrow-forward-outline',
   onPress,
   disabled = false,
   variant = 'gradient',
@@ -46,7 +46,7 @@ export default function PrimaryButton({
   const content = (
     <>
       <Text style={styles.buttonText}>{label}</Text>
-      {icon && <Feather name={icon} size={18} color={colors.text} />}
+      {icon && <Ionicons name={icon} size={18} color={colors.text} />}
     </>
   );
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
@@ -10,7 +10,7 @@ import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
-import { toFeatherIcon } from '../lib/icons';
+import { toIonicon } from '../lib/icons';
 import { useAuth } from '../contexts/AuthContext';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { Community } from '../types/database';
@@ -98,7 +98,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="sliders"
+        icon="options-outline"
         image={require('../../assets/telegram.png')}
         title="Telegram Channels"
       />
@@ -120,15 +120,15 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               >
                 <View style={styles.featuredTopRow}>
                   <View style={styles.featuredIconCircle}>
-                    <Feather
-                      name={toFeatherIcon(featured.icon_name)}
+                    <Ionicons
+                      name={toIonicon(featured.icon_name)}
                       size={20}
                       color={colors.text}
                     />
                   </View>
                   <View style={styles.featuredBadge}>
-                    <Feather
-                      name={isPremium ? 'unlock' : 'lock'}
+                    <Ionicons
+                      name={isPremium ? 'lock-open-outline' : 'lock-closed-outline'}
                       size={11}
                       color={colors.text}
                     />
@@ -145,7 +145,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                 </Text>
 
                 <View style={styles.featuredMembersRow}>
-                  <Feather name="users" size={13} color="rgba(255,255,255,0.85)" />
+                  <Ionicons name="people-outline" size={13} color="rgba(255,255,255,0.85)" />
                   <Text style={styles.featuredMembersText}>
                     {featured.member_count ?? '—'} members
                   </Text>
@@ -155,8 +155,8 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                   <Text style={styles.featuredCtaText}>
                     {isPremium ? 'Join Channel' : 'Unlock with Premium'}
                   </Text>
-                  <Feather
-                    name={isPremium ? 'arrow-right' : 'lock'}
+                  <Ionicons
+                    name={isPremium ? 'arrow-forward-outline' : 'lock-closed-outline'}
                     size={15}
                     color={colors.accentBlue}
                   />
@@ -177,7 +177,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
             return (
               <ChannelCard
                 key={community.id}
-                icon={toFeatherIcon(community.icon_name)}
+                icon={toIonicon(community.icon_name)}
                 iconColor={accent.fg}
                 iconBackground={accent.bg}
                 title={community.name}
@@ -195,7 +195,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
           <GlassCard style={styles.cardSpaced}>
             <View style={styles.tipRow}>
               <View style={styles.tipIcon}>
-                <Feather name="message-circle" size={18} color={colors.link} />
+                <Ionicons name="chatbubble-outline" size={18} color={colors.link} />
               </View>
               <View style={styles.tipBody}>
                 <Text style={styles.tipTitle}>New to Telegram?</Text>

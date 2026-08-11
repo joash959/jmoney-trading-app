@@ -238,12 +238,12 @@ export default function AlertsScreen({ navigation }: Props) {
           }
         />
         <ScreenHeader
-          icon="bell"
+          icon="notifications-outline"
           image={require('../../assets/tradealerts.png')}
           title="Trade Alerts"
         />
         <EmptyStateCard
-          icon="lock"
+          icon="lock-closed-outline"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock real-time trade alerts."
           buttonLabel="Connect PrimeXBT"
@@ -281,7 +281,7 @@ export default function AlertsScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="bell"
+        icon="notifications-outline"
         image={require('../../assets/tradealerts.png')}
         title="Trade Alerts"
         rightElement={
@@ -318,7 +318,7 @@ export default function AlertsScreen({ navigation }: Props) {
             <InsightCard
               compact
               variant="gradient"
-              icon="activity"
+              icon="pulse-outline"
               label="Today"
               value={String(todayCount)}
             />
@@ -339,7 +339,7 @@ export default function AlertsScreen({ navigation }: Props) {
             <InsightCard
               compact
               variant="gradient"
-              icon="clock"
+              icon="time-outline"
               label="Last Alert"
               value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
             />

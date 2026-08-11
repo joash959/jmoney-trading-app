@@ -1,12 +1,12 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import GlassCard from './GlassCard';
 import PrimaryButton from './PrimaryButton';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   iconVariant?: 'circle' | 'plain';
   title: string;
   subtitle: string;
@@ -28,10 +28,10 @@ export default function EmptyStateCard({
     <GlassCard style={style} contentStyle={styles.card}>
       {iconVariant === 'circle' ? (
         <View style={styles.iconCircle}>
-          <Feather name={icon} size={22} color={colors.link} />
+          <Ionicons name={icon} size={22} color={colors.link} />
         </View>
       ) : (
-        <Feather name={icon} size={48} color={colors.textFaint} />
+        <Ionicons name={icon} size={48} color={colors.textFaint} />
       )}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 
@@ -84,13 +84,13 @@ export default function Calendar({
     <View style={styles.card}>
       <View style={styles.navRow}>
         <Pressable style={styles.navButton} onPress={onPrevMonth} hitSlop={6}>
-          <Feather name="chevron-left" size={16} color={colors.text} />
+          <Ionicons name="chevron-back" size={16} color={colors.text} />
         </Pressable>
         <Pressable style={styles.todayButton} onPress={onToday}>
           <Text style={styles.todayText}>TODAY</Text>
         </Pressable>
         <Pressable style={styles.navButton} onPress={onNextMonth} hitSlop={6}>
-          <Feather name="chevron-right" size={16} color={colors.text} />
+          <Ionicons name="chevron-forward" size={16} color={colors.text} />
         </Pressable>
         <Text style={styles.monthLabel}>
           {MONTH_NAMES[month].slice(0, 3)} {year}

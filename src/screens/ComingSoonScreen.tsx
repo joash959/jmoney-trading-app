@@ -1,12 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   title: string;
 };
 
@@ -16,7 +16,7 @@ export default function ComingSoonScreen({ icon, title }: Props) {
       <TopBar />
       <View style={styles.wrap}>
         <View style={styles.iconCircle}>
-          <Feather name={icon} size={28} color={colors.link} />
+          <Ionicons name={icon} size={28} color={colors.link} />
         </View>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>Coming soon</Text>

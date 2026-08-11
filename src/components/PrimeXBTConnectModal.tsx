@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -53,11 +53,11 @@ export default function PrimeXBTConnectModal({
           <Pressable style={styles.sheet} onPress={() => {}}>
             <View style={styles.headerRow}>
               <View style={styles.cardHeadingRow}>
-                <Feather name="shield" size={18} color={colors.text} />
+                <Ionicons name="shield-outline" size={18} color={colors.text} />
                 <Text style={styles.title}>Connect your PrimeXBT account</Text>
               </View>
               <Pressable onPress={onClose} hitSlop={12}>
-                <Feather name="x" size={22} color={colors.textFaint} />
+                <Ionicons name="close-outline" size={22} color={colors.textFaint} />
               </Pressable>
             </View>
 
@@ -92,7 +92,7 @@ export default function PrimeXBTConnectModal({
 
             <PrimaryButton
               label={loading ? 'Checking...' : 'Connect & unlock premium'}
-              icon="shield"
+              icon="shield-outline"
               variant="flat"
               disabled={clientId.trim().length === 0 || loading}
               onPress={onConnect}
@@ -100,7 +100,7 @@ export default function PrimeXBTConnectModal({
             />
             <SecondaryButton
               label="Don't have an account? Open & fund PrimeXBT"
-              icon="external-link"
+              icon="open-outline"
               onPress={() =>
                 Linking.openURL(
                   'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt'

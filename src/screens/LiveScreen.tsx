@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -161,7 +161,7 @@ export default function LiveScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="video"
+        icon="videocam-outline"
         image={require('../../assets/livesessions.png')}
         title="Live Sessions"
       />
@@ -181,13 +181,13 @@ export default function LiveScreen({ navigation }: Props) {
           <View style={styles.statsRow}>
             <InsightCard
               variant="gradient"
-              icon="calendar"
+              icon="calendar-outline"
               label="This Week"
               value={String(thisWeekCount)}
             />
             <InsightCard
               variant="gradient"
-              icon="clock"
+              icon="time-outline"
               label="Next Session"
               value={nextSession ? formatDateOnly(nextSession.session_date) : 'None'}
             />
@@ -195,7 +195,7 @@ export default function LiveScreen({ navigation }: Props) {
 
           {upcoming.length === 0 ? (
             <EmptyStateCard
-              icon="video"
+              icon="videocam-outline"
               iconVariant="plain"
               title="No Upcoming Sessions"
               subtitle="Check back later for new live trading sessions."
@@ -211,7 +211,7 @@ export default function LiveScreen({ navigation }: Props) {
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
                       <View style={styles.sessionIconCircle}>
-                        <Feather name="video" size={16} color={colors.link} />
+                        <Ionicons name="videocam-outline" size={16} color={colors.link} />
                       </View>
                       <View style={styles.sessionTitleCol}>
                         <Text style={styles.sessionTitle} numberOfLines={2}>
@@ -225,7 +225,7 @@ export default function LiveScreen({ navigation }: Props) {
                       </View>
                       {locked && (
                         <View style={styles.premiumPill}>
-                          <Feather name="lock" size={11} color={colors.warning} />
+                          <Ionicons name="lock-closed-outline" size={11} color={colors.warning} />
                           <Text style={styles.premiumPillText}>Premium</Text>
                         </View>
                       )}
@@ -238,7 +238,7 @@ export default function LiveScreen({ navigation }: Props) {
                     )}
 
                     <View style={styles.sessionDateRow}>
-                      <Feather name="calendar" size={12} color={colors.textFaint} />
+                      <Ionicons name="calendar-outline" size={12} color={colors.textFaint} />
                       <Text style={styles.sessionDate}>
                         {formatSessionDate(
                           session.session_date,
@@ -261,8 +261,8 @@ export default function LiveScreen({ navigation }: Props) {
                         <Text style={styles.passwordValue}>
                           {session.zoom_password}
                         </Text>
-                        <Feather
-                          name={copiedId === session.id ? 'check' : 'copy'}
+                        <Ionicons
+                          name={copiedId === session.id ? 'checkmark-outline' : 'copy-outline'}
                           size={12}
                           color={
                             copiedId === session.id
@@ -275,7 +275,7 @@ export default function LiveScreen({ navigation }: Props) {
 
                     <PrimaryButton
                       label={locked ? 'Connect PrimeXBT' : 'Join session'}
-                      icon={locked ? 'lock' : 'video'}
+                      icon={locked ? 'lock-closed-outline' : 'videocam-outline'}
                       variant="flat"
                       disabled={!locked && !session.zoom_link}
                       onPress={() => (locked ? connect.open() : handleJoin(session))}

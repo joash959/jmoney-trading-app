@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Linking, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
@@ -25,10 +25,10 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 
 const STATS = [
-  { icon: 'clock' as const, value: '2018+', label: 'Operating Since' },
-  { icon: 'trending-up' as const, value: '100+', label: 'Markets' },
-  { icon: 'zap' as const, value: '1:1000', label: 'Max Leverage' },
-  { icon: 'headphones' as const, value: '24/7', label: 'Support' },
+  { icon: 'time-outline' as const, value: '2018+', label: 'Operating Since' },
+  { icon: 'trending-up-outline' as const, value: '100+', label: 'Markets' },
+  { icon: 'flash-outline' as const, value: '1:1000', label: 'Max Leverage' },
+  { icon: 'headset-outline' as const, value: '24/7', label: 'Support' },
 ];
 
 const RATINGS = [
@@ -98,12 +98,12 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
           }
         />
         <ScreenHeader
-          icon="briefcase"
+          icon="briefcase-outline"
           image={require('../../assets/broker.png')}
           title="Recommended Broker"
         />
         <EmptyStateCard
-          icon="lock"
+          icon="lock-closed-outline"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock this page."
           buttonLabel="Connect PrimeXBT"
@@ -136,7 +136,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="briefcase"
+        icon="briefcase-outline"
         image={require('../../assets/broker.png')}
         title="Recommended Broker"
       />
@@ -163,11 +163,11 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
 
         <View style={styles.badgeRow}>
           <View style={styles.badgePill}>
-            <Feather name="award" size={13} color={colors.textMuted} />
+            <Ionicons name="trophy-outline" size={13} color={colors.textMuted} />
             <Text style={styles.badgeText}>Official Partner</Text>
           </View>
           <View style={styles.badgePill}>
-            <Feather name="shield" size={13} color={colors.textMuted} />
+            <Ionicons name="shield-outline" size={13} color={colors.textMuted} />
             <Text style={styles.badgeText}>Secure Platform</Text>
           </View>
         </View>
@@ -218,19 +218,19 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       </Text>
       <View style={[styles.row, styles.fieldSpaced]}>
         <FeatureCard
-          icon="globe"
+          icon="globe-outline"
           title="All-in-One Platform"
           description="Trade crypto, forex, indices and commodities from a single account."
         />
         <FeatureCard
-          icon="bar-chart-2"
+          icon="bar-chart-outline"
           title="Advanced Charting"
           description="Professional TradingView charts and technical analysis tools."
           featured
         />
       </View>
       <FeatureCard
-        icon="credit-card"
+        icon="card-outline"
         title="Easy Funding"
         description="Fund via crypto, card, or local payment methods quickly."
         style={styles.fieldSpaced}
@@ -284,7 +284,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       />
 
       <SurfaceCard style={[styles.cardSpaced, styles.ctaCard]}>
-        <Feather name="globe" size={30} color={colors.link} />
+        <Ionicons name="globe-outline" size={30} color={colors.link} />
         <Text style={styles.ctaTitle}>Ready to Start Trading?</Text>
         <Text style={styles.ctaDescription}>
           Join thousands of active traders on PrimeXBT. Open your account
@@ -292,7 +292,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         </Text>
         <PrimaryButton
           label="Open Live Account"
-          icon="external-link"
+          icon="open-outline"
           onPress={openAffiliateLink}
           style={styles.fieldSpaced}
         />

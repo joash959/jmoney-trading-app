@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
@@ -58,14 +58,14 @@ export default function MoreScreen({ navigation }: Props) {
 
   const mainMenu = [
     {
-      icon: 'grid' as const,
+      icon: 'grid-outline' as const,
       label: 'Dashboard',
       gradient: iconTileGradients.blue,
       image: require('../../assets/dashboard.png'),
       onPress: () => tabNavigation?.navigate('Home'),
     },
     {
-      icon: 'book-open' as const,
+      icon: 'book-outline' as const,
       label: 'Courses',
       gradient: iconTileGradients.blue,
       image: require('../../assets/courses.png'),
@@ -73,28 +73,28 @@ export default function MoreScreen({ navigation }: Props) {
         tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }),
     },
     {
-      icon: 'zap' as const,
+      icon: 'flash-outline' as const,
       label: 'Trade Alerts',
       gradient: iconTileGradients.gold,
       image: require('../../assets/tradealerts.png'),
       onPress: () => tabNavigation?.navigate('Alerts'),
     },
     {
-      icon: 'target' as const,
+      icon: 'locate-outline' as const,
       label: 'AI Scanner',
       gradient: iconTileGradients.purple,
       image: require('../../assets/aiscanner.png'),
       onPress: () => navigation.navigate('AIScanner'),
     },
     {
-      icon: 'send' as const,
+      icon: 'paper-plane-outline' as const,
       label: 'Telegram',
       gradient: iconTileGradients.teal,
       image: require('../../assets/telegram.png'),
       onPress: () => navigation.navigate('TelegramChannels'),
     },
     {
-      icon: 'video' as const,
+      icon: 'videocam-outline' as const,
       label: 'Live Sessions',
       gradient: iconTileGradients.green,
       image: require('../../assets/livesessions.png'),
@@ -104,21 +104,21 @@ export default function MoreScreen({ navigation }: Props) {
 
   const tradingTools = [
     {
-      icon: 'bookmark' as const,
+      icon: 'bookmark-outline' as const,
       label: 'Journal',
       gradient: iconTileGradients.gold,
       image: require('../../assets/tradingjournal.png'),
       onPress: () => navigation.navigate('TradingJournal'),
     },
     {
-      icon: 'briefcase' as const,
+      icon: 'briefcase-outline' as const,
       label: 'Broker',
       gradient: iconTileGradients.green,
       image: require('../../assets/broker.png'),
       onPress: () => navigation.navigate('RecommendedBroker'),
     },
     {
-      icon: 'bar-chart-2' as const,
+      icon: 'bar-chart-outline' as const,
       label: 'Market Analysis',
       gradient: iconTileGradients.blue,
       image: require('../../assets/marketanalysis.png'),
@@ -128,21 +128,21 @@ export default function MoreScreen({ navigation }: Props) {
 
   const account = [
     {
-      icon: 'bell' as const,
+      icon: 'notifications-outline' as const,
       label: 'Notifications',
       gradient: iconTileGradients.teal,
       image: require('../../assets/notifications.png'),
       onPress: () => navigation.navigate('Notifications'),
     },
     {
-      icon: 'phone' as const,
+      icon: 'call-outline' as const,
       label: 'Contact Us',
       gradient: iconTileGradients.purple,
       image: require('../../assets/contactus.png'),
       onPress: () => navigation.navigate('ContactUs'),
     },
     {
-      icon: 'award' as const,
+      icon: 'trophy-outline' as const,
       label: 'Leaderboard',
       gradient: iconTileGradients.red,
       image: require('../../assets/leaderboard.png'),
@@ -170,8 +170,8 @@ export default function MoreScreen({ navigation }: Props) {
           {!!email && <Text style={styles.profileEmail}>{email}</Text>}
         </View>
         <View style={styles.tierPill}>
-          <Feather
-            name={isPremium ? 'award' : 'lock'}
+          <Ionicons
+            name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
             size={11}
             color={isPremium ? colors.warning : colors.textFaint}
           />
@@ -235,7 +235,7 @@ export default function MoreScreen({ navigation }: Props) {
       </SurfaceCard>
 
       <SurfaceCard style={styles.signOutCard}>
-        <MenuRow icon="log-out" label="Sign Out" destructive onPress={handleSignOut} />
+        <MenuRow icon="log-out-outline" label="Sign Out" destructive onPress={handleSignOut} />
       </SurfaceCard>
 
       <DisclaimerCard style={styles.disclaimerSpaced} />

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -9,8 +9,8 @@ import { spacing } from '../theme/spacing';
 import { IconTileGradient } from './IconTile';
 
 export type PromoItem = {
-  icon: React.ComponentProps<typeof Feather>['name'];
-  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
   image?: number;
   title: string;
   subtitle: string;
@@ -58,8 +58,8 @@ export default function PromoCarousel({ items }: Props) {
               end={{ x: 1, y: 1 }}
               style={styles.card}
             >
-              <Feather
-                name="arrow-right"
+              <Ionicons
+                name="arrow-forward-outline"
                 size={20}
                 color={colors.text}
                 style={styles.arrow}
@@ -77,7 +77,7 @@ export default function PromoCarousel({ items }: Props) {
                   />
                 ) : (
                   <View style={styles.iconCircle}>
-                    <Feather name={item.icon} size={20} color={colors.text} />
+                    <Ionicons name={item.icon} size={20} color={colors.text} />
                   </View>
                 )}
               </View>

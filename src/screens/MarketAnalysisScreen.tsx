@@ -154,12 +154,12 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
             }
           />
           <ScreenHeader
-            icon="bar-chart-2"
+            icon="bar-chart-outline"
             image={require('../../assets/marketanalysis.png')}
             title="Market Analysis"
           />
           <EmptyStateCard
-            icon="lock"
+            icon="lock-closed-outline"
             title="Premium Feature"
             subtitle="Connect and fund your PrimeXBT account to unlock live charts and the economic calendar."
             buttonLabel="Connect PrimeXBT"
@@ -194,7 +194,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
           }
         />
         <ScreenHeader
-          icon="bar-chart-2"
+          icon="bar-chart-outline"
           image={require('../../assets/marketanalysis.png')}
           title="Market Analysis"
         />

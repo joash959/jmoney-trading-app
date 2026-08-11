@@ -1,14 +1,14 @@
 import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
-  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
   image?: number;
   trendLabel?: string;
   value: string;
@@ -33,12 +33,12 @@ export default function StatCard({
           <Image source={image} style={styles.iconImagePlain} resizeMode="contain" />
         ) : (
           <View style={styles.iconCircle}>
-            <Feather name={icon} size={16} color={colors.link} />
+            <Ionicons name={icon} size={16} color={colors.link} />
           </View>
         )}
         {trendLabel && (
           <View style={styles.trendPill}>
-            <Feather name="trending-up" size={10} color={colors.accentGreen} />
+            <Ionicons name="trending-up-outline" size={10} color={colors.accentGreen} />
             <Text style={styles.trendText}>{trendLabel}</Text>
           </View>
         )}

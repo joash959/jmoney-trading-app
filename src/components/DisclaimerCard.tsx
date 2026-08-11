@@ -1,6 +1,6 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -12,7 +12,7 @@ type Props = {
 export default function DisclaimerCard({ style }: Props) {
   return (
     <View style={[styles.card, style]}>
-      <Feather name="alert-triangle" size={16} color={colors.textFaint} />
+      <Ionicons name="warning-outline" size={16} color={colors.textFaint} />
       <Text style={styles.text}>
         <Text style={styles.bold}>Disclaimer: </Text>
         Representative of FSP No. 53590. Market observations and content

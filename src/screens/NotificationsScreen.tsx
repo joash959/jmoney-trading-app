@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -18,10 +18,10 @@ import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Notifications'>;
 
-const TYPE_ICON: Record<string, React.ComponentProps<typeof Feather>['name']> = {
-  premium_unlocked: 'shield',
-  session_reminder: 'video',
-  telegram_access: 'send',
+const TYPE_ICON: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+  premium_unlocked: 'shield-outline',
+  session_reminder: 'videocam-outline',
+  telegram_access: 'paper-plane-outline',
 };
 
 const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
@@ -33,7 +33,7 @@ const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
 const DEFAULT_ACCENT = { fg: colors.link, bg: 'rgba(78,140,255,0.12)' };
 
 function iconForType(type: string) {
-  return TYPE_ICON[type] ?? 'bell';
+  return TYPE_ICON[type] ?? 'notifications-outline';
 }
 
 function accentForType(type: string) {
@@ -109,7 +109,7 @@ export default function NotificationsScreen({}: Props) {
       <TopBar />
 
       <ScreenHeader
-        icon="bell"
+        icon="notifications-outline"
         image={require('../../assets/notifications.png')}
         title="Notifications"
       />
@@ -119,7 +119,7 @@ export default function NotificationsScreen({}: Props) {
           style={({ pressed }) => [styles.markAllPill, pressed && styles.markAllPillPressed]}
           onPress={handleMarkAllRead}
         >
-          <Feather name="check" size={13} color={colors.text} />
+          <Ionicons name="checkmark-outline" size={13} color={colors.text} />
           <Text style={styles.markAllText}>
             Mark all as read ({unreadCount})
           </Text>
@@ -133,7 +133,7 @@ export default function NotificationsScreen({}: Props) {
         />
       ) : notifications.length === 0 ? (
         <EmptyStateCard
-          icon="bell"
+          icon="notifications-outline"
           iconVariant="plain"
           title="No notifications yet"
           subtitle="We'll let you know when something needs your attention."
@@ -153,7 +153,7 @@ export default function NotificationsScreen({}: Props) {
               onPress={() => handlePressNotification(notification)}
             >
               <View style={[styles.rowIcon, { backgroundColor: accent.bg }]}>
-                <Feather
+                <Ionicons
                   name={iconForType(notification.type)}
                   size={18}
                   color={accent.fg}

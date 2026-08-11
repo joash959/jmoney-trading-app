@@ -1,10 +1,10 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   label: string;
   onPress?: () => void;
   destructive?: boolean;
@@ -19,11 +19,11 @@ export default function MenuRow({ icon, label, onPress, destructive }: Props) {
       onPress={onPress}
     >
       <View style={styles.left}>
-        <Feather name={icon} size={20} color={tint} />
+        <Ionicons name={icon} size={20} color={tint} />
         <Text style={[styles.label, { color: tint }]}>{label}</Text>
       </View>
       {!destructive && (
-        <Feather name="chevron-right" size={18} color={colors.textFaint} />
+        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
       )}
     </Pressable>
   );

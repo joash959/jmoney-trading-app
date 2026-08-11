@@ -1,6 +1,6 @@
 import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
@@ -19,10 +19,10 @@ export const iconTileGradients: Record<string, IconTileGradient> = {
 };
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   label: string;
   gradient?: IconTileGradient;
-  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
   image?: number;
   onPress?: () => void;
   /** Overrides the default width, letting callers control per-row column count. */
@@ -58,7 +58,7 @@ export default function IconTile({
           end={{ x: 1, y: 1 }}
           style={styles.tile}
         >
-          <Feather name={icon} size={22} color={colors.text} />
+          <Ionicons name={icon} size={22} color={colors.text} />
         </LinearGradient>
       )}
       <Text style={styles.label} numberOfLines={2}>

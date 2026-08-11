@@ -1,6 +1,6 @@
 import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -15,8 +15,8 @@ type Props = {
   onPress: () => void;
   /** Defaults to the app's standard blue button gradient. */
   gradient?: readonly [string, string, ...string[]];
-  /** Top-right glyph - defaults to a link arrow, pass "check-circle" etc. for a status card. */
-  glyph?: React.ComponentProps<typeof Feather>['name'];
+  /** Top-right glyph - defaults to a link arrow, pass "checkmark-circle-outline" etc. for a status card. */
+  glyph?: React.ComponentProps<typeof Ionicons>['name'];
   style?: StyleProp<ViewStyle>;
 };
 
@@ -27,7 +27,7 @@ export default function GradientLinkCard({
   icon,
   onPress,
   gradient = gradients.button,
-  glyph = 'arrow-right',
+  glyph = 'arrow-forward-outline',
   style,
 }: Props) {
   return (
@@ -41,7 +41,7 @@ export default function GradientLinkCard({
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
-        <Feather name={glyph} size={20} color={colors.text} style={styles.arrow} />
+        <Ionicons name={glyph} size={20} color={colors.text} style={styles.arrow} />
         <View style={styles.row}>
           <View style={styles.textCol}>
             <Text style={styles.title}>{title}</Text>

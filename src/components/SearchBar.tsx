@@ -5,7 +5,7 @@ import {
   TextInput,
   ViewStyle,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { radius } from '../theme/radius';
@@ -23,7 +23,7 @@ export default function SearchBar({ value, onChangeText, placeholder, style }: P
 
   return (
     <Animated.View style={[styles.wrapper, { borderColor: glow.borderColor }, style]}>
-      <Feather name="search" size={18} color={colors.textFaint} />
+      <Ionicons name="search-outline" size={18} color={colors.textFaint} />
       <TextInput
         value={value}
         onChangeText={onChangeText}

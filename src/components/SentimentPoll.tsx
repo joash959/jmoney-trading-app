@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -27,14 +27,14 @@ export default function SentimentPoll() {
       <View style={styles.headerRow}>
         <Text style={styles.title}>How do you feel about the market today?</Text>
         <Pressable onPress={() => setDismissed(true)} hitSlop={8}>
-          <Feather name="x" size={18} color={colors.textFaint} />
+          <Ionicons name="close-outline" size={18} color={colors.textFaint} />
         </Pressable>
       </View>
 
       {picked ? (
         <View style={styles.resultRow}>
-          <Feather
-            name={picked === 'bullish' ? 'trending-up' : 'trending-down'}
+          <Ionicons
+            name={picked === 'bullish' ? 'trending-up-outline' : 'trending-down-outline'}
             size={16}
             color={picked === 'bullish' ? colors.accentGreen : colors.accentRed}
           />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
@@ -109,7 +109,7 @@ export default function SignUpScreen({ navigation }: Props) {
         />
 
         <View style={styles.badgeRow}>
-          <Badge icon="check" label="Account created" />
+          <Badge icon="checkmark-outline" label="Account created" />
         </View>
 
         <View style={styles.heading}>
@@ -130,8 +130,8 @@ export default function SignUpScreen({ navigation }: Props) {
             onPress={() => handleCopy('email', createdAccount.email)}
           >
             <Text style={styles.credentialValue}>{createdAccount.email}</Text>
-            <Feather
-              name={copiedField === 'email' ? 'check' : 'copy'}
+            <Ionicons
+              name={copiedField === 'email' ? 'checkmark-outline' : 'copy-outline'}
               size={16}
               color={colors.textFaint}
             />
@@ -147,8 +147,8 @@ export default function SignUpScreen({ navigation }: Props) {
             <Text style={styles.credentialValue}>
               {createdAccount.password}
             </Text>
-            <Feather
-              name={copiedField === 'password' ? 'check' : 'copy'}
+            <Ionicons
+              name={copiedField === 'password' ? 'checkmark-outline' : 'copy-outline'}
               size={16}
               color={colors.textFaint}
             />
@@ -184,7 +184,7 @@ export default function SignUpScreen({ navigation }: Props) {
       </Text>
 
       <GlassCard style={styles.card}>
-        <Badge icon="shield" label="Step 1 · Open broker account" />
+        <Badge icon="shield-outline" label="Step 1 · Open broker account" />
 
         <View style={styles.cardHeading}>
           <Text style={styles.cardHeadingLine}>
@@ -201,7 +201,7 @@ export default function SignUpScreen({ navigation }: Props) {
 
         <PrimaryButton
           label="Open broker account"
-          icon="external-link"
+          icon="open-outline"
           onPress={handleOpenBroker}
           style={styles.brokerButton}
         />
@@ -213,13 +213,13 @@ export default function SignUpScreen({ navigation }: Props) {
           <Text style={styles.haveAccountText}>
             Already have a PrimeXBT account?{' '}
           </Text>
-          <Feather name="message-circle" size={14} color={colors.accentGreen} />
+          <Ionicons name="chatbubble-outline" size={14} color={colors.accentGreen} />
           <Text style={styles.haveAccountLink}> WhatsApp us</Text>
         </Pressable>
       </GlassCard>
 
       <GlassCard style={[styles.card, styles.cardSpaced]}>
-        <Badge icon="star" label="Step 2 · Enter your details" />
+        <Badge icon="star-outline" label="Step 2 · Enter your details" />
 
         <View style={styles.cardHeading}>
           <Text style={styles.cardHeadingLine}>A few quick details. </Text>
@@ -284,7 +284,7 @@ export default function SignUpScreen({ navigation }: Props) {
           onPress={() => setAgreed((prev) => !prev)}
         >
           <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-            {agreed && <Feather name="check" size={12} color={colors.text} />}
+            {agreed && <Ionicons name="checkmark-outline" size={12} color={colors.text} />}
           </View>
           <Text style={styles.agreementText}>
             I agree to the <Text style={styles.link}>Terms & Conditions</Text>

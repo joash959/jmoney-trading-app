@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
@@ -194,12 +194,12 @@ export default function LeaderboardScreen({ navigation }: Props) {
           }
         />
         <ScreenHeader
-          icon="award"
+          icon="trophy-outline"
           image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
         <EmptyStateCard
-          icon="lock"
+          icon="lock-closed-outline"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock the leaderboard."
           buttonLabel="Connect PrimeXBT"
@@ -225,7 +225,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
       <ScreenShell>
         <TopBar />
         <ScreenHeader
-          icon="award"
+          icon="trophy-outline"
           image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
@@ -248,7 +248,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="award"
+        icon="trophy-outline"
         image={require('../../assets/leaderboard.png')}
         title="Leaderboard"
       />
@@ -261,7 +261,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           style={[styles.heroCard, styles.cardSpaced]}
         >
           <View style={styles.heroIconCircle}>
-            <Feather name="award" size={20} color={colors.text} />
+            <Ionicons name="trophy-outline" size={20} color={colors.text} />
           </View>
           <Text style={styles.heroTitle}>
             {settings?.competition_name ?? 'Enter The Millionaire League Challenge'}
@@ -274,7 +274,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           <View style={styles.podiumRow}>
             <View style={styles.podiumColumn}>
               <View style={[styles.podiumMedal, styles.podiumMedalSilver]}>
-                <Feather name="award" size={18} color="#0A0D16" />
+                <Ionicons name="trophy-outline" size={18} color="#0A0D16" />
               </View>
               <View style={[styles.podiumBar, styles.podiumSilver]}>
                 <Text style={styles.podiumNumber}>2</Text>
@@ -282,7 +282,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             </View>
             <View style={styles.podiumColumn}>
               <View style={[styles.podiumMedal, styles.podiumMedalGold]}>
-                <Feather name="award" size={20} color="#0A0D16" />
+                <Ionicons name="trophy-outline" size={20} color="#0A0D16" />
               </View>
               <View
                 style={[styles.podiumBar, styles.podiumGold, styles.podiumTall]}
@@ -292,7 +292,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             </View>
             <View style={styles.podiumColumn}>
               <View style={[styles.podiumMedal, styles.podiumMedalBronze]}>
-                <Feather name="award" size={18} color="#0A0D16" />
+                <Ionicons name="trophy-outline" size={18} color="#0A0D16" />
               </View>
               <View style={[styles.podiumBar, styles.podiumBronze]}>
                 <Text style={styles.podiumNumber}>3</Text>
@@ -304,13 +304,13 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.sectionHeadingRow}>
-          <Feather name="award" size={18} color={colors.link} />
+          <Ionicons name="trophy-outline" size={18} color={colors.link} />
           <Text style={styles.sectionHeading}>Prize Breakdown</Text>
         </View>
 
         <View style={styles.prizeRow}>
           <PrizeTile
-            icon="award"
+            icon="trophy-outline"
             iconColor={GOLD}
             label="1ST PLACE"
             amount={`${currency}${prize1.toLocaleString()}`}
@@ -321,7 +321,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             gradient={iconTileGradients.gold}
           />
           <PrizeTile
-            icon="award"
+            icon="trophy-outline"
             iconColor={SILVER}
             label="2ND PLACE"
             amount={`${currency}${prize2.toLocaleString()}`}
@@ -330,7 +330,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             borderColor="rgba(184,196,217,0.3)"
           />
           <PrizeTile
-            icon="award"
+            icon="trophy-outline"
             iconColor={BRONZE}
             label="3RD PLACE"
             amount={`${currency}${prize3.toLocaleString()}`}
@@ -351,7 +351,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.sectionHeadingRow}>
-          <Feather name="user" size={18} color={colors.link} />
+          <Ionicons name="person-outline" size={18} color={colors.link} />
           <Text style={styles.sectionHeading}>Join the Challenge</Text>
         </View>
 
@@ -366,7 +366,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           <>
             <FormInput
               label="Full Name"
-              icon="user"
+              icon="person-outline"
               value={fullName}
               onChangeText={setFullName}
               placeholder="Enter your full name"
@@ -375,7 +375,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             />
             <FormInput
               label="Nickname"
-              icon="user"
+              icon="person-outline"
               value={nickname}
               onChangeText={setNickname}
               placeholder="Enter your trading nickname"
@@ -383,7 +383,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             />
             <FormInput
               label="PrimeXBT Client ID or MT5 Number"
-              icon="hash"
+              icon="key-outline"
               value={clientId}
               onChangeText={setClientId}
               placeholder="e.g. 1824763 or 1040834"
@@ -412,10 +412,10 @@ export default function LeaderboardScreen({ navigation }: Props) {
         onPress={() => setRulesOpen((prev) => !prev)}
       >
         <View style={styles.rulesLeft}>
-          <Feather name="info" size={18} color={colors.link} />
+          <Ionicons name="information-circle-outline" size={18} color={colors.link} />
           <Text style={styles.rulesTitle}>Rules</Text>
         </View>
-        <Feather
+        <Ionicons
           name={rulesOpen ? 'chevron-up' : 'chevron-down'}
           size={18}
           color={colors.textFaint}
@@ -430,7 +430,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.sectionHeadingRow}>
-          <Feather name="award" size={18} color={colors.link} />
+          <Ionicons name="trophy-outline" size={18} color={colors.link} />
           <Text style={styles.sectionHeading}>Top 20 Traders</Text>
         </View>
 

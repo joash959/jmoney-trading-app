@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Accelerometer } from 'expo-sensors';
 import YoutubePlayer, {
   PLAYER_STATES,
@@ -237,8 +237,8 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <Pressable style={styles.tapArea} onPress={handleTogglePlay}>
           <View style={styles.playButton}>
-            <Feather
-              name={playing ? 'pause' : 'play'}
+            <Ionicons
+              name={playing ? 'pause-outline' : 'play-outline'}
               size={26}
               color={colors.text}
             />
@@ -269,8 +269,8 @@ export default function YoutubeLessonPlayer({ videoId, width, height }: Props) {
             style={styles.fullscreenButton}
             onPress={isFullscreen ? exitFullscreen : enterFullscreen}
           >
-            <Feather
-              name={isFullscreen ? 'minimize' : 'maximize'}
+            <Ionicons
+              name={isFullscreen ? 'contract-outline' : 'expand-outline'}
               size={16}
               color={colors.text}
             />

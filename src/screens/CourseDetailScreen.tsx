@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -196,7 +196,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
               />
             ) : (
               <View style={[styles.video, styles.videoPlaceholder]}>
-                <Feather name="video-off" size={28} color={colors.textFaint} />
+                <Ionicons name="videocam-off-outline" size={28} color={colors.textFaint} />
                 <Text style={styles.videoPlaceholderText}>
                   {activeLesson
                     ? 'Video not available'
@@ -239,7 +239,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
 
           <View style={[styles.sectionHeadingRow, styles.sectionSpaced]}>
             <View style={styles.sectionHeadingLeft}>
-              <Feather name="list" size={18} color={colors.link} />
+              <Ionicons name="list-outline" size={18} color={colors.link} />
               <Text style={styles.sectionTitle}>Lessons</Text>
             </View>
             <View style={styles.lessonCountPill}>
@@ -263,8 +263,8 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                       locked && styles.lessonIconLocked,
                     ]}
                   >
-                    <Feather
-                      name={locked ? 'lock' : isActive ? 'play' : 'play-circle'}
+                    <Ionicons
+                      name={locked ? 'lock-closed-outline' : isActive ? 'play-outline' : 'play-circle-outline'}
                       size={16}
                       color={
                         locked

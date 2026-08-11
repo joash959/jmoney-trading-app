@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
@@ -50,8 +50,8 @@ export default function AlertCard({ message, time }: Props) {
                 >
                   <Text style={styles.fieldLabel}>{field.label}</Text>
                   <Text style={styles.fieldValue}>{field.value}</Text>
-                  <Feather
-                    name={copied ? 'check' : 'copy'}
+                  <Ionicons
+                    name={copied ? 'checkmark-outline' : 'copy-outline'}
                     size={11}
                     color={copied ? colors.accentGreen : colors.textFaint}
                   />

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { RootStackParamList } from '../navigation/types';
@@ -50,7 +50,7 @@ export default function LoginScreen({ navigation }: Props) {
       />
 
       <View style={styles.badgeRow}>
-        <Badge icon="shield" label="Secure sign in" />
+        <Badge icon="shield-outline" label="Secure sign in" />
       </View>
 
       <View style={styles.heading}>
@@ -64,7 +64,7 @@ export default function LoginScreen({ navigation }: Props) {
       <GlassCard style={styles.card}>
         <FormInput
           label="EMAIL"
-          icon="mail"
+          icon="mail-outline"
           value={email}
           onChangeText={setEmail}
           placeholder="Email address"
@@ -73,7 +73,7 @@ export default function LoginScreen({ navigation }: Props) {
 
         <FormInput
           label="PASSWORD"
-          icon="lock"
+          icon="lock-closed-outline"
           value={password}
           onChangeText={setPassword}
           placeholder="Password"
@@ -84,8 +84,8 @@ export default function LoginScreen({ navigation }: Props) {
               onPress={() => setShowPassword((prev) => !prev)}
               hitSlop={8}
             >
-              <Feather
-                name={showPassword ? 'eye-off' : 'eye'}
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={18}
                 color={colors.textFaint}
               />
@@ -102,7 +102,7 @@ export default function LoginScreen({ navigation }: Props) {
               style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
             >
               {rememberMe && (
-                <Feather name="check" size={12} color={colors.text} />
+                <Ionicons name="checkmark-outline" size={12} color={colors.text} />
               )}
             </View>
             <Text style={styles.rememberMeText}>Remember me</Text>

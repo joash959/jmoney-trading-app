@@ -1,17 +1,17 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   label: string;
 };
 
 export default function Badge({ icon, label }: Props) {
   return (
     <View style={styles.badge}>
-      <Feather name={icon} size={13} color={colors.link} />
+      <Ionicons name={icon} size={13} color={colors.link} />
       <Text style={styles.badgeText}>{label}</Text>
     </View>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
@@ -99,21 +99,21 @@ export default function HomeScreen({ navigation }: Props) {
 
   const quickActions = [
     {
-      icon: 'book-open' as const,
+      icon: 'book-outline' as const,
       label: 'Courses',
       gradient: iconTileGradients.blue,
       image: require('../../assets/courses.png'),
       onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
     },
     {
-      icon: 'target' as const,
+      icon: 'locate-outline' as const,
       label: 'AI Scanner',
       gradient: iconTileGradients.purple,
       image: require('../../assets/aiscanner.png'),
       onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
     },
     {
-      icon: 'send' as const,
+      icon: 'paper-plane-outline' as const,
       label: 'Telegram',
       gradient: iconTileGradients.teal,
       image: require('../../assets/telegram.png'),
@@ -121,14 +121,14 @@ export default function HomeScreen({ navigation }: Props) {
         navigation.navigate('More', { screen: 'TelegramChannels' }),
     },
     {
-      icon: 'video' as const,
+      icon: 'videocam-outline' as const,
       label: 'Live Sessions',
       gradient: iconTileGradients.green,
       image: require('../../assets/livesessions.png'),
       onPress: () => navigation.navigate('Live'),
     },
     {
-      icon: 'bookmark' as const,
+      icon: 'bookmark-outline' as const,
       label: 'Journal',
       gradient: iconTileGradients.gold,
       image: require('../../assets/tradingjournal.png'),
@@ -136,14 +136,14 @@ export default function HomeScreen({ navigation }: Props) {
         navigation.navigate('More', { screen: 'TradingJournal' }),
     },
     {
-      icon: 'award' as const,
+      icon: 'trophy-outline' as const,
       label: 'Leaderboard',
       gradient: iconTileGradients.red,
       image: require('../../assets/leaderboard.png'),
       onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
     },
     {
-      icon: 'bar-chart-2' as const,
+      icon: 'bar-chart-outline' as const,
       label: 'Market Analysis',
       gradient: iconTileGradients.blue,
       image: require('../../assets/marketanalysis.png'),
@@ -151,7 +151,7 @@ export default function HomeScreen({ navigation }: Props) {
         navigation.navigate('More', { screen: 'MarketAnalysis' }),
     },
     {
-      icon: 'phone' as const,
+      icon: 'call-outline' as const,
       label: 'Contact Us',
       gradient: iconTileGradients.purple,
       image: require('../../assets/contactus.png'),
@@ -161,7 +161,7 @@ export default function HomeScreen({ navigation }: Props) {
 
   const promoItems = [
     {
-      icon: 'target' as const,
+      icon: 'locate-outline' as const,
       image: require('../../assets/aiscanner.png'),
       title: 'Scan any chart',
       subtitle: 'Let AI mark key levels and call the trend instantly.',
@@ -169,7 +169,7 @@ export default function HomeScreen({ navigation }: Props) {
       onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
     },
     {
-      icon: 'send' as const,
+      icon: 'paper-plane-outline' as const,
       image: require('../../assets/telegram.png'),
       title: 'Join the community',
       subtitle: 'Live trade alerts and mentorship, the moment you\'re funded.',
@@ -178,7 +178,7 @@ export default function HomeScreen({ navigation }: Props) {
         navigation.navigate('More', { screen: 'TelegramChannels' }),
     },
     {
-      icon: 'award' as const,
+      icon: 'trophy-outline' as const,
       image: require('../../assets/leaderboard.png'),
       title: 'Climb the leaderboard',
       subtitle: 'Compete with other traders for real prizes.',
@@ -186,7 +186,7 @@ export default function HomeScreen({ navigation }: Props) {
       onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
     },
     {
-      icon: 'book-open' as const,
+      icon: 'book-outline' as const,
       image: require('../../assets/courses.png'),
       title: 'Keep learning',
       subtitle: "New lessons added regularly — pick up where you left off.",
@@ -224,8 +224,8 @@ export default function HomeScreen({ navigation }: Props) {
         <View style={styles.heroTopRow}>
           <Text style={styles.greetingLabel}>{getGreeting()}</Text>
           <View style={styles.tierPill}>
-            <Feather
-              name={isPremium ? 'award' : 'lock'}
+            <Ionicons
+              name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
               size={11}
               color={isPremium ? colors.warning : colors.textFaint}
             />
@@ -256,7 +256,7 @@ export default function HomeScreen({ navigation }: Props) {
         icon={require('../../assets/broker.png')}
         onPress={connect.open}
         gradient={isPremium ? gradients.whatsapp : undefined}
-        glyph={isPremium ? 'check-circle' : 'arrow-right'}
+        glyph={isPremium ? 'checkmark-circle-outline' : 'arrow-forward-outline'}
         style={styles.cardSpaced}
       />
 
@@ -294,7 +294,7 @@ export default function HomeScreen({ navigation }: Props) {
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.progressHeaderRow}>
           <Text style={styles.cardHeading}>Your Progress</Text>
-          <Feather name="chevron-right" size={18} color={colors.textFaint} />
+          <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
         </View>
         <View style={styles.progressRow}>
           <Text style={styles.progressLabel}>Courses started</Text>
@@ -325,14 +325,14 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={[styles.statsRow, styles.cardSpaced]}>
         <StatCard
-          icon="video"
+          icon="videocam-outline"
           image={require('../../assets/livesessions.png')}
           value="No sessions"
           label="Next Live Session"
           sublabel="Check back soon"
         />
         <StatCard
-          icon="sliders"
+          icon="options-outline"
           image={require('../../assets/marketanalysis.png')}
           trendLabel="4 Days To Go"
           value="Aug 7, 2026"
@@ -342,7 +342,7 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
       <View style={[styles.statsRow, styles.fieldSpaced]}>
         <StatCard
-          icon="bar-chart-2"
+          icon="bar-chart-outline"
           image={require('../../assets/marketanalysis.png')}
           trendLabel="9 Days To Go"
           value="Aug 12, 2026"
@@ -350,7 +350,7 @@ export default function HomeScreen({ navigation }: Props) {
           sublabel="US Consumer Price Index • 3:30 PM..."
         />
         <StatCard
-          icon="award"
+          icon="trophy-outline"
           image={require('../../assets/dashboard.png')}
           trendLabel="+Growing daily"
           value="22,099"

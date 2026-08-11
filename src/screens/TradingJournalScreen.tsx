@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
@@ -240,12 +240,12 @@ export default function TradingJournalScreen({ navigation }: Props) {
           }
         />
         <ScreenHeader
-          icon="bookmark"
+          icon="bookmark-outline"
           image={require('../../assets/tradingjournal.png')}
           title="Trading Journal"
         />
         <EmptyStateCard
-          icon="lock"
+          icon="lock-closed-outline"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock the trading journal."
           buttonLabel="Connect PrimeXBT"
@@ -278,7 +278,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="bookmark"
+        icon="bookmark-outline"
         image={require('../../assets/tradingjournal.png')}
         title="Trading Journal"
       />
@@ -291,7 +291,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
       >
         <View style={styles.summaryTopRow}>
           <View style={styles.summaryIconCircle}>
-            <Feather name="trending-up" size={20} color={colors.text} />
+            <Ionicons name="trending-up-outline" size={20} color={colors.text} />
           </View>
           <View style={styles.daysPill}>
             <Text style={styles.daysText}>
@@ -327,7 +327,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.sectionHeadingRow}>
-          <Feather name="edit-3" size={18} color={colors.link} />
+          <Ionicons name="create-outline" size={18} color={colors.link} />
           <Text style={styles.sectionHeading}>Log Entry</Text>
         </View>
         <Text style={styles.entryDate}>{formatDayLabel(selectedDate)}</Text>
@@ -368,7 +368,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
           {selectedEntry && (
             <SecondaryButton
               label="Delete"
-              icon="trash-2"
+              icon="trash-outline"
               onPress={handleDelete}
             />
           )}
@@ -395,8 +395,8 @@ export default function TradingJournalScreen({ navigation }: Props) {
                     entry.profit_loss < 0 && styles.weekIndicatorNegative,
                   ]}
                 >
-                  <Feather
-                    name={entry.profit_loss < 0 ? 'arrow-down-right' : 'arrow-up-right'}
+                  <Ionicons
+                    name={entry.profit_loss < 0 ? 'trending-down-outline' : 'trending-up-outline'}
                     size={13}
                     color={entry.profit_loss < 0 ? colors.accentRed : colors.accentGreen}
                   />

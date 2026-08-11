@@ -1,6 +1,6 @@
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
@@ -36,7 +36,7 @@ export default function ContactUsScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="phone"
+        icon="call-outline"
         image={require('../../assets/contactus.png')}
         title="Contact Us"
       />
@@ -57,7 +57,7 @@ export default function ContactUsScreen({ navigation }: Props) {
           style={styles.contactCard}
         >
           <View style={styles.contactIconCircle}>
-            <Feather name="message-circle" size={22} color={colors.text} />
+            <Ionicons name="chatbubble-outline" size={22} color={colors.text} />
           </View>
           <View style={styles.contactTextWrap}>
             <Text style={styles.contactTitle}>WhatsApp</Text>
@@ -65,7 +65,7 @@ export default function ContactUsScreen({ navigation }: Props) {
               Chat with our support team directly.
             </Text>
           </View>
-          <Feather name="arrow-right" size={18} color={colors.text} />
+          <Ionicons name="arrow-forward-outline" size={18} color={colors.text} />
         </LinearGradient>
       </Pressable>
 
@@ -80,7 +80,7 @@ export default function ContactUsScreen({ navigation }: Props) {
           style={styles.contactCard}
         >
           <View style={styles.contactIconCircle}>
-            <Feather name="send" size={22} color={colors.text} />
+            <Ionicons name="paper-plane-outline" size={22} color={colors.text} />
           </View>
           <View style={styles.contactTextWrap}>
             <Text style={styles.contactTitle}>Telegram</Text>
@@ -88,14 +88,14 @@ export default function ContactUsScreen({ navigation }: Props) {
               Join our channels for alerts and updates.
             </Text>
           </View>
-          <Feather name="arrow-right" size={18} color={colors.text} />
+          <Ionicons name="arrow-forward-outline" size={18} color={colors.text} />
         </LinearGradient>
       </Pressable>
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.rowHeader}>
           <View style={styles.iconCircle}>
-            <Feather name="mail" size={20} color={colors.link} />
+            <Ionicons name="mail-outline" size={20} color={colors.link} />
           </View>
           <View style={styles.rowText}>
             <Text style={styles.rowTitle}>Email</Text>
@@ -110,7 +110,7 @@ export default function ContactUsScreen({ navigation }: Props) {
             ]}
             onPress={() => Linking.openURL(EMAIL_URL)}
           >
-            <Feather name="send" size={15} color={colors.text} />
+            <Ionicons name="paper-plane-outline" size={15} color={colors.text} />
           </Pressable>
         </View>
       </GlassCard>

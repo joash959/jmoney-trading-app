@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Animated, KeyboardTypeOptions, StyleProp, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { radius } from '../theme/radius';
@@ -9,7 +9,7 @@ import { useFocusGlow } from '../hooks/useFocusGlow';
 
 type Props = {
   label: string;
-  icon?: React.ComponentProps<typeof Feather>['name'];
+  icon?: React.ComponentProps<typeof Ionicons>['name'];
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
@@ -40,7 +40,7 @@ export default function FormInput({
       <Animated.View
         style={[styles.inputWrapper, { borderColor: glow.borderColor }]}
       >
-        {icon && <Feather name={icon} size={18} color={colors.textFaint} />}
+        {icon && <Ionicons name={icon} size={18} color={colors.textFaint} />}
         <TextInput
           value={value}
           onChangeText={onChangeText}

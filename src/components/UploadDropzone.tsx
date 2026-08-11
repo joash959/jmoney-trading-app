@@ -1,6 +1,6 @@
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Props = {
@@ -17,7 +17,7 @@ export default function UploadDropzone({ title, subtitle, onPress, style }: Prop
       onPress={onPress}
     >
       <View style={styles.iconCircle}>
-        <Feather name="upload" size={20} color={colors.link} />
+        <Ionicons name="cloud-upload-outline" size={20} color={colors.link} />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>

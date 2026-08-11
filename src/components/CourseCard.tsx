@@ -1,6 +1,6 @@
 import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
 import { shadows } from '../theme/shadows';
@@ -63,7 +63,7 @@ export default function CourseCard({
               <Text style={styles.avatarText}>{getInitials(instructor)}</Text>
             </LinearGradient>
             <View style={styles.playBadge}>
-              <Feather name="play" size={11} color={colors.text} />
+              <Ionicons name="play-outline" size={11} color={colors.text} />
             </View>
           </View>
         </LinearGradient>
@@ -81,11 +81,11 @@ export default function CourseCard({
 
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Feather name="clock" size={11} color={colors.textFaint} />
+              <Ionicons name="time-outline" size={11} color={colors.textFaint} />
               <Text style={styles.metaText}>{duration}</Text>
             </View>
             <View style={styles.metaItem}>
-              <Feather name="book" size={11} color={colors.textFaint} />
+              <Ionicons name="book-outline" size={11} color={colors.textFaint} />
               <Text style={styles.metaText}>{lessons} lessons</Text>
             </View>
           </View>

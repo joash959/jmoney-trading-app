@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 export default function NotificationBell({ count = 0, onPress }: Props) {
   return (
     <Pressable style={styles.bellButton} onPress={onPress}>
-      <Feather name="bell" size={18} color={colors.text} />
+      <Ionicons name="notifications-outline" size={18} color={colors.text} />
       {count > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>

@@ -1,6 +1,6 @@
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -35,7 +35,7 @@ export default function FilterSheet({
           <View style={styles.headerRow}>
             <Text style={styles.title}>{title}</Text>
             <Pressable onPress={onClose} hitSlop={12}>
-              <Feather name="x" size={20} color={colors.textFaint} />
+              <Ionicons name="close-outline" size={20} color={colors.textFaint} />
             </Pressable>
           </View>
           <ScrollView style={styles.optionsScroll} bounces={false}>
@@ -63,7 +63,7 @@ export default function FilterSheet({
                     {option.label}
                   </Text>
                   {isSelected && (
-                    <Feather name="check" size={16} color={colors.accentBlue} />
+                    <Ionicons name="checkmark-outline" size={16} color={colors.accentBlue} />
                   )}
                 </Pressable>
               );

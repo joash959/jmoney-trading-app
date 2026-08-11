@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -9,12 +9,12 @@ import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   title: string;
   subtitle?: string;
   rightElement?: ReactNode;
   style?: StyleProp<ViewStyle>;
-  /** Optional real icon artwork - overrides the Feather glyph when provided. */
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
   image?: number;
 };
 
@@ -33,7 +33,7 @@ export default function ScreenHeader({
           <Image source={image} style={styles.iconImage} resizeMode="contain" />
         ) : (
           <View style={styles.iconCircle}>
-            <Feather name={icon} size={22} color={colors.link} />
+            <Ionicons name={icon} size={22} color={colors.link} />
           </View>
         )}
         <Text style={styles.title} numberOfLines={1}>

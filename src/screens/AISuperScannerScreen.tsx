@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
@@ -147,14 +147,14 @@ export default function AISuperScannerScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="target"
+        icon="locate-outline"
         image={require('../../assets/aiscanner.png')}
         title="AI Super Scanner"
       />
 
       {!isPremium ? (
         <EmptyStateCard
-          icon="lock"
+          icon="lock-closed-outline"
           title="Premium Feature"
           subtitle="Connect and fund your PrimeXBT account to unlock the AI Super Scanner."
           buttonLabel="Connect PrimeXBT"
@@ -175,13 +175,13 @@ export default function AISuperScannerScreen({ navigation }: Props) {
             <View style={styles.actionsRow}>
               <SecondaryButton
                 label="Choose Different Image"
-                icon="image"
+                icon="image-outline"
                 onPress={handlePick}
                 style={styles.actionButton}
               />
               <PrimaryButton
                 label={scanning ? 'Scanning...' : 'Scan Chart'}
-                icon="target"
+                icon="locate-outline"
                 disabled={scanning}
                 onPress={handleScan}
                 style={styles.actionButton}
@@ -203,7 +203,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
       {analysis && !analysis.valid && (
         <EmptyStateCard
-          icon="alert-triangle"
+          icon="warning-outline"
           title="Couldn't read that chart"
           subtitle="Try a clearer screenshot with visible price and levels."
           buttonLabel="Try Again"
@@ -293,8 +293,8 @@ export default function AISuperScannerScreen({ navigation }: Props) {
             <Text style={styles.reasoningText}>{analysis.reasoning}</Text>
             {!!analysis.warnings && (
               <View style={styles.warningRow}>
-                <Feather
-                  name="alert-triangle"
+                <Ionicons
+                  name="warning-outline"
                   size={14}
                   color={colors.accentRed}
                 />
@@ -305,7 +305,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
           <SecondaryButton
             label="Scan Another Chart"
-            icon="rotate-ccw"
+            icon="refresh-outline"
             onPress={handleReset}
             style={styles.cardSpaced}
           />

@@ -1,12 +1,12 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import GlassCard from './GlassCard';
 import AccentCard from './AccentCard';
 
 type Props = {
-  icon?: React.ComponentProps<typeof Feather>['name'];
+  icon?: React.ComponentProps<typeof Ionicons>['name'];
   title: string;
   description: string;
   align?: 'left' | 'center';
@@ -28,7 +28,7 @@ export default function FeatureCard({
     <Card style={[styles.card, align === 'center' && styles.centered, style]}>
       {icon && (
         <View style={styles.iconCircle}>
-          <Feather name={icon} size={18} color={colors.link} />
+          <Ionicons name={icon} size={18} color={colors.link} />
         </View>
       )}
       <Text

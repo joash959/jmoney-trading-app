@@ -1,6 +1,6 @@
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
@@ -33,7 +33,7 @@ export default function VideoCard({
             {eyebrow}
           </Text>
           <View style={styles.playCircle}>
-            <Feather name="play" size={16} color={colors.text} />
+            <Ionicons name="play-outline" size={16} color={colors.text} />
           </View>
           <View style={styles.durationBadge}>
             <Text style={styles.durationText}>{duration}</Text>

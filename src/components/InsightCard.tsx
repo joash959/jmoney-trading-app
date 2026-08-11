@@ -1,13 +1,13 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   iconColor?: string;
   label: string;
   value: string;
@@ -36,7 +36,7 @@ export default function InsightCard({
   const content = (
     <>
       <View style={styles.headerRow}>
-        <Feather
+        <Ionicons
           name={icon}
           size={compact ? 11 : 13}
           color={isGradient ? colors.text : iconColor}

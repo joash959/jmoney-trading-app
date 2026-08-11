@@ -1,13 +1,13 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   iconColor: string;
   label: string;
   amount: string;
@@ -42,7 +42,7 @@ export default function PrizeTile({
           },
         ]}
       >
-        <Feather
+        <Ionicons
           name={icon}
           size={20}
           color={featured ? colors.text : iconColor}

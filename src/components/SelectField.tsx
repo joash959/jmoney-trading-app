@@ -1,12 +1,12 @@
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 
 type Props = {
   label?: string;
-  icon?: React.ComponentProps<typeof Feather>['name'];
+  icon?: React.ComponentProps<typeof Ionicons>['name'];
   placeholder: string;
   value?: string | null;
   onPress?: () => void;
@@ -36,7 +36,7 @@ export default function SelectField({
       >
         <View style={styles.left}>
           {icon && (
-            <Feather
+            <Ionicons
               name={icon}
               size={14}
               color={isActive ? colors.accentBlue : colors.textFaint}
@@ -49,7 +49,7 @@ export default function SelectField({
             {value ?? placeholder}
           </Text>
         </View>
-        <Feather
+        <Ionicons
           name="chevron-down"
           size={16}
           color={isActive ? colors.accentBlue : colors.textFaint}

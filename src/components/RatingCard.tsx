@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { shadows } from '../theme/shadows';
 
@@ -16,7 +16,7 @@ export default function RatingCard({ name, rating }: Props) {
         {name}
       </Text>
       <View style={styles.ratingRow}>
-        <Feather name="star" size={13} color={colors.warning} />
+        <Ionicons name="star-outline" size={13} color={colors.warning} />
         <Text style={styles.rating}>{rating}</Text>
       </View>
     </View>

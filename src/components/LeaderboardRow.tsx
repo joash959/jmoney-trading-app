@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 type Badge =
@@ -31,7 +31,7 @@ export default function LeaderboardRow({
     <View style={styles.row}>
       <View style={styles.rankColumn}>
         {isTopThree ? (
-          <Feather name="award" size={22} color={rankIconColor} />
+          <Ionicons name="trophy-outline" size={22} color={rankIconColor} />
         ) : (
           <View style={styles.rankBadge}>
             <Text style={styles.rankBadgeText}>{rank ?? '—'}</Text>
@@ -44,8 +44,8 @@ export default function LeaderboardRow({
         )}
         {(badge?.type === 'down' || badge?.type === 'up') && (
           <View style={styles.changeBadge}>
-            <Feather
-              name={badge.type === 'down' ? 'arrow-down' : 'arrow-up'}
+            <Ionicons
+              name={badge.type === 'down' ? 'arrow-down-outline' : 'arrow-up-outline'}
               size={10}
               color={badge.type === 'down' ? colors.accentRed : colors.accentGreen}
             />

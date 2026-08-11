@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
@@ -8,7 +8,7 @@ import AccentCard from './AccentCard';
 import Pill from './Pill';
 
 type Props = {
-  icon: React.ComponentProps<typeof Feather>['name'];
+  icon: React.ComponentProps<typeof Ionicons>['name'];
   iconColor?: string;
   iconBackground?: string;
   title: string;
@@ -45,7 +45,7 @@ export default function ChannelCard({
     <Card style={styles.card}>
       <View style={styles.topRow}>
         <View style={[styles.iconCircle, { backgroundColor: iconBackground }]}>
-          <Feather name={icon} size={22} color={iconColor} />
+          <Ionicons name={icon} size={22} color={iconColor} />
         </View>
         {locked ? (
           <Pill label="Premium" color={colors.warning} backgroundColor={colors.warningDim} />
@@ -61,7 +61,7 @@ export default function ChannelCard({
 
       <View style={styles.footerRow}>
         <View style={styles.membersRow}>
-          <Feather name="users" size={13} color={colors.textFaint} />
+          <Ionicons name="people-outline" size={13} color={colors.textFaint} />
           <Text style={styles.membersText}>{members} members</Text>
         </View>
         <Pressable
@@ -75,8 +75,8 @@ export default function ChannelCard({
           <Text style={[styles.joinButtonText, locked && styles.joinButtonTextLocked]}>
             {locked ? 'Unlock' : 'Join'}
           </Text>
-          <Feather
-            name={locked ? 'lock' : 'arrow-right'}
+          <Ionicons
+            name={locked ? 'lock-closed-outline' : 'arrow-forward-outline'}
             size={13}
             color={locked ? colors.warning : colors.text}
           />
