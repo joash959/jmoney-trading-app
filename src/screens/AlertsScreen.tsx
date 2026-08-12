@@ -216,6 +216,48 @@ export default function AlertsScreen({ navigation }: Props) {
     return groups;
   }, [alerts]);
 
+  const statsRow = (
+    <View style={styles.statsRow}>
+      <InsightCard
+        compact
+        variant="gradient"
+        icon="pulse-outline"
+        label="Today"
+        value={String(todayCount)}
+      />
+      <InsightCard
+        compact
+        variant="gradient"
+        icon="trending-up"
+        label="Long"
+        value={String(longCount)}
+      />
+      <InsightCard
+        compact
+        variant="gradient"
+        icon="trending-down"
+        label="Short"
+        value={String(shortCount)}
+      />
+      <InsightCard
+        compact
+        variant="gradient"
+        icon="time-outline"
+        label="Last Alert"
+        value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
+      />
+    </View>
+  );
+
+  const statsSkeleton = (
+    <View style={styles.statsRow}>
+      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
+    </View>
+  );
+
   if (checkingAccess) {
     return (
       <ScreenShell>
@@ -242,6 +284,9 @@ export default function AlertsScreen({ navigation }: Props) {
           image={require('../../assets/tradealerts.png')}
           title="Trade Alerts"
         />
+        <View style={styles.fieldSpaced}>
+          {loading ? statsSkeleton : statsRow}
+        </View>
         <EmptyStateCard
           icon="lock-closed-outline"
           title="Premium Feature"
@@ -296,12 +341,7 @@ export default function AlertsScreen({ navigation }: Props) {
 
       {loading ? (
         <View style={styles.fieldSpaced}>
-          <View style={styles.statsRow}>
-            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-            <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-          </View>
+          {statsSkeleton}
           <View style={[styles.list, styles.sectionSpaced]}>
             <Skeleton height={68} radius={16} />
             <Skeleton height={68} radius={16} />
@@ -314,36 +354,7 @@ export default function AlertsScreen({ navigation }: Props) {
         </Text>
       ) : (
         <>
-          <View style={styles.statsRow}>
-            <InsightCard
-              compact
-              variant="gradient"
-              icon="pulse-outline"
-              label="Today"
-              value={String(todayCount)}
-            />
-            <InsightCard
-              compact
-              variant="gradient"
-              icon="trending-up"
-              label="Long"
-              value={String(longCount)}
-            />
-            <InsightCard
-              compact
-              variant="gradient"
-              icon="trending-down"
-              label="Short"
-              value={String(shortCount)}
-            />
-            <InsightCard
-              compact
-              variant="gradient"
-              icon="time-outline"
-              label="Last Alert"
-              value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
-            />
-          </View>
+          {statsRow}
 
           <View style={styles.list}>
             {groupedAlerts.map((group) => (
