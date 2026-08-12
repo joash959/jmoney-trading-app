@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -21,6 +21,8 @@ type Props = {
   featured?: boolean;
   /** Premium-tier channel the user hasn't unlocked yet. */
   locked?: boolean;
+  /** Fetching the invite link from the server. */
+  loading?: boolean;
   onJoinPress?: () => void;
 };
 
@@ -37,6 +39,7 @@ export default function ChannelCard({
   members,
   featured,
   locked,
+  loading,
   onJoinPress,
 }: Props) {
   const Card = featured ? AccentCard : GlassCard;
@@ -71,15 +74,25 @@ export default function ChannelCard({
             pressed && styles.joinButtonPressed,
           ]}
           onPress={onJoinPress}
+          disabled={loading}
         >
-          <Text style={[styles.joinButtonText, locked && styles.joinButtonTextLocked]}>
-            {locked ? 'Unlock' : 'Join'}
-          </Text>
-          <Ionicons
-            name={locked ? 'lock-closed-outline' : 'arrow-forward-outline'}
-            size={13}
-            color={locked ? colors.warning : colors.text}
-          />
+          {loading ? (
+            <ActivityIndicator
+              size="small"
+              color={locked ? colors.warning : colors.text}
+            />
+          ) : (
+            <>
+              <Text style={[styles.joinButtonText, locked && styles.joinButtonTextLocked]}>
+                {locked ? 'Unlock' : 'Join'}
+              </Text>
+              <Ionicons
+                name={locked ? 'lock-closed-outline' : 'arrow-forward-outline'}
+                size={13}
+                color={locked ? colors.warning : colors.text}
+              />
+            </>
+          )}
         </Pressable>
       </View>
     </Card>

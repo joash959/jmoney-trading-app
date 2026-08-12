@@ -57,6 +57,10 @@ export default function LiveScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [accessBySessionId, setAccessBySessionId] = useState<
+    Record<string, { zoom_link: string; zoom_password: string | null }>
+  >({});
   // Section-wide default from the admin panel - a session is locked if
   // EITHER it's individually marked premium OR the whole section defaults
   // to premium, so nothing slips through as free just because an item was
@@ -79,7 +83,23 @@ export default function LiveScreen({ navigation }: Props) {
   const fetchSessions = useCallback(async () => {
     const { data, error: fetchError } = await supabase
       .from('live_sessions')
-      .select('*')
+      .select(
+        `
+        id,
+        title,
+        description,
+        host,
+        session_date,
+        session_time,
+        duration,
+        status,
+        display_order,
+        is_active,
+        created_at,
+        updated_at,
+        tier
+      `
+      )
       .eq('is_active', true)
       .order('session_date', { ascending: true })
       .order('session_time', { ascending: true });
@@ -119,8 +139,9 @@ export default function LiveScreen({ navigation }: Props) {
   };
 
   const handleCopyPassword = async (session: LiveSession) => {
-    if (!session.zoom_password) return;
-    await Clipboard.setStringAsync(session.zoom_password);
+    const password = accessBySessionId[session.id]?.zoom_password;
+    if (!password) return;
+    await Clipboard.setStringAsync(password);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setCopiedId(session.id);
     setTimeout(() => setCopiedId((current) => (current === session.id ? null : current)), 1500);
@@ -138,10 +159,21 @@ export default function LiveScreen({ navigation }: Props) {
 
   const nextSession = upcoming[0];
 
-  const handleJoin = (session: LiveSession) => {
-    if (session.zoom_link) {
-      Linking.openURL(session.zoom_link);
+  const handleJoin = async (session: LiveSession) => {
+    const cached = accessBySessionId[session.id];
+    if (cached) {
+      Linking.openURL(cached.zoom_link);
+      return;
     }
+    setJoiningId(session.id);
+    const { data, error: accessError } = await supabase.rpc('get_session_access', {
+      _id: session.id,
+    });
+    setJoiningId(null);
+    const access = data?.[0];
+    if (accessError || !access?.zoom_link) return;
+    setAccessBySessionId((prev) => ({ ...prev, [session.id]: access }));
+    Linking.openURL(access.zoom_link);
   };
 
   return (
@@ -248,7 +280,7 @@ export default function LiveScreen({ navigation }: Props) {
                       </Text>
                     </View>
 
-                    {!!session.zoom_password && !locked && (
+                    {!!accessBySessionId[session.id]?.zoom_password && !locked && (
                       <Pressable
                         style={({ pressed }) => [
                           styles.passwordChip,
@@ -259,7 +291,7 @@ export default function LiveScreen({ navigation }: Props) {
                       >
                         <Text style={styles.passwordLabel}>Passcode</Text>
                         <Text style={styles.passwordValue}>
-                          {session.zoom_password}
+                          {accessBySessionId[session.id]?.zoom_password}
                         </Text>
                         <Ionicons
                           name={copiedId === session.id ? 'checkmark-outline' : 'copy-outline'}
@@ -277,7 +309,7 @@ export default function LiveScreen({ navigation }: Props) {
                       label={locked ? 'Connect PrimeXBT' : 'Join session'}
                       icon={locked ? 'lock-closed-outline' : 'videocam-outline'}
                       variant="flat"
-                      disabled={!locked && !session.zoom_link}
+                      loading={joiningId === session.id}
                       onPress={() => (locked ? connect.open() : handleJoin(session))}
                       style={styles.joinButton}
                     />

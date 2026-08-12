@@ -86,7 +86,6 @@ export type Community = {
   name: string;
   description: string | null;
   member_count: string | null;
-  telegram_link: string;
   icon_name: string;
   category: string;
   display_order: number;
@@ -158,8 +157,6 @@ export type LiveSession = {
   session_date: string;
   session_time: string | null;
   duration: number | null;
-  zoom_link: string | null;
-  zoom_password: string | null;
   status: string | null;
   display_order: number | null;
   is_active: boolean;

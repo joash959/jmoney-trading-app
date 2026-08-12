@@ -48,11 +48,26 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [openingId, setOpeningId] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {
     const { data } = await supabase
       .from('communities')
-      .select('*')
+      .select(
+        `
+        id,
+        name,
+        description,
+        member_count,
+        icon_name,
+        category,
+        display_order,
+        is_active,
+        created_at,
+        updated_at,
+        tier
+      `
+      )
       .eq('is_active', true)
       .order('display_order', { ascending: true });
     setCommunities((data as Community[]) ?? []);
@@ -78,12 +93,21 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
     return { featured: featuredCommunity, rest: others };
   }, [communities]);
 
-  const openCommunity = (community: Community) => {
+  const openCommunity = async (community: Community) => {
     if (community.tier === 'premium' && !isPremium) {
       connect.open();
       return;
     }
-    Linking.openURL(community.telegram_link);
+    setOpeningId(community.id);
+    const { data, error } = await supabase.rpc('get_community_link', {
+      _id: community.id,
+    });
+    setOpeningId(null);
+    if (error || !data) {
+      connect.open();
+      return;
+    }
+    Linking.openURL(data);
   };
 
   return (
@@ -110,6 +134,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
           {featured && (
             <Pressable
               onPress={() => openCommunity(featured)}
+              disabled={openingId === featured.id}
               style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
             >
               <LinearGradient
@@ -152,14 +177,20 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                 </View>
 
                 <View style={styles.featuredCta}>
-                  <Text style={styles.featuredCtaText}>
-                    {isPremium ? 'Join Channel' : 'Unlock with Premium'}
-                  </Text>
-                  <Ionicons
-                    name={isPremium ? 'arrow-forward-outline' : 'lock-closed-outline'}
-                    size={15}
-                    color={colors.accentBlue}
-                  />
+                  {openingId === featured.id ? (
+                    <ActivityIndicator size="small" color={colors.accentBlue} />
+                  ) : (
+                    <>
+                      <Text style={styles.featuredCtaText}>
+                        {isPremium ? 'Join Channel' : 'Unlock with Premium'}
+                      </Text>
+                      <Ionicons
+                        name={isPremium ? 'arrow-forward-outline' : 'lock-closed-outline'}
+                        size={15}
+                        color={colors.accentBlue}
+                      />
+                    </>
+                  )}
                 </View>
               </LinearGradient>
             </Pressable>
@@ -187,6 +218,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                 description={community.description ?? ''}
                 members={community.member_count ?? ''}
                 locked={community.tier === 'premium' && !isPremium}
+                loading={openingId === community.id}
                 onJoinPress={() => openCommunity(community)}
               />
             );

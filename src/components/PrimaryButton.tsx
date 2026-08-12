@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Animated, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { ActivityIndicator, Animated, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,6 +13,7 @@ type Props = {
   icon?: React.ComponentProps<typeof Ionicons>['name'] | null;
   onPress?: () => void;
   disabled?: boolean;
+  loading?: boolean;
   variant?: 'gradient' | 'flat';
   style?: StyleProp<ViewStyle>;
 };
@@ -22,28 +23,32 @@ export default function PrimaryButton({
   icon = 'arrow-forward-outline',
   onPress,
   disabled = false,
+  loading = false,
   variant = 'gradient',
   style,
 }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
+  const isDisabled = disabled || loading;
 
   const handlePressIn = () => {
-    if (disabled) return;
+    if (isDisabled) return;
     Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 50 }).start();
   };
 
   const handlePressOut = () => {
-    if (disabled) return;
+    if (isDisabled) return;
     Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30 }).start();
   };
 
   const handlePress = () => {
-    if (disabled) return;
+    if (isDisabled) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onPress?.();
   };
 
-  const content = (
+  const content = loading ? (
+    <ActivityIndicator color={colors.text} size="small" />
+  ) : (
     <>
       <Text style={styles.buttonText}>{label}</Text>
       {icon && <Ionicons name={icon} size={18} color={colors.text} />}
@@ -55,10 +60,10 @@ export default function PrimaryButton({
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      disabled={disabled}
+      disabled={isDisabled}
     >
       <Animated.View
-        style={[{ transform: [{ scale }] }, disabled && styles.disabled]}
+        style={[{ transform: [{ scale }] }, isDisabled && styles.disabled]}
       >
         {variant === 'gradient' ? (
           <LinearGradient
