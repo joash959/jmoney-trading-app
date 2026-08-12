@@ -178,7 +178,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
                 <View style={styles.featuredCta}>
                   {openingId === featured.id ? (
-                    <ActivityIndicator size="small" color={colors.accentBlue} />
+                    <ActivityIndicator size="small" color={colors.text} />
                   ) : (
                     <>
                       <Text style={styles.featuredCtaText}>
@@ -187,7 +187,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                       <Ionicons
                         name={isPremium ? 'arrow-forward-outline' : 'lock-closed-outline'}
                         size={15}
-                        color={colors.accentBlue}
+                        color={colors.text}
                       />
                     </>
                   )}
@@ -322,13 +322,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.text,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
     borderRadius: radius.pill,
     height: 46,
     marginTop: 16,
   },
   featuredCtaText: {
-    color: colors.accentBlue,
+    color: colors.text,
     fontSize: 14,
     fontWeight: '800',
   },
