@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
+import { getCommunityCount } from '../lib/communityCount';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -353,7 +354,7 @@ export default function HomeScreen({ navigation }: Props) {
           icon="trophy-outline"
           image={require('../../assets/dashboard.png')}
           trendLabel="+Growing daily"
-          value="22,099"
+          value={getCommunityCount().toLocaleString('en-US')}
           label="Community Members"
           sublabel="Active traders"
         />
