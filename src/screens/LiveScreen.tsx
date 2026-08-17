@@ -194,6 +194,7 @@ export default function LiveScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="videocam-outline"
+        image={require('../../assets/livesessions.png')}
         title="Live Sessions"
       />
 

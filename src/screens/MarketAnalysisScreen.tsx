@@ -155,6 +155,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
           />
           <ScreenHeader
             icon="bar-chart-outline"
+            image={require('../../assets/marketanalysis.png')}
             title="Market Analysis"
           />
           <EmptyStateCard
@@ -194,6 +195,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="bar-chart-outline"
+          image={require('../../assets/marketanalysis.png')}
           title="Market Analysis"
         />
       </View>

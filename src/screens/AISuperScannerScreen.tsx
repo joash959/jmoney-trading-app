@@ -148,6 +148,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="locate-outline"
+        image={require('../../assets/aiscanner.png')}
         title="AI Super Scanner"
       />
 

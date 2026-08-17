@@ -10,10 +10,8 @@ import { spacing } from '../theme/spacing';
 type Props = {
   title: string;
   subtitle: string;
-  /** Ionicons glyph shown on the right, in a tinted circle. */
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  /** require()'d artwork (e.g. a real brand logo) - overrides the Ionicons glyph when provided. */
-  image?: number;
+  /** require()'d icon artwork shown on the right. */
+  icon: number;
   onPress: () => void;
   /** Defaults to the app's standard blue button gradient. */
   gradient?: readonly [string, string, ...string[]];
@@ -27,7 +25,6 @@ export default function GradientLinkCard({
   title,
   subtitle,
   icon,
-  image,
   onPress,
   gradient = gradients.button,
   glyph = 'arrow-forward-outline',
@@ -50,13 +47,7 @@ export default function GradientLinkCard({
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
-          {image ? (
-            <Image source={image} style={styles.icon} resizeMode="contain" />
-          ) : (
-            <View style={styles.iconCircle}>
-              <Ionicons name={icon} size={28} color={colors.text} />
-            </View>
-          )}
+          <Image source={icon} style={styles.icon} resizeMode="contain" />
         </View>
       </LinearGradient>
     </Pressable>
@@ -102,13 +93,5 @@ const styles = StyleSheet.create({
   icon: {
     width: 72,
     height: 72,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

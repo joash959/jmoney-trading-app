@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -14,6 +14,8 @@ type Props = {
   subtitle?: string;
   rightElement?: ReactNode;
   style?: StyleProp<ViewStyle>;
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
+  image?: number;
 };
 
 export default function ScreenHeader({
@@ -22,13 +24,18 @@ export default function ScreenHeader({
   subtitle,
   rightElement,
   style,
+  image,
 }: Props) {
   return (
     <View style={[styles.wrap, style]}>
       <View style={styles.row}>
-        <View style={styles.iconCircle}>
-          <Ionicons name={icon} size={22} color={colors.link} />
-        </View>
+        {image ? (
+          <Image source={image} style={styles.iconImage} resizeMode="contain" />
+        ) : (
+          <View style={styles.iconCircle}>
+            <Ionicons name={icon} size={22} color={colors.link} />
+          </View>
+        )}
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
@@ -56,6 +63,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.glow,
+  },
+  iconImage: {
+    width: 48,
+    height: 48,
   },
   title: {
     flex: 1,

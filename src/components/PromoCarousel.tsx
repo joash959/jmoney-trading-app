@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,8 @@ import { IconTileGradient } from './IconTile';
 
 export type PromoItem = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
+  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
+  image?: number;
   title: string;
   subtitle: string;
   gradient: IconTileGradient;
@@ -67,9 +69,17 @@ export default function PromoCarousel({ items }: Props) {
                   <Text style={styles.title}>{item.title}</Text>
                   <Text style={styles.subtitle}>{item.subtitle}</Text>
                 </View>
-                <View style={styles.iconCircle}>
-                  <Ionicons name={item.icon} size={20} color={colors.text} />
-                </View>
+                {item.image ? (
+                  <Image
+                    source={item.image}
+                    style={styles.icon}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.iconCircle}>
+                    <Ionicons name={item.icon} size={20} color={colors.text} />
+                  </View>
+                )}
               </View>
             </LinearGradient>
           </Pressable>
@@ -121,6 +131,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  icon: {
+    width: 64,
+    height: 64,
   },
   title: {
     color: colors.text,

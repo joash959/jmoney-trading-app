@@ -281,6 +281,7 @@ export default function AlertsScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="notifications-outline"
+          image={require('../../assets/tradealerts.png')}
           title="Trade Alerts"
         />
         <View style={styles.fieldSpaced}>
@@ -326,6 +327,7 @@ export default function AlertsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="notifications-outline"
+        image={require('../../assets/tradealerts.png')}
         title="Trade Alerts"
         rightElement={
           <View style={styles.livePill}>

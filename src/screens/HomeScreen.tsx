@@ -103,18 +103,21 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'book-outline' as const,
       label: 'Courses',
       gradient: iconTileGradients.blue,
+      image: require('../../assets/courses.png'),
       onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
     },
     {
       icon: 'locate-outline' as const,
       label: 'AI Scanner',
       gradient: iconTileGradients.purple,
+      image: require('../../assets/aiscanner.png'),
       onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
     },
     {
       icon: 'paper-plane-outline' as const,
       label: 'Telegram',
       gradient: iconTileGradients.teal,
+      image: require('../../assets/telegram.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'TelegramChannels' }),
     },
@@ -122,12 +125,14 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'videocam-outline' as const,
       label: 'Live Sessions',
       gradient: iconTileGradients.green,
+      image: require('../../assets/livesessions.png'),
       onPress: () => navigation.navigate('Live'),
     },
     {
       icon: 'bookmark-outline' as const,
       label: 'Journal',
       gradient: iconTileGradients.gold,
+      image: require('../../assets/tradingjournal.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'TradingJournal' }),
     },
@@ -135,12 +140,14 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'trophy-outline' as const,
       label: 'Leaderboard',
       gradient: iconTileGradients.red,
+      image: require('../../assets/leaderboard.png'),
       onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
     },
     {
       icon: 'bar-chart-outline' as const,
       label: 'Market Analysis',
       gradient: iconTileGradients.blue,
+      image: require('../../assets/marketanalysis.png'),
       onPress: () =>
         navigation.navigate('More', { screen: 'MarketAnalysis' }),
     },
@@ -148,6 +155,7 @@ export default function HomeScreen({ navigation }: Props) {
       icon: 'call-outline' as const,
       label: 'Contact Us',
       gradient: iconTileGradients.purple,
+      image: require('../../assets/contactus.png'),
       onPress: () => navigation.navigate('More', { screen: 'ContactUs' }),
     },
   ];
@@ -155,6 +163,7 @@ export default function HomeScreen({ navigation }: Props) {
   const promoItems = [
     {
       icon: 'locate-outline' as const,
+      image: require('../../assets/aiscanner.png'),
       title: 'Scan any chart',
       subtitle: 'Let AI mark key levels and call the trend instantly.',
       gradient: iconTileGradients.purple,
@@ -162,6 +171,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'paper-plane-outline' as const,
+      image: require('../../assets/telegram.png'),
       title: 'Join the community',
       subtitle: 'Live trade alerts and mentorship, the moment you\'re funded.',
       gradient: iconTileGradients.teal,
@@ -170,6 +180,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'trophy-outline' as const,
+      image: require('../../assets/leaderboard.png'),
       title: 'Climb the leaderboard',
       subtitle: 'Compete with other traders for real prizes.',
       gradient: iconTileGradients.gold,
@@ -177,6 +188,7 @@ export default function HomeScreen({ navigation }: Props) {
     },
     {
       icon: 'book-outline' as const,
+      image: require('../../assets/courses.png'),
       title: 'Keep learning',
       subtitle: "New lessons added regularly — pick up where you left off.",
       gradient: iconTileGradients.blue,
@@ -257,6 +269,7 @@ export default function HomeScreen({ navigation }: Props) {
               icon={action.icon}
               label={action.label}
               gradient={action.gradient}
+              image={action.image}
               onPress={action.onPress}
             />
           ))}
@@ -266,7 +279,7 @@ export default function HomeScreen({ navigation }: Props) {
       <GradientLinkCard
         title="View JMONEY Trade Alerts"
         subtitle="Real-time trade alert insights"
-        icon="notifications-outline"
+        icon={require('../../assets/tradealerts.png')}
         onPress={() => navigation.navigate('Alerts')}
         style={styles.cardSpaced}
       />
@@ -314,12 +327,14 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={[styles.statsRow, styles.cardSpaced]}>
         <StatCard
           icon="videocam-outline"
+          image={require('../../assets/livesessions.png')}
           value="No sessions"
           label="Next Live Session"
           sublabel="Check back soon"
         />
         <StatCard
           icon="options-outline"
+          image={require('../../assets/marketanalysis.png')}
           trendLabel="4 Days To Go"
           value="Aug 7, 2026"
           label="Next NFP"
@@ -329,6 +344,7 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={[styles.statsRow, styles.fieldSpaced]}>
         <StatCard
           icon="bar-chart-outline"
+          image={require('../../assets/marketanalysis.png')}
           trendLabel="9 Days To Go"
           value="Aug 12, 2026"
           label="Next CPI"
@@ -336,6 +352,7 @@ export default function HomeScreen({ navigation }: Props) {
         />
         <StatCard
           icon="trophy-outline"
+          image={require('../../assets/dashboard.png')}
           trendLabel="+Growing daily"
           value={getCommunityCount().toLocaleString('en-US')}
           label="Community Members"
