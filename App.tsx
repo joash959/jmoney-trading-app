@@ -16,6 +16,7 @@ import {
 import { AuthProvider } from './src/contexts/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import UpdateBanner from './src/components/UpdateBanner';
+import ForceUpdateGate from './src/components/ForceUpdateGate';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,6 +46,7 @@ export default function App() {
         <RootNavigator />
       </AuthProvider>
       <UpdateBanner />
+      <ForceUpdateGate />
       <StatusBar style="light" />
     </SafeAreaProvider>
   );
