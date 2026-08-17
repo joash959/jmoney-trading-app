@@ -228,7 +228,6 @@ export default function LiveScreen({ navigation }: Props) {
           {upcoming.length === 0 ? (
             <EmptyStateCard
               icon="videocam-outline"
-              iconVariant="plain"
               title="No Upcoming Sessions"
               subtitle="Check back later for new live trading sessions."
               style={styles.cardSpaced}

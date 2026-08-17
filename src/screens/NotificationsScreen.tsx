@@ -134,7 +134,6 @@ export default function NotificationsScreen({}: Props) {
       ) : notifications.length === 0 ? (
         <EmptyStateCard
           icon="notifications-outline"
-          iconVariant="plain"
           title="No notifications yet"
           subtitle="We'll let you know when something needs your attention."
           style={styles.cardSpaced}

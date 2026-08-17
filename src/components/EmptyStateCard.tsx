@@ -8,7 +8,6 @@ import PrimaryButton from './PrimaryButton';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
-  iconVariant?: 'circle' | 'plain';
   title: string;
   subtitle: string;
   buttonLabel?: string;
@@ -18,7 +17,6 @@ type Props = {
 
 export default function EmptyStateCard({
   icon,
-  iconVariant = 'circle',
   title,
   subtitle,
   buttonLabel,
@@ -27,13 +25,9 @@ export default function EmptyStateCard({
 }: Props) {
   return (
     <GlassCard style={style} contentStyle={styles.card}>
-      {iconVariant === 'circle' ? (
-        <View style={styles.iconCircle}>
-          <Ionicons name={icon} size={22} color={colors.link} />
-        </View>
-      ) : (
-        <Ionicons name={icon} size={48} color={colors.textFaint} />
-      )}
+      <View style={styles.iconCircle}>
+        <Ionicons name={icon} size={22} color={colors.link} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       {buttonLabel && (
