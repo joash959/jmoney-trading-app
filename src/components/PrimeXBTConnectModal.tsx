@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { shadows } from '../theme/shadows';
@@ -38,6 +39,13 @@ export default function PrimeXBTConnectModal({
   successMessage,
   errorMessage,
 }: Props) {
+  const navigation = useNavigation<any>();
+
+  const openSupport = () => {
+    onClose();
+    navigation.navigate('More', { screen: 'TelegramChannels' });
+  };
+
   return (
     <Modal
       visible={visible}
@@ -108,6 +116,17 @@ export default function PrimeXBTConnectModal({
               }
               style={styles.fieldSpaced}
             />
+
+            <Pressable
+              onPress={openSupport}
+              style={({ pressed }) => [
+                styles.supportRow,
+                pressed && styles.supportRowPressed,
+              ]}
+            >
+              <Ionicons name="paper-plane-outline" size={14} color={colors.link} />
+              <Text style={styles.supportText}>Need help? Contact support on Telegram</Text>
+            </Pressable>
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
@@ -178,5 +197,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     marginTop: 14,
+  },
+  supportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 16,
+  },
+  supportRowPressed: {
+    opacity: 0.7,
+  },
+  supportText: {
+    color: colors.link,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
