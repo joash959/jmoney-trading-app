@@ -123,7 +123,6 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="options-outline"
-        image={require('../../assets/telegram.png')}
         title="Telegram Channels"
       />
 

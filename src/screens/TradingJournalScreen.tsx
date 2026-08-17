@@ -241,7 +241,6 @@ export default function TradingJournalScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="bookmark-outline"
-          image={require('../../assets/tradingjournal.png')}
           title="Trading Journal"
         />
         <EmptyStateCard
@@ -279,7 +278,6 @@ export default function TradingJournalScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="bookmark-outline"
-        image={require('../../assets/tradingjournal.png')}
         title="Trading Journal"
       />
 

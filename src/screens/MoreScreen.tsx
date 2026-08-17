@@ -61,14 +61,12 @@ export default function MoreScreen({ navigation }: Props) {
       icon: 'grid-outline' as const,
       label: 'Dashboard',
       gradient: iconTileGradients.blue,
-      image: require('../../assets/dashboard.png'),
       onPress: () => tabNavigation?.navigate('Home'),
     },
     {
       icon: 'book-outline' as const,
       label: 'Courses',
       gradient: iconTileGradients.blue,
-      image: require('../../assets/courses.png'),
       onPress: () =>
         tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }),
     },
@@ -76,28 +74,24 @@ export default function MoreScreen({ navigation }: Props) {
       icon: 'flash-outline' as const,
       label: 'Trade Alerts',
       gradient: iconTileGradients.gold,
-      image: require('../../assets/tradealerts.png'),
       onPress: () => tabNavigation?.navigate('Alerts'),
     },
     {
       icon: 'locate-outline' as const,
       label: 'AI Scanner',
       gradient: iconTileGradients.purple,
-      image: require('../../assets/aiscanner.png'),
       onPress: () => navigation.navigate('AIScanner'),
     },
     {
       icon: 'paper-plane-outline' as const,
       label: 'Telegram',
       gradient: iconTileGradients.teal,
-      image: require('../../assets/telegram.png'),
       onPress: () => navigation.navigate('TelegramChannels'),
     },
     {
       icon: 'videocam-outline' as const,
       label: 'Live Sessions',
       gradient: iconTileGradients.green,
-      image: require('../../assets/livesessions.png'),
       onPress: () => tabNavigation?.navigate('Live'),
     },
   ];
@@ -107,21 +101,18 @@ export default function MoreScreen({ navigation }: Props) {
       icon: 'bookmark-outline' as const,
       label: 'Journal',
       gradient: iconTileGradients.gold,
-      image: require('../../assets/tradingjournal.png'),
       onPress: () => navigation.navigate('TradingJournal'),
     },
     {
       icon: 'briefcase-outline' as const,
       label: 'Broker',
       gradient: iconTileGradients.green,
-      image: require('../../assets/broker.png'),
       onPress: () => navigation.navigate('RecommendedBroker'),
     },
     {
       icon: 'bar-chart-outline' as const,
       label: 'Market Analysis',
       gradient: iconTileGradients.blue,
-      image: require('../../assets/marketanalysis.png'),
       onPress: () => navigation.navigate('MarketAnalysis'),
     },
   ];
@@ -131,21 +122,18 @@ export default function MoreScreen({ navigation }: Props) {
       icon: 'notifications-outline' as const,
       label: 'Notifications',
       gradient: iconTileGradients.teal,
-      image: require('../../assets/notifications.png'),
       onPress: () => navigation.navigate('Notifications'),
     },
     {
       icon: 'call-outline' as const,
       label: 'Contact Us',
       gradient: iconTileGradients.purple,
-      image: require('../../assets/contactus.png'),
       onPress: () => navigation.navigate('ContactUs'),
     },
     {
       icon: 'trophy-outline' as const,
       label: 'Leaderboard',
       gradient: iconTileGradients.red,
-      image: require('../../assets/leaderboard.png'),
       onPress: () => navigation.navigate('Leaderboard'),
     },
   ];
@@ -192,7 +180,6 @@ export default function MoreScreen({ navigation }: Props) {
               icon={item.icon}
               label={item.label}
               gradient={item.gradient}
-              image={item.image}
               onPress={item.onPress}
               style={{ width: tileWidth(3) }}
             />
@@ -209,7 +196,6 @@ export default function MoreScreen({ navigation }: Props) {
               icon={item.icon}
               label={item.label}
               gradient={item.gradient}
-              image={item.image}
               onPress={item.onPress}
               style={{ width: tileWidth(3) }}
             />
@@ -226,7 +212,6 @@ export default function MoreScreen({ navigation }: Props) {
               icon={item.icon}
               label={item.label}
               gradient={item.gradient}
-              image={item.image}
               onPress={item.onPress}
               style={{ width: tileWidth(3) }}
             />

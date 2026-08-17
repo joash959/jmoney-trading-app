@@ -1,4 +1,4 @@
-import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -8,8 +8,6 @@ import { spacing } from '../theme/spacing';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
-  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
-  image?: number;
   trendLabel?: string;
   value: string;
   label: string;
@@ -19,7 +17,6 @@ type Props = {
 
 export default function StatCard({
   icon,
-  image,
   trendLabel,
   value,
   label,
@@ -29,13 +26,9 @@ export default function StatCard({
   return (
     <View style={[styles.card, style]}>
       <View style={styles.topRow}>
-        {image ? (
-          <Image source={image} style={styles.iconImagePlain} resizeMode="contain" />
-        ) : (
-          <View style={styles.iconCircle}>
-            <Ionicons name={icon} size={16} color={colors.link} />
-          </View>
-        )}
+        <View style={styles.iconCircle}>
+          <Ionicons name={icon} size={16} color={colors.link} />
+        </View>
         {trendLabel && (
           <View style={styles.trendPill}>
             <Ionicons name="trending-up-outline" size={10} color={colors.accentGreen} />
@@ -76,10 +69,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(78,140,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconImagePlain: {
-    width: 38,
-    height: 38,
   },
   trendPill: {
     flexDirection: 'row',

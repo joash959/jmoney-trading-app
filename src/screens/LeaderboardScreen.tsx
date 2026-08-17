@@ -195,7 +195,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="trophy-outline"
-          image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
         <EmptyStateCard
@@ -226,7 +225,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <TopBar />
         <ScreenHeader
           icon="trophy-outline"
-          image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
       </ScreenShell>
@@ -249,7 +247,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="trophy-outline"
-        image={require('../../assets/leaderboard.png')}
         title="Leaderboard"
       />
 

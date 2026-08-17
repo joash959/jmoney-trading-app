@@ -99,7 +99,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="briefcase-outline"
-          image={require('../../assets/broker.png')}
           title="Recommended Broker"
         />
         <EmptyStateCard
@@ -137,7 +136,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="briefcase-outline"
-        image={require('../../assets/broker.png')}
         title="Recommended Broker"
       />
 
@@ -176,7 +174,8 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       <GradientLinkCard
         title="Open a PrimeXBT Account"
         subtitle="Trade crypto, forex, indices & commodities"
-        icon={require('../../assets/broker.png')}
+        icon="briefcase-outline"
+        image={require('../../assets/broker.png')}
         onPress={openAffiliateLink}
         style={styles.cardSpaced}
       />

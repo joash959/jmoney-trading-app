@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,8 +22,6 @@ type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   label: string;
   gradient?: IconTileGradient;
-  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
-  image?: number;
   onPress?: () => void;
   /** Overrides the default width, letting callers control per-row column count. */
   style?: StyleProp<ViewStyle>;
@@ -33,7 +31,6 @@ export default function IconTile({
   icon,
   label,
   gradient = iconTileGradients.blue,
-  image,
   onPress,
   style,
 }: Props) {
@@ -47,20 +44,14 @@ export default function IconTile({
       style={({ pressed }) => [styles.wrap, style, pressed && styles.pressed]}
       onPress={handlePress}
     >
-      {image ? (
-        <View style={styles.imageTile}>
-          <Image source={image} style={styles.image} resizeMode="contain" />
-        </View>
-      ) : (
-        <LinearGradient
-          colors={gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.tile}
-        >
-          <Ionicons name={icon} size={22} color={colors.text} />
-        </LinearGradient>
-      )}
+      <LinearGradient
+        colors={gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.tile}
+      >
+        <Ionicons name={icon} size={22} color={colors.text} />
+      </LinearGradient>
       <Text style={styles.label} numberOfLines={2}>
         {label}
       </Text>
@@ -83,16 +74,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...shadows.sm,
-  },
-  imageTile: {
-    width: 56,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: 56,
-    height: 56,
   },
   label: {
     color: colors.textMuted,

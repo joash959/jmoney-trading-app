@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -52,11 +52,7 @@ export default function CourseCard({
             <Text style={styles.levelText}>{level}</Text>
           </View>
           <View style={styles.thumbIconWrap} pointerEvents="none">
-            <Image
-              source={require('../../assets/courses.png')}
-              style={styles.thumbIcon}
-              resizeMode="contain"
-            />
+            <Ionicons name="book-outline" size={48} color="rgba(255,255,255,0.12)" />
           </View>
           <View style={styles.avatarWrap}>
             <LinearGradient colors={gradients.brand} style={styles.avatar}>
@@ -133,11 +129,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  thumbIcon: {
-    width: '42%',
-    height: '42%',
-    opacity: 0.9,
   },
   avatarWrap: {
     position: 'absolute',

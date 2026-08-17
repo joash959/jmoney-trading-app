@@ -110,7 +110,6 @@ export default function NotificationsScreen({}: Props) {
 
       <ScreenHeader
         icon="notifications-outline"
-        image={require('../../assets/notifications.png')}
         title="Notifications"
       />
 
