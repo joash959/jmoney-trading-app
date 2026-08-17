@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -76,6 +78,14 @@ export default function AISuperScannerScreen({ navigation }: Props) {
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<ChartAnalysis | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const handleCopy = async (key: string, value: string) => {
+    await Clipboard.setStringAsync(value);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1500);
+  };
 
   const handlePick = async () => {
     setPickError(null);
@@ -235,19 +245,49 @@ export default function AISuperScannerScreen({ navigation }: Props) {
             <View style={styles.levelsRow}>
               <View style={styles.levelsCol}>
                 <Text style={styles.levelsLabel}>SUPPORT</Text>
-                {analysis.support_levels.map((level, i) => (
-                  <Text key={i} style={[styles.levelValue, styles.supportValue]}>
-                    {level}
-                  </Text>
-                ))}
+                {analysis.support_levels.map((level, i) => {
+                  const key = `support-${i}`;
+                  const copied = copiedKey === key;
+                  return (
+                    <Pressable
+                      key={key}
+                      style={styles.levelValueRow}
+                      onPress={() => handleCopy(key, level)}
+                    >
+                      <Text style={[styles.levelValue, styles.supportValue]}>
+                        {level}
+                      </Text>
+                      <Ionicons
+                        name={copied ? 'checkmark-outline' : 'copy-outline'}
+                        size={12}
+                        color={copied ? colors.accentGreen : colors.textFaint}
+                      />
+                    </Pressable>
+                  );
+                })}
               </View>
               <View style={styles.levelsCol}>
                 <Text style={styles.levelsLabel}>RESISTANCE</Text>
-                {analysis.resistance_levels.map((level, i) => (
-                  <Text key={i} style={[styles.levelValue, styles.resistanceValue]}>
-                    {level}
-                  </Text>
-                ))}
+                {analysis.resistance_levels.map((level, i) => {
+                  const key = `resistance-${i}`;
+                  const copied = copiedKey === key;
+                  return (
+                    <Pressable
+                      key={key}
+                      style={styles.levelValueRow}
+                      onPress={() => handleCopy(key, level)}
+                    >
+                      <Text style={[styles.levelValue, styles.resistanceValue]}>
+                        {level}
+                      </Text>
+                      <Ionicons
+                        name={copied ? 'checkmark-outline' : 'copy-outline'}
+                        size={12}
+                        color={copied ? colors.accentGreen : colors.textFaint}
+                      />
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
           </AccentCard>
@@ -255,32 +295,32 @@ export default function AISuperScannerScreen({ navigation }: Props) {
           <GlassCard style={styles.cardSpaced}>
             <Text style={styles.sectionTitle}>Trade Plan</Text>
             <View style={styles.planRow}>
-              <View style={styles.planCell}>
-                <Text style={styles.planLabel}>Entry</Text>
-                <Text style={styles.planValue}>
-                  {analysis.trade_plan.entry}
-                </Text>
-              </View>
-              <View style={styles.planCell}>
-                <Text style={styles.planLabel}>Stop Loss</Text>
-                <Text style={styles.planValue}>
-                  {analysis.trade_plan.stop_loss}
-                </Text>
-              </View>
+              <CopyablePlanCell
+                label="Entry"
+                value={analysis.trade_plan.entry}
+                copied={copiedKey === 'entry'}
+                onCopy={() => handleCopy('entry', analysis.trade_plan.entry)}
+              />
+              <CopyablePlanCell
+                label="Stop Loss"
+                value={analysis.trade_plan.stop_loss}
+                copied={copiedKey === 'stop_loss'}
+                onCopy={() => handleCopy('stop_loss', analysis.trade_plan.stop_loss)}
+              />
             </View>
             <View style={styles.planRow}>
-              <View style={styles.planCell}>
-                <Text style={styles.planLabel}>Take Profit 1</Text>
-                <Text style={styles.planValue}>
-                  {analysis.trade_plan.take_profit_1}
-                </Text>
-              </View>
-              <View style={styles.planCell}>
-                <Text style={styles.planLabel}>Take Profit 2</Text>
-                <Text style={styles.planValue}>
-                  {analysis.trade_plan.take_profit_2}
-                </Text>
-              </View>
+              <CopyablePlanCell
+                label="Take Profit 1"
+                value={analysis.trade_plan.take_profit_1}
+                copied={copiedKey === 'tp1'}
+                onCopy={() => handleCopy('tp1', analysis.trade_plan.take_profit_1)}
+              />
+              <CopyablePlanCell
+                label="Take Profit 2"
+                value={analysis.trade_plan.take_profit_2}
+                copied={copiedKey === 'tp2'}
+                onCopy={() => handleCopy('tp2', analysis.trade_plan.take_profit_2)}
+              />
             </View>
             <View style={styles.rrRow}>
               <Text style={styles.planLabel}>Risk / Reward</Text>
@@ -325,6 +365,29 @@ export default function AISuperScannerScreen({ navigation }: Props) {
         errorMessage={connect.errorMessage}
       />
     </ScreenShell>
+  );
+}
+
+type CopyablePlanCellProps = {
+  label: string;
+  value: string;
+  copied: boolean;
+  onCopy: () => void;
+};
+
+function CopyablePlanCell({ label, value, copied, onCopy }: CopyablePlanCellProps) {
+  return (
+    <Pressable style={styles.planCell} onPress={onCopy}>
+      <Text style={styles.planLabel}>{label}</Text>
+      <View style={styles.planValueRow}>
+        <Text style={styles.planValue}>{value}</Text>
+        <Ionicons
+          name={copied ? 'checkmark-outline' : 'copy-outline'}
+          size={12}
+          color={copied ? colors.accentGreen : colors.textFaint}
+        />
+      </View>
+    </Pressable>
   );
 }
 
@@ -386,10 +449,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
+  levelValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xxs,
+    marginTop: spacing.xxs + 2,
+  },
   levelValue: {
     fontSize: 14,
     fontWeight: '700',
-    marginTop: spacing.xxs + 2,
   },
   supportValue: {
     color: colors.accentGreen,
@@ -415,11 +483,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  planValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xxs,
+    marginTop: spacing.xxs,
+  },
   planValue: {
     color: colors.text,
     fontSize: 15,
     fontWeight: '700',
-    marginTop: spacing.xxs,
   },
   rrRow: {
     marginTop: spacing.md,
