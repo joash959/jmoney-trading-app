@@ -2,6 +2,7 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
 import PrimaryButton from './PrimaryButton';
 
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 52,
     height: 52,
-    borderRadius: 26,
+    borderRadius: radius.xl,
     backgroundColor: 'rgba(78,140,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
