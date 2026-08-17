@@ -10,7 +10,9 @@ type Props = {
 export default function Pill({ label, color, backgroundColor }: Props) {
   return (
     <View style={[styles.pill, { borderColor: color, backgroundColor }]}>
-      <Text style={[styles.text, { color }]}>{label}</Text>
+      <Text style={[styles.text, { color }]} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }

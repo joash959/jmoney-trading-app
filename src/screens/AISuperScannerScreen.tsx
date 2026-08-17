@@ -5,6 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { radius } from '../theme/radius';
+import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -215,21 +217,19 @@ export default function AISuperScannerScreen({ navigation }: Props) {
       {analysis && analysis.valid && (
         <>
           <AccentCard style={styles.cardSpaced}>
-            <View style={styles.resultHeaderRow}>
-              <View>
-                <Text style={styles.instrument}>{analysis.instrument}</Text>
-                <Text style={styles.timeframe}>{analysis.timeframe}</Text>
-              </View>
-              <View style={styles.pillColumn}>
-                <Pill
-                  label={analysis.trend.toUpperCase()}
-                  color={TREND_COLOR[analysis.trend]}
-                />
-                <Pill
-                  label={`${analysis.bias.toUpperCase()} · ${analysis.confidence}`}
-                  color={BIAS_COLOR[analysis.bias]}
-                />
-              </View>
+            <View>
+              <Text style={styles.instrument}>{analysis.instrument}</Text>
+              <Text style={styles.timeframe}>{analysis.timeframe}</Text>
+            </View>
+            <View style={styles.pillRow}>
+              <Pill
+                label={analysis.trend.toUpperCase()}
+                color={TREND_COLOR[analysis.trend]}
+              />
+              <Pill
+                label={`${analysis.bias.toUpperCase()} · ${analysis.confidence}`}
+                color={BIAS_COLOR[analysis.bias]}
+              />
             </View>
 
             <View style={styles.levelsRow}>
@@ -254,7 +254,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
           <GlassCard style={styles.cardSpaced}>
             <Text style={styles.sectionTitle}>Trade Plan</Text>
-            <View style={styles.planGrid}>
+            <View style={styles.planRow}>
               <View style={styles.planCell}>
                 <Text style={styles.planLabel}>Entry</Text>
                 <Text style={styles.planValue}>
@@ -267,6 +267,8 @@ export default function AISuperScannerScreen({ navigation }: Props) {
                   {analysis.trade_plan.stop_loss}
                 </Text>
               </View>
+            </View>
+            <View style={styles.planRow}>
               <View style={styles.planCell}>
                 <Text style={styles.planLabel}>Take Profit 1</Text>
                 <Text style={styles.planValue}>
@@ -328,21 +330,21 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   dropzone: {
-    marginTop: 24,
+    marginTop: spacing.xl,
   },
   cardSpaced: {
-    marginTop: 20,
+    marginTop: spacing.lg,
   },
   preview: {
     width: '100%',
     aspectRatio: 16 / 10,
-    borderRadius: 14,
+    borderRadius: radius.xl,
     backgroundColor: colors.inputBackground,
   },
   actionsRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 16,
+    gap: spacing.sm,
+    marginTop: spacing.md,
   },
   actionButton: {
     flex: 1,
@@ -351,13 +353,8 @@ const styles = StyleSheet.create({
     color: colors.accentRed,
     fontSize: 13,
     lineHeight: 18,
-    marginTop: 14,
+    marginTop: spacing.sm,
     textAlign: 'center',
-  },
-  resultHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
   },
   instrument: {
     color: colors.text,
@@ -369,14 +366,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
-  pillColumn: {
-    alignItems: 'flex-end',
-    gap: 8,
+  pillRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
   },
   levelsRow: {
     flexDirection: 'row',
-    gap: 16,
-    marginTop: 18,
+    gap: spacing.md,
+    marginTop: spacing.lg,
   },
   levelsCol: {
     flex: 1,
@@ -390,7 +389,7 @@ const styles = StyleSheet.create({
   levelValue: {
     fontSize: 14,
     fontWeight: '700',
-    marginTop: 6,
+    marginTop: spacing.xxs + 2,
   },
   supportValue: {
     color: colors.accentGreen,
@@ -400,17 +399,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
   },
-  planGrid: {
+  planRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 14,
-    gap: 12,
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   },
   planCell: {
-    width: '47%',
+    flex: 1,
   },
   planLabel: {
     color: colors.textFaint,
@@ -421,11 +419,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 15,
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: spacing.xxs,
   },
   rrRow: {
-    marginTop: 16,
-    paddingTop: 14,
+    marginTop: spacing.md,
+    paddingTop: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
@@ -433,14 +431,14 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 13,
     lineHeight: 20,
-    marginTop: 10,
+    marginTop: spacing.xs,
   },
   warningRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 14,
-    padding: 12,
-    borderRadius: 12,
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
     backgroundColor: 'rgba(239,68,68,0.1)',
   },
   warningText: {
