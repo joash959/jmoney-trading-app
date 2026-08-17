@@ -243,7 +243,7 @@ export default function LiveScreen({ navigation }: Props) {
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
                       <View style={styles.sessionIconCircle}>
-                        <Ionicons name="videocam-outline" size={16} color={colors.link} />
+                        <Ionicons name="videocam-outline" size={11} color={colors.link} />
                       </View>
                       <View style={styles.sessionTitleCol}>
                         <Text style={styles.sessionTitle} numberOfLines={2}>
@@ -364,12 +364,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sessionIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(78,140,255,0.12)',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
   },
   sessionTitleCol: {
     flex: 1,
