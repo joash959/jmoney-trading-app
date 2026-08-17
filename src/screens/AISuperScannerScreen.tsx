@@ -20,7 +20,6 @@ import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
-import AccentCard from '../components/AccentCard';
 import Pill from '../components/Pill';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
@@ -226,7 +225,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
       {analysis && analysis.valid && (
         <>
-          <AccentCard style={styles.cardSpaced}>
+          <GlassCard style={styles.cardSpaced}>
             <View>
               <Text style={styles.instrument}>{analysis.instrument}</Text>
               <Text style={styles.timeframe}>{analysis.timeframe}</Text>
@@ -290,7 +289,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
                 })}
               </View>
             </View>
-          </AccentCard>
+          </GlassCard>
 
           <GlassCard style={styles.cardSpaced}>
             <Text style={styles.sectionTitle}>Trade Plan</Text>

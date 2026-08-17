@@ -226,7 +226,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
           icon="bar-chart-outline"
           title="Advanced Charting"
           description="Professional TradingView charts and technical analysis tools."
-          featured
         />
       </View>
       <FeatureCard

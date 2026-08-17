@@ -3,14 +3,12 @@ import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import GlassCard from './GlassCard';
-import AccentCard from './AccentCard';
 
 type Props = {
   icon?: React.ComponentProps<typeof Ionicons>['name'];
   title: string;
   description: string;
   align?: 'left' | 'center';
-  featured?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -19,13 +17,10 @@ export default function FeatureCard({
   title,
   description,
   align = 'left',
-  featured,
   style,
 }: Props) {
-  const Card = featured ? AccentCard : GlassCard;
-
   return (
-    <Card style={[styles.card, align === 'center' && styles.centered, style]}>
+    <GlassCard style={[styles.card, align === 'center' && styles.centered, style]}>
       {icon && (
         <View style={styles.iconCircle}>
           <Ionicons name={icon} size={18} color={colors.link} />
@@ -41,7 +36,7 @@ export default function FeatureCard({
       >
         {description}
       </Text>
-    </Card>
+    </GlassCard>
   );
 }
 

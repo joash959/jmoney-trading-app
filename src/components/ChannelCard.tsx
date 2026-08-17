@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
-import AccentCard from './AccentCard';
 import Pill from './Pill';
 
 type Props = {
@@ -18,7 +17,6 @@ type Props = {
   tagBackground?: string;
   description: string;
   members: string;
-  featured?: boolean;
   /** Premium-tier channel the user hasn't unlocked yet. */
   locked?: boolean;
   /** Fetching the invite link from the server. */
@@ -37,15 +35,12 @@ export default function ChannelCard({
   tagBackground,
   description,
   members,
-  featured,
   locked,
   loading,
   onJoinPress,
 }: Props) {
-  const Card = featured ? AccentCard : GlassCard;
-
   return (
-    <Card style={styles.card}>
+    <GlassCard style={styles.card}>
       <View style={styles.topRow}>
         <View style={[styles.iconCircle, { backgroundColor: iconBackground }]}>
           <Ionicons name={icon} size={22} color={iconColor} />
@@ -95,7 +90,7 @@ export default function ChannelCard({
           )}
         </Pressable>
       </View>
-    </Card>
+    </GlassCard>
   );
 }
 
