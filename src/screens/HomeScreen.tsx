@@ -6,6 +6,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { getCommunityCount } from '../lib/communityCount';
+import { getNextNFP } from '../lib/economicCalendar';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -49,21 +50,35 @@ export default function HomeScreen({ navigation }: Props) {
   const [coursesTotal, setCoursesTotal] = useState(0);
   const [coursesStarted, setCoursesStarted] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [nextSession, setNextSession] = useState<{
+    dateLabel: string;
+    title: string;
+  } | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
 
   const fetchData = async () => {
-    const [{ data: progressData }, { count: totalCount }, { data: progressRows }] =
-      await Promise.all([
-        supabase
-          .from('user_course_progress')
-          .select('course_id, updated_at, courses(title)')
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-        supabase.from('courses').select('id', { count: 'exact', head: true }),
-        supabase.from('user_course_progress').select('course_id'),
-      ]);
+    const [
+      { data: progressData },
+      { count: totalCount },
+      { data: progressRows },
+      { data: sessionRows },
+    ] = await Promise.all([
+      supabase
+        .from('user_course_progress')
+        .select('course_id, updated_at, courses(title)')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from('courses').select('id', { count: 'exact', head: true }),
+      supabase.from('user_course_progress').select('course_id'),
+      supabase
+        .from('live_sessions')
+        .select('title, session_date, session_time')
+        .eq('is_active', true)
+        .order('session_date', { ascending: true })
+        .order('session_time', { ascending: true }),
+    ]);
 
     const progressRow = progressData as any;
     setContinueCourse(
@@ -79,11 +94,33 @@ export default function HomeScreen({ navigation }: Props) {
     setCoursesStarted(
       new Set((progressRows ?? []).map((row: any) => row.course_id)).size
     );
+
+    const now = new Date();
+    const upcoming = (sessionRows ?? []).find(
+      (s: any) =>
+        new Date(`${s.session_date}T${s.session_time ?? '23:59:59'}`) >= now
+    );
+    setNextSession(
+      upcoming
+        ? {
+            dateLabel: new Date(
+              `${upcoming.session_date}T00:00:00`
+            ).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            }),
+            title: upcoming.title,
+          }
+        : null
+    );
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  const nextNFP = getNextNFP();
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -328,17 +365,17 @@ export default function HomeScreen({ navigation }: Props) {
         <StatCard
           icon="videocam-outline"
           image={require('../../assets/livesessions.png')}
-          value="No sessions"
+          value={nextSession?.dateLabel ?? 'No sessions'}
           label="Next Live Session"
-          sublabel="Check back soon"
+          sublabel={nextSession?.title ?? 'Check back soon'}
         />
         <StatCard
           icon="options-outline"
           image={require('../../assets/marketanalysis.png')}
-          trendLabel="4 Days To Go"
-          value="Aug 7, 2026"
+          trendLabel={nextNFP.daysToGoLabel}
+          value={nextNFP.dateLabel}
           label="Next NFP"
-          sublabel="US Non-Farm Payrolls • 3:30 PM SAST"
+          sublabel="US Non-Farm Payrolls"
         />
       </View>
       <View style={[styles.statsRow, styles.fieldSpaced]}>
