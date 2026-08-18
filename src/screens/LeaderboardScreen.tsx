@@ -315,7 +315,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
             amount={`${currency}${prize1.toLocaleString()}`}
             amountColor={GOLD}
             backgroundColor="rgba(245,197,24,0.1)"
-            borderColor="rgba(245,197,24,0.3)"
             featured
             gradient={iconTileGradients.gold}
           />
@@ -326,7 +325,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
             amount={`${currency}${prize2.toLocaleString()}`}
             amountColor={SILVER}
             backgroundColor="rgba(184,196,217,0.1)"
-            borderColor="rgba(184,196,217,0.3)"
           />
           <PrizeTile
             icon="trophy-outline"
@@ -335,7 +333,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
             amount={`${currency}${prize3.toLocaleString()}`}
             amountColor={BRONZE}
             backgroundColor="rgba(224,138,75,0.1)"
-            borderColor="rgba(224,138,75,0.3)"
           />
         </View>
 

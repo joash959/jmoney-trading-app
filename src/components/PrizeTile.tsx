@@ -12,7 +12,6 @@ type Props = {
   amount: string;
   amountColor: string;
   backgroundColor: string;
-  borderColor: string;
   /** 1st place gets a gradient card + glow instead of a flat tinted tile. */
   featured?: boolean;
   gradient?: readonly [string, string, ...string[]];
@@ -25,7 +24,6 @@ export default function PrizeTile({
   amount,
   amountColor,
   backgroundColor,
-  borderColor,
   featured,
   gradient,
 }: Props) {
@@ -65,7 +63,7 @@ export default function PrizeTile({
         colors={gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.tile, styles.tileFeatured, { borderColor }]}
+        style={[styles.tile, styles.tileFeatured]}
       >
         {content}
       </LinearGradient>
@@ -73,7 +71,7 @@ export default function PrizeTile({
   }
 
   return (
-    <View style={[styles.tile, { backgroundColor, borderColor }]}>
+    <View style={[styles.tile, { backgroundColor }]}>
       {content}
     </View>
   );
@@ -83,7 +81,6 @@ const styles = StyleSheet.create({
   tile: {
     flex: 1,
     alignItems: 'center',
-    borderWidth: 1,
     borderRadius: radius.xl,
     paddingVertical: 16,
     paddingHorizontal: 6,
