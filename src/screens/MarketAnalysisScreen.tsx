@@ -74,7 +74,19 @@ function getWidgetHtml(symbol: string) {
             "hide_top_toolbar": true,
             "withdateranges": false,
             "save_image": false,
-            "container_id": "tradingview_chart"
+            "container_id": "tradingview_chart",
+            "overrides": {
+              "mainSeriesProperties.candleStyle.upColor": "${colors.accentGreen}",
+              "mainSeriesProperties.candleStyle.downColor": "${colors.accentRed}",
+              "mainSeriesProperties.candleStyle.borderUpColor": "${colors.accentGreen}",
+              "mainSeriesProperties.candleStyle.borderDownColor": "${colors.accentRed}",
+              "mainSeriesProperties.candleStyle.wickUpColor": "${colors.accentGreen}",
+              "mainSeriesProperties.candleStyle.wickDownColor": "${colors.accentRed}"
+            },
+            "studies_overrides": {
+              "volume.volume.color.0": "${colors.accentRed}",
+              "volume.volume.color.1": "${colors.accentGreen}"
+            }
           });
         </script>
       </div>
