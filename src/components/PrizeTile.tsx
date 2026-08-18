@@ -66,7 +66,7 @@ export default function PrizeTile({
         colors={gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.tile, styles.tileFeatured]}
+        style={[styles.tile, styles.tileFeatured, { borderColor }]}
       >
         {content}
       </LinearGradient>
@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   tileFeatured: {
-    borderWidth: 0,
     paddingVertical: 20,
     ...shadows.glow,
   },
