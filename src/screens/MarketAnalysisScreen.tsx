@@ -71,6 +71,9 @@ function getWidgetHtml(symbol: string) {
             "enable_publishing": false,
             "allow_symbol_change": false,
             "hide_side_toolbar": true,
+            "hide_top_toolbar": true,
+            "withdateranges": false,
+            "save_image": false,
             "container_id": "tradingview_chart"
           });
         </script>
