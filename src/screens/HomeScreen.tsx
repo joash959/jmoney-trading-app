@@ -369,6 +369,13 @@ export default function HomeScreen({ navigation }: Props) {
         loading={connect.loading}
         successMessage={connect.successMessage}
         errorMessage={connect.errorMessage}
+        title={isPremium ? 'Connect a different PrimeXBT account' : undefined}
+        description={
+          isPremium
+            ? "You're already connected and funded. Enter a different PrimeXBT client ID or MT5 account number to switch accounts."
+            : undefined
+        }
+        confirmLabel={isPremium ? 'Connect different account' : undefined}
       />
     </ScreenShell>
   );

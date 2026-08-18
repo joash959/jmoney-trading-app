@@ -27,6 +27,10 @@ type Props = {
   loading: boolean;
   successMessage: string | null;
   errorMessage: string | null;
+  /** Overrides for an already-premium user reconnecting a different account. */
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
 };
 
 export default function PrimeXBTConnectModal({
@@ -38,6 +42,9 @@ export default function PrimeXBTConnectModal({
   loading,
   successMessage,
   errorMessage,
+  title = 'Connect your PrimeXBT account',
+  description = 'Enter your PrimeXBT client ID or MT5 account number to unlock premium features instantly. Your account needs a minimum deposit of R500.',
+  confirmLabel = 'Connect & unlock premium',
 }: Props) {
   const navigation = useNavigation<any>();
 
@@ -62,18 +69,14 @@ export default function PrimeXBTConnectModal({
             <View style={styles.headerRow}>
               <View style={styles.cardHeadingRow}>
                 <Ionicons name="shield-outline" size={18} color={colors.text} />
-                <Text style={styles.title}>Connect your PrimeXBT account</Text>
+                <Text style={styles.title}>{title}</Text>
               </View>
               <Pressable onPress={onClose} hitSlop={12}>
                 <Ionicons name="close-outline" size={22} color={colors.textFaint} />
               </Pressable>
             </View>
 
-            <Text style={styles.description}>
-              Enter your PrimeXBT client ID or MT5 account number to unlock
-              premium features instantly. Your account needs a minimum
-              deposit of R500.
-            </Text>
+            <Text style={styles.description}>{description}</Text>
 
             <FormInput
               label="PRIMEXBT CLIENT ID"
@@ -99,7 +102,7 @@ export default function PrimeXBTConnectModal({
             )}
 
             <PrimaryButton
-              label={loading ? 'Checking...' : 'Connect & unlock premium'}
+              label={loading ? 'Checking...' : confirmLabel}
               icon="shield-outline"
               variant="flat"
               disabled={clientId.trim().length === 0 || loading}
