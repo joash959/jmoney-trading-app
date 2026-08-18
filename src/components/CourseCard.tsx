@@ -3,7 +3,6 @@ import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   level: string;
@@ -103,7 +102,6 @@ export default function CourseCard({
 const styles = StyleSheet.create({
   cardShadow: {
     borderRadius: 14,
-    ...shadows.sm,
   },
   pressed: {
     opacity: 0.85,

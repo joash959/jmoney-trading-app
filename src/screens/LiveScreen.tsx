@@ -6,7 +6,6 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
@@ -355,7 +354,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 14,
     padding: 16,
-    ...shadows.sm,
   },
   sessionHeaderRow: {
     flexDirection: 'row',

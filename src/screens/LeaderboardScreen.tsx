@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { parseFunctionError } from '../lib/functionError';
@@ -483,7 +482,6 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: 14,
     padding: 20,
-    ...shadows.glow,
   },
   heroIconCircle: {
     width: 44,
@@ -605,7 +603,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    ...shadows.sm,
   },
   rulesLeft: {
     flexDirection: 'row',

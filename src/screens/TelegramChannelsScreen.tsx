@@ -6,7 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
@@ -266,7 +265,6 @@ const styles = StyleSheet.create({
   featuredCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
-    ...shadows.glow,
   },
   featuredTopRow: {
     flexDirection: 'row',

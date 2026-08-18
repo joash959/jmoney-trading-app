@@ -6,7 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -433,7 +432,6 @@ const styles = StyleSheet.create({
   summaryCard: {
     borderRadius: radius.xl,
     padding: 18,
-    ...shadows.glow,
   },
   summaryTopRow: {
     flexDirection: 'row',
@@ -519,7 +517,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 28,
     alignItems: 'center',
-    ...shadows.sm,
   },
   emptyText: {
     color: colors.textMuted,
@@ -536,7 +533,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    ...shadows.sm,
   },
   weekLeft: {
     flexDirection: 'row',

@@ -3,7 +3,6 @@ import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -34,7 +33,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.lg,
     padding: 16,
-    ...shadows.sm,
   },
   text: {
     flex: 1,

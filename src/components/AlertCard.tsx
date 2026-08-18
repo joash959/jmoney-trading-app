@@ -6,7 +6,6 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { parseAlertFields } from '../lib/tradeAlertParser';
 
 type Props = {
@@ -77,7 +76,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    ...shadows.sm,
   },
   sender: {
     color: colors.accentBlue,

@@ -3,7 +3,6 @@ import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
 type Props = {
@@ -62,7 +61,6 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
     borderRadius: radius.lg,
     padding: spacing.md,
-    ...shadows.sm,
   },
   topRow: {
     flexDirection: 'row',

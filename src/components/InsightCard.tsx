@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -106,7 +105,6 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
     borderRadius: radius.lg,
     padding: 10,
-    ...shadows.sm,
   },
   cardCompact: {
     padding: 7,
@@ -114,7 +112,6 @@ const styles = StyleSheet.create({
   },
   cardGradient: {
     borderWidth: 0,
-    ...shadows.glow,
   },
   headerRow: {
     flexDirection: 'row',

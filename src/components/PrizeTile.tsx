@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -88,11 +87,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     paddingVertical: 16,
     paddingHorizontal: 6,
-    ...shadows.sm,
   },
   tileFeatured: {
     paddingVertical: 20,
-    ...shadows.glow,
   },
   iconCircle: {
     width: 40,

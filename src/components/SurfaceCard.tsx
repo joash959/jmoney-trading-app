@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
 type Props = {
@@ -36,7 +35,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     padding: spacing.lg,
-    ...shadows.sm,
   },
   pressed: {
     opacity: 0.85,

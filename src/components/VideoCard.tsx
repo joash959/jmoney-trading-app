@@ -3,7 +3,6 @@ import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   eyebrow: string;
@@ -57,7 +56,6 @@ const styles = StyleSheet.create({
   },
   thumbShadow: {
     borderRadius: 14,
-    ...shadows.sm,
   },
   thumb: {
     aspectRatio: 1.1,

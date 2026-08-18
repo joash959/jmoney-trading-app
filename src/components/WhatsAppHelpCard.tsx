@@ -2,7 +2,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 
 export default function WhatsAppHelpCard() {
   return (
@@ -28,7 +27,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: 20,
-    ...shadows.sm,
   },
   helpIcon: {
     width: 26,

@@ -2,7 +2,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTH_NAMES = [
@@ -158,7 +157,6 @@ export default function Calendar({
 const styles = StyleSheet.create({
   shadowWrap: {
     borderRadius: 14,
-    ...shadows.sm,
   },
   card: {
     backgroundColor: colors.card,

@@ -2,7 +2,6 @@ import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   name: string;
@@ -33,7 +32,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 6,
-    ...shadows.sm,
   },
   name: {
     color: colors.textMuted,

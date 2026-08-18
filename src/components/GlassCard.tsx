@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
 type Props = {
@@ -26,7 +25,6 @@ export default function GlassCard({ children, style, contentStyle }: Props) {
 const styles = StyleSheet.create({
   shadowWrap: {
     borderRadius: radius.xl,
-    ...shadows.sm,
   },
   card: {
     backgroundColor: colors.surface,

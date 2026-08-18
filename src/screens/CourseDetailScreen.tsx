@@ -433,7 +433,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.sm,
-    ...shadows.sm,
   },
   lessonRowActive: {
     borderWidth: 1,

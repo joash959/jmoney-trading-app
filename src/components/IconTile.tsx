@@ -5,7 +5,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 
 export type IconTileGradient = readonly [string, string, ...string[]];
 
@@ -82,7 +81,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.sm,
   },
   imageTile: {
     width: 56,

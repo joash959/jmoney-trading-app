@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 import { spacing } from '../theme/spacing';
 
 type Props = {
@@ -62,7 +61,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.lg,
     position: 'relative',
-    ...shadows.glow,
   },
   arrow: {
     position: 'absolute',
