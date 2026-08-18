@@ -40,11 +40,15 @@ export function usePrimeXBTConnect() {
       return;
     }
     if (data.funded) {
-      setSuccessMessage(
-        data.upgraded
-          ? 'Account verified and funded — premium unlocked! 🎉'
-          : 'Account verified and funded.'
-      );
+      if (data.switched) {
+        setSuccessMessage('Switched to your new PrimeXBT account — premium confirmed.');
+      } else {
+        setSuccessMessage(
+          data.upgraded
+            ? 'Account verified and funded — premium unlocked! 🎉'
+            : 'Account verified and funded.'
+        );
+      }
       refreshProfile();
     } else {
       setSuccessMessage(
