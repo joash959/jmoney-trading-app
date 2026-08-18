@@ -28,11 +28,13 @@ export default function FeatureCard({
       )}
       <Text
         style={[styles.title, align === 'center' && styles.textCenter]}
+        numberOfLines={2}
       >
         {title}
       </Text>
       <Text
         style={[styles.description, align === 'center' && styles.textCenter]}
+        numberOfLines={2}
       >
         {description}
       </Text>
@@ -59,13 +61,16 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 15,
     fontWeight: '800',
+    lineHeight: 19,
     marginTop: 12,
+    minHeight: 38,
   },
   description: {
     color: colors.textMuted,
     fontSize: 13,
     lineHeight: 18,
     marginTop: 4,
+    minHeight: 36,
   },
   textCenter: {
     textAlign: 'center',
