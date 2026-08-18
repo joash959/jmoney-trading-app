@@ -14,6 +14,7 @@ import {
   Poppins_800ExtraBold,
 } from '@expo-google-fonts/poppins';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { AlertsBadgeProvider } from './src/contexts/AlertsBadgeContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import UpdateBanner from './src/components/UpdateBanner';
 import ForceUpdateGate from './src/components/ForceUpdateGate';
@@ -43,7 +44,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <RootNavigator />
+        <AlertsBadgeProvider>
+          <RootNavigator />
+        </AlertsBadgeProvider>
       </AuthProvider>
       <UpdateBanner />
       <ForceUpdateGate />

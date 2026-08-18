@@ -7,6 +7,7 @@ import AlertsScreen from '../screens/AlertsScreen';
 import LiveScreen from '../screens/LiveScreen';
 import MoreStackNavigator from './MoreStackNavigator';
 import { colors } from '../theme/colors';
+import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
 import { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -32,6 +33,8 @@ const ICONS: Record<
 };
 
 export default function MainTabNavigator() {
+  const { unseenCount } = useAlertsBadge();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -66,7 +69,14 @@ export default function MainTabNavigator() {
           },
         })}
       />
-      <Tab.Screen name="Alerts" component={AlertsScreen} />
+      <Tab.Screen
+        name="Alerts"
+        component={AlertsScreen}
+        options={{
+          tabBarBadge: unseenCount > 0 ? unseenCount : undefined,
+          tabBarBadgeStyle: styles.badge,
+        }}
+      />
       <Tab.Screen name="Live" component={LiveScreen} />
       <Tab.Screen
         name="More"
@@ -100,5 +110,11 @@ const styles = StyleSheet.create({
   },
   iconWrapActive: {
     backgroundColor: colors.accentBlue,
+  },
+  badge: {
+    backgroundColor: colors.accentRed,
+    color: colors.text,
+    fontSize: 10,
+    fontWeight: '700',
   },
 });

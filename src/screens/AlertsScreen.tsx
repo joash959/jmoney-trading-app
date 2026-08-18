@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
+import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
+import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
@@ -70,6 +72,7 @@ function formatDateLabel(iso: string) {
 export default function AlertsScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
+  const { markAlertsSeen } = useAlertsBadge();
   const connect = usePrimeXBTConnect();
   const [alerts, setAlerts] = useState<TradeAlert[]>([]);
   const [longCount, setLongCount] = useState(0);
@@ -164,6 +167,12 @@ export default function AlertsScreen({ navigation }: Props) {
     }, 3000);
     return () => clearInterval(interval);
   }, [fetchAlerts]);
+
+  useFocusEffect(
+    useCallback(() => {
+      markAlertsSeen();
+    }, [markAlertsSeen])
+  );
 
   const livePulse = useRef(new Animated.Value(1)).current;
 
