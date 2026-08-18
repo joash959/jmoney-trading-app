@@ -183,12 +183,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginTop: 3,
     lineHeight: 18,
+    minHeight: 36,
   },
   description: {
     color: colors.textMuted,
     fontSize: 12,
     lineHeight: 16,
     marginTop: 5,
+    minHeight: 32,
   },
   metaRow: {
     flexDirection: 'row',
