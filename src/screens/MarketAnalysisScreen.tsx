@@ -32,7 +32,7 @@ function getWidgetHtml(symbol: string) {
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <style>
-      html, body { margin: 0; padding: 0; background: #0A0A0D; }
+      html, body { margin: 0; padding: 0; background: ${colors.background}; }
       .section-label {
         color: #FFFFFF;
         font-size: 15px;
