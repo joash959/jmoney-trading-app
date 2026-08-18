@@ -35,7 +35,7 @@ export function usePrimeXBTConnect() {
     }
     if (!data?.found) {
       setErrorMessage(
-        "We couldn't find that PrimeXBT client ID. Double-check it's your 7-digit client ID, not your MT5 account number."
+        "We couldn't find that PrimeXBT client ID. Double-check it's your 7-digit client ID, usually starting with 26."
       );
       return;
     }

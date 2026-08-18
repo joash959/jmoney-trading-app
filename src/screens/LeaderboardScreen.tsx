@@ -122,7 +122,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
     setSubmitError(null);
     setSubmitting(true);
 
-    // Verify the PrimeXBT client ID / MT5 number against the broker before
+    // Verify the PrimeXBT client ID against the broker before
     // letting anyone register for a real-money challenge - previously this
     // just wrote whatever was typed straight into leaderboard_participants
     // with no check that the account even exists.
@@ -139,7 +139,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
     if (!verifyData?.found) {
       setSubmitting(false);
       setSubmitError(
-        "We couldn't find that PrimeXBT client ID or MT5 number. Double-check it and try again."
+        "We couldn't find that PrimeXBT client ID. Double-check it and try again."
       );
       return;
     }
@@ -382,11 +382,11 @@ export default function LeaderboardScreen({ navigation }: Props) {
               containerStyle={styles.fieldSpaced}
             />
             <FormInput
-              label="PrimeXBT Client ID or MT5 Number"
+              label="PrimeXBT Client ID"
               icon="key-outline"
               value={clientId}
               onChangeText={setClientId}
-              placeholder="e.g. 1824763 or 1040834"
+              placeholder="e.g. 2629398"
               keyboardType="number-pad"
               containerStyle={styles.fieldSpaced}
             />

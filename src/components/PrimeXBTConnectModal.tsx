@@ -43,7 +43,7 @@ export default function PrimeXBTConnectModal({
   successMessage,
   errorMessage,
   title = 'Connect your PrimeXBT account',
-  description = 'Enter your PrimeXBT client ID or MT5 account number to unlock premium features instantly. Your account needs a minimum deposit of R500.',
+  description = 'Enter your PrimeXBT client ID to unlock premium features instantly. Your account needs a minimum deposit of R500.',
   confirmLabel = 'Connect & unlock premium',
 }: Props) {
   const navigation = useNavigation<any>();
@@ -89,9 +89,7 @@ export default function PrimeXBTConnectModal({
             <Text style={styles.helperText}>
               Use your <Text style={styles.helperBold}>PrimeXBT client ID</Text>{' '}
               (7 digits, usually starting with 26), found in the PrimeXBT app
-              under Profile / Account settings. MT5 account numbers often
-              aren't listed on our partner report, so they may not be
-              recognised.
+              under Profile / Account settings.
             </Text>
 
             {successMessage && (

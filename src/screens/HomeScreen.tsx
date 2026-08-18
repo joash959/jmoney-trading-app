@@ -372,7 +372,7 @@ export default function HomeScreen({ navigation }: Props) {
         title={isPremium ? 'Connect a different PrimeXBT account' : undefined}
         description={
           isPremium
-            ? "You're already connected and funded. Enter a different PrimeXBT client ID or MT5 account number to switch accounts."
+            ? "You're already connected and funded. Enter a different PrimeXBT client ID to switch accounts."
             : undefined
         }
         confirmLabel={isPremium ? 'Connect different account' : undefined}
