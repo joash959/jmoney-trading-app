@@ -6,7 +6,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { getCommunityCount } from '../lib/communityCount';
-import { getNextNFP } from '../lib/economicCalendar';
+import { getNextNFP, getNextCPI } from '../lib/economicCalendar';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -121,6 +121,7 @@ export default function HomeScreen({ navigation }: Props) {
   }, []);
 
   const nextNFP = getNextNFP();
+  const nextCPI = getNextCPI();
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -382,10 +383,10 @@ export default function HomeScreen({ navigation }: Props) {
         <StatCard
           icon="bar-chart-outline"
           image={require('../../assets/marketanalysis.png')}
-          trendLabel="9 Days To Go"
-          value="Aug 12, 2026"
+          trendLabel={nextCPI.daysToGoLabel}
+          value={nextCPI.dateLabel}
           label="Next CPI"
-          sublabel="US Consumer Price Index • 3:30 PM..."
+          sublabel="US Consumer Price Index"
         />
         <StatCard
           icon="trophy-outline"
