@@ -22,7 +22,6 @@ export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,20 +93,7 @@ export default function LoginScreen({ navigation }: Props) {
         />
 
         <View style={styles.optionsRow}>
-          <Pressable
-            style={styles.rememberMe}
-            onPress={() => setRememberMe((prev) => !prev)}
-          >
-            <View
-              style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-            >
-              {rememberMe && (
-                <Ionicons name="checkmark-outline" size={12} color={colors.text} />
-              )}
-            </View>
-            <Text style={styles.rememberMeText}>Remember me</Text>
-          </Pressable>
-          <Pressable>
+          <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.link}>Forgot password?</Text>
           </Pressable>
         </View>
@@ -167,30 +153,8 @@ const styles = StyleSheet.create({
   optionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginTop: 18,
-  },
-  rememberMe: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 5,
-    borderWidth: 1.5,
-    borderColor: colors.inputBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: colors.accentBlue,
-    borderColor: colors.accentBlue,
-  },
-  rememberMeText: {
-    color: colors.textMuted,
-    fontSize: 14,
   },
   link: {
     color: colors.link,
