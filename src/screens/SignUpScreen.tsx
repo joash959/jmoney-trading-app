@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,7 +41,7 @@ export default function SignUpScreen({ navigation }: Props) {
   );
 
   const handleOpenBroker = () => {
-    // TODO: open PrimeXBT signup link via Linking.openURL
+    Linking.openURL('https://go.primexbt.direct/visit/?bta=53738&brand=primexbt');
   };
 
   const handleCopy = async (field: 'email' | 'password', value: string) => {
@@ -208,7 +208,14 @@ export default function SignUpScreen({ navigation }: Props) {
 
         <View style={styles.divider} />
 
-        <Pressable style={styles.haveAccountRow}>
+        <Pressable
+          style={styles.haveAccountRow}
+          onPress={() =>
+            Linking.openURL(
+              'https://wa.me/27686784063?text=Hi%20JMONEY%2C%20I%20already%20have%20a%20PrimeXBT%20account.'
+            )
+          }
+        >
           <Text style={styles.haveAccountText}>
             Already have a PrimeXBT account?{' '}
           </Text>
