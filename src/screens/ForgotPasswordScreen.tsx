@@ -28,12 +28,17 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
     }
     setError(null);
     setSubmitting(true);
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email.trim()
+    const { data, error: invokeError } = await supabase.functions.invoke(
+      'password-reset-otp',
+      { body: { action: 'send_code', email: email.trim() } }
     );
     setSubmitting(false);
-    if (resetError) {
-      setError(resetError.message);
+    if (invokeError) {
+      setError(invokeError.message);
+      return;
+    }
+    if (data?.error) {
+      setError(data.error);
       return;
     }
     navigation.navigate('ResetPassword', { email: email.trim() });

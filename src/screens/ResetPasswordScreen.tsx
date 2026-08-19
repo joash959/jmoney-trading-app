@@ -26,6 +26,7 @@ export default function ResetPasswordScreen({ navigation, route }: Props) {
   const [resending, setResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [resetComplete, setResetComplete] = useState(false);
 
   const handleReset = async () => {
     if (!code.trim()) {
@@ -44,42 +45,83 @@ export default function ResetPasswordScreen({ navigation, route }: Props) {
     setNotice(null);
     setSubmitting(true);
 
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: code.trim(),
-      type: 'recovery',
-    });
-    if (verifyError) {
-      setSubmitting(false);
-      setError(verifyError.message);
+    const { data, error: invokeError } = await supabase.functions.invoke(
+      'password-reset-otp',
+      {
+        body: {
+          action: 'reset_password',
+          email,
+          code: code.trim(),
+          new_password: newPassword,
+        },
+      }
+    );
+    setSubmitting(false);
+    if (invokeError) {
+      setError(invokeError.message);
+      return;
+    }
+    if (data?.error) {
+      setError(data.error);
       return;
     }
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-    setSubmitting(false);
-    if (updateError) {
-      setError(updateError.message);
-    }
-    // On success, RootNavigator swaps to the Main stack automatically
-    // once the recovery session updates - no manual navigation needed here.
+    setResetComplete(true);
+    setTimeout(() => {
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    }, 2000);
   };
 
   const handleResend = async () => {
     setError(null);
     setNotice(null);
     setResending(true);
-    const { error: resendError } = await supabase.auth.resetPasswordForEmail(
-      email
+    const { data, error: invokeError } = await supabase.functions.invoke(
+      'password-reset-otp',
+      { body: { action: 'send_code', email } }
     );
     setResending(false);
-    if (resendError) {
-      setError(resendError.message);
+    if (invokeError) {
+      setError(invokeError.message);
+      return;
+    }
+    if (data?.error) {
+      setError(data.error);
       return;
     }
     setNotice('A new code has been sent to your email.');
   };
+
+  if (resetComplete) {
+    return (
+      <ScreenShell>
+        <TopBar />
+
+        <View style={styles.badgeRow}>
+          <Badge icon="checkmark-circle-outline" label="Password updated" />
+        </View>
+
+        <View style={styles.heading}>
+          <Text style={styles.headingLine}>You're all</Text>
+          <GradientText style={[styles.headingLine, styles.headingAccent]}>
+            set
+          </GradientText>
+        </View>
+        <Text style={styles.subtitle}>
+          Your password has been updated. Taking you back to sign in...
+        </Text>
+
+        <PrimaryButton
+          label="Back to sign in now"
+          icon={null}
+          onPress={() =>
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] })
+          }
+          style={styles.card}
+        />
+      </ScreenShell>
+    );
+  }
 
   return (
     <ScreenShell>
