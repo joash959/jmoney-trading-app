@@ -51,3 +51,4 @@ $$;
 
 revoke all on function public.get_sentiment_counts(date) from public;
 grant execute on function public.get_sentiment_counts(date) to authenticated;
+revoke execute on function public.get_sentiment_counts(date) from anon;
