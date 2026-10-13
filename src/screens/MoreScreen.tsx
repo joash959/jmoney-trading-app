@@ -166,20 +166,26 @@ export default function MoreScreen({ navigation }: Props) {
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
         <View style={styles.profileTextWrap}>
-          <Text style={styles.profileName}>{displayName}</Text>
-          {!!email && <Text style={styles.profileEmail}>{email}</Text>}
-        </View>
-        <View style={styles.tierPill}>
-          <Ionicons
-            name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
-            size={11}
-            color={isPremium ? colors.warning : colors.textFaint}
-          />
-          <Text
-            style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
-          >
-            {isPremium ? 'PREMIUM' : 'FREE'}
+          <Text style={styles.profileName} numberOfLines={1}>
+            {displayName}
           </Text>
+          {!!email && (
+            <Text style={styles.profileEmail} numberOfLines={1}>
+              {email}
+            </Text>
+          )}
+          <View style={styles.tierPill}>
+            <Ionicons
+              name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
+              size={11}
+              color={isPremium ? colors.warning : colors.textFaint}
+            />
+            <Text
+              style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
+            >
+              {isPremium ? 'PREMIUM' : 'FREE'}
+            </Text>
+          </View>
         </View>
       </SurfaceCard>
 
@@ -251,9 +257,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -276,12 +282,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   tierPill: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
+    marginTop: 8,
     backgroundColor: colors.surfaceAlt,
   },
   tierPillText: {

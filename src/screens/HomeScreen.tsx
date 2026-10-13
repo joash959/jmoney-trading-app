@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { getCommunityCount } from '../lib/communityCount';
 import { getNextNFP, getNextCPI } from '../lib/economicCalendar';
@@ -261,7 +261,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <View style={styles.heroCard}>
         <View style={styles.heroTopRow}>
-          <Text style={styles.greetingLabel}>{getGreeting()}</Text>
+          <Text style={styles.greetingLabel}>{getGreeting()},</Text>
           <View style={styles.tierPill}>
             <Ionicons
               name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
@@ -275,29 +275,33 @@ export default function HomeScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-        <Text
-          style={styles.greetingHeading}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.5}
-        >
-          Welcome back, {firstName}!
+        <Text style={styles.greetingHeading} numberOfLines={2}>
+          {firstName}
         </Text>
       </View>
 
-      <GradientLinkCard
-        title={isPremium ? 'PrimeXBT Account Connected' : 'Connect your PrimeXBT account'}
-        subtitle={
-          isPremium
-            ? 'Your account is verified and funded'
-            : 'Unlock premium features and trade alerts'
-        }
-        icon={require('../../assets/broker.png')}
-        onPress={connect.open}
-        gradient={isPremium ? gradients.whatsapp : undefined}
-        glyph={isPremium ? 'checkmark-circle-outline' : 'arrow-forward-outline'}
-        style={styles.cardSpaced}
-      />
+      {isPremium ? (
+        // Already connected - a quiet status row, not a second hero banner
+        // competing with the Trade Alerts card below.
+        <SurfaceCard onPress={connect.open} style={[styles.cardSpaced, styles.statusCard]}>
+          <View style={styles.statusIcon}>
+            <Ionicons name="checkmark" size={18} color={colors.accentGreen} />
+          </View>
+          <View style={styles.statusText}>
+            <Text style={styles.statusTitle}>PrimeXBT connected</Text>
+            <Text style={styles.statusSubtitle}>Verified and funded</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+        </SurfaceCard>
+      ) : (
+        <GradientLinkCard
+          title="Connect your PrimeXBT account"
+          subtitle="Unlock premium features and trade alerts"
+          icon={require('../../assets/broker.png')}
+          onPress={connect.open}
+          style={styles.cardSpaced}
+        />
+      )}
 
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.quickActionsGrid}>
@@ -429,9 +433,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   greetingLabel: {
-    color: colors.textMuted,
-    fontSize: 13,
-    fontWeight: '600',
+    color: colors.textFaint,
+    fontSize: 15,
+    fontWeight: '500',
   },
   tierPill: {
     flexDirection: 'row',
@@ -459,10 +463,37 @@ const styles = StyleSheet.create({
   },
   greetingHeading: {
     color: colors.text,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 32,
+    lineHeight: 40,
     fontWeight: '800',
-    marginTop: 10,
+    marginTop: 2,
+  },
+  statusCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+  },
+  statusIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(37,211,102,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statusText: {
+    flex: 1,
+  },
+  statusTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  statusSubtitle: {
+    color: colors.textFaint,
+    fontSize: 13,
+    marginTop: 1,
   },
   cardSpaced: {
     marginTop: 20,

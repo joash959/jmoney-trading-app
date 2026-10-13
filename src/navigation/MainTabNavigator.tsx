@@ -52,7 +52,7 @@ export default function MainTabNavigator() {
                   : ICONS[route.name as keyof MainTabParamList].outline
               }
               size={size - 4}
-              color={focused ? colors.text : color}
+              color={color}
             />
           </View>
         ),
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconWrapActive: {
-    backgroundColor: colors.accentBlue,
+    backgroundColor: colors.accentBlueDim,
   },
   badge: {
     backgroundColor: colors.accentRed,

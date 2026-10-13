@@ -36,7 +36,7 @@ export default function ScreenHeader({
             <Ionicons name={icon} size={22} color={colors.link} />
           </View>
         )}
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
         {rightElement}

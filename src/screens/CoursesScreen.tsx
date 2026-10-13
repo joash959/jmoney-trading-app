@@ -178,6 +178,7 @@ export default function CoursesScreen({ navigation }: Props) {
                 description={course.description ?? ''}
                 duration={formatDuration(course.duration_hours)}
                 lessons={course.lessons_count ?? 0}
+                thumbnailUrl={course.thumbnail_url}
                 onPress={() =>
                   navigation.navigate('CourseDetail', { courseId: course.id })
                 }

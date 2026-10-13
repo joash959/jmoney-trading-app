@@ -108,16 +108,18 @@ export default function SentimentPoll() {
       ) : (
         <View style={styles.pillRow}>
           <Pressable
-            style={styles.bearish}
+            style={({ pressed }) => [styles.bearish, pressed && styles.pressed]}
             onPress={() => handlePick('bearish')}
           >
-            <Text style={styles.pillText}>Bearish</Text>
+            <Ionicons name="trending-down" size={16} color={colors.accentRed} />
+            <Text style={styles.bearishText}>Bearish</Text>
           </Pressable>
           <Pressable
-            style={styles.bullish}
+            style={({ pressed }) => [styles.bullish, pressed && styles.pressed]}
             onPress={() => handlePick('bullish')}
           >
-            <Text style={styles.pillText}>Bullish</Text>
+            <Ionicons name="trending-up" size={16} color={colors.accentGreen} />
+            <Text style={styles.bullishText}>Bullish</Text>
           </Pressable>
         </View>
       )}
@@ -139,26 +141,39 @@ const styles = StyleSheet.create({
   },
   pillRow: {
     flexDirection: 'row',
-    height: 48,
-    borderRadius: radius.pill,
-    overflow: 'hidden',
+    gap: spacing.sm,
     marginTop: spacing.md,
   },
   bearish: {
     flex: 1,
-    backgroundColor: colors.accentRed,
+    height: 48,
+    flexDirection: 'row',
+    gap: 6,
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(239,68,68,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   bullish: {
     flex: 1,
-    backgroundColor: colors.accentGreen,
+    height: 48,
+    flexDirection: 'row',
+    gap: 6,
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(37,211,102,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pillText: {
-    color: colors.text,
+  bearishText: {
+    color: colors.accentRed,
     ...typography.bodyStrong,
+  },
+  bullishText: {
+    color: colors.accentGreen,
+    ...typography.bodyStrong,
+  },
+  pressed: {
+    opacity: 0.7,
   },
   resultRow: {
     flexDirection: 'row',

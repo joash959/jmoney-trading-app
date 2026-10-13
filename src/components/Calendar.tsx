@@ -230,9 +230,8 @@ const styles = StyleSheet.create({
     borderRightColor: colors.cardBorder,
   },
   dayCellSelected: {
-    borderWidth: 2,
-    borderColor: colors.accentBlue,
-    margin: -1,
+    backgroundColor: colors.accentBlueDim,
+    borderRadius: 10,
   },
   dayText: {
     color: colors.text,

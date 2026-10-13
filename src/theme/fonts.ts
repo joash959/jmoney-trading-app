@@ -17,8 +17,11 @@ export function fontFamilyForWeight(weight?: string | number | null): string {
         ? 700
         : parseInt(weight ?? '', 10) || 400;
 
-  if (numeric >= 800) return fonts.poppinsExtraBold;
-  if (numeric >= 700) return fonts.poppinsBold;
+  // One step lighter than the CSS weight asks for: Poppins runs heavy, and
+  // ExtraBold/Bold at heading sizes read as shouty rather than premium.
+  if (numeric >= 900) return fonts.poppinsExtraBold;
+  if (numeric >= 800) return fonts.poppinsBold;
+  if (numeric >= 700) return fonts.poppinsSemiBold;
   if (numeric >= 600) return fonts.interSemiBold;
   if (numeric >= 500) return fonts.interMedium;
   return fonts.interRegular;

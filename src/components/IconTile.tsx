@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 15,
+    lineHeight: 14,
   },
 });

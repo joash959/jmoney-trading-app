@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +13,8 @@ type Props = {
   description: string;
   duration: string;
   lessons: number;
+  /** Course artwork - falls back to the placeholder icon when missing or broken. */
+  thumbnailUrl?: string | null;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
@@ -33,9 +36,16 @@ export default function CourseCard({
   description,
   duration,
   lessons,
+  thumbnailUrl,
   onPress,
   style,
 }: Props) {
+  const [thumbFailed, setThumbFailed] = useState(false);
+  const showThumb = !!thumbnailUrl && !thumbFailed;
+  // Categories are stored comma-separated ("Forex,Indices,") - show the first.
+  const primaryCategory =
+    category.split(',').map((c) => c.trim()).find(Boolean) ?? category;
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -47,15 +57,24 @@ export default function CourseCard({
     >
       <View style={styles.card}>
         <LinearGradient colors={['#1B2033', '#0A0D16']} style={styles.thumb}>
+          {showThumb ? (
+            <Image
+              source={{ uri: thumbnailUrl! }}
+              style={StyleSheet.absoluteFill}
+              resizeMode="cover"
+              onError={() => setThumbFailed(true)}
+            />
+          ) : (
+            <View style={styles.thumbIconWrap} pointerEvents="none">
+              <Image
+                source={require('../../assets/courses.png')}
+                style={styles.thumbIcon}
+                resizeMode="contain"
+              />
+            </View>
+          )}
           <View style={styles.levelPill}>
             <Text style={styles.levelText}>{level}</Text>
-          </View>
-          <View style={styles.thumbIconWrap} pointerEvents="none">
-            <Image
-              source={require('../../assets/courses.png')}
-              style={styles.thumbIcon}
-              resizeMode="contain"
-            />
           </View>
           <View style={styles.avatarWrap}>
             <LinearGradient colors={gradients.brand} style={styles.avatar}>
@@ -69,7 +88,7 @@ export default function CourseCard({
 
         <View style={styles.body}>
           <Text style={styles.category} numberOfLines={1}>
-            {category}
+            {primaryCategory}
           </Text>
           <Text style={styles.title} numberOfLines={2}>
             {title}
@@ -117,7 +136,8 @@ const styles = StyleSheet.create({
   },
   levelPill: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(37,211,102,0.15)',
+    // Opaque enough to stay legible on top of real course artwork.
+    backgroundColor: 'rgba(10,10,13,0.8)',
     paddingHorizontal: 9,
     paddingVertical: 3,
     borderRadius: 10,
@@ -125,7 +145,8 @@ const styles = StyleSheet.create({
   levelText: {
     color: colors.accentGreen,
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
+    textTransform: 'capitalize',
   },
   thumbIconWrap: {
     ...StyleSheet.absoluteFillObject,
@@ -178,7 +199,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: 3,
     lineHeight: 18,
     minHeight: 36,

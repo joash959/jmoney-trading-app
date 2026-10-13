@@ -1,8 +1,7 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 
 type Props = {
@@ -14,7 +13,7 @@ type Props = {
   sublabel?: string;
   /** Tighter padding, smaller type, no sublabel - for dense multi-card rows. */
   compact?: boolean;
-  /** 'gradient' matches the blue gradient cards used on Home. */
+  /** 'gradient' marks a featured stat: same flat card, blue label instead of a filled background. */
   variant?: 'flat' | 'gradient';
   style?: StyleProp<ViewStyle>;
 };
@@ -30,7 +29,7 @@ export default function InsightCard({
   variant = 'flat',
   style,
 }: Props) {
-  const isGradient = variant === 'gradient';
+  const isFeatured = variant === 'gradient';
 
   const content = (
     <>
@@ -38,13 +37,13 @@ export default function InsightCard({
         <Ionicons
           name={icon}
           size={compact ? 11 : 13}
-          color={isGradient ? colors.text : iconColor}
+          color={isFeatured ? colors.link : iconColor}
         />
         <Text
           style={[
             styles.label,
             compact && styles.labelCompact,
-            isGradient && styles.labelGradient,
+            isFeatured && styles.labelFeatured,
           ]}
           numberOfLines={1}
         >
@@ -55,7 +54,7 @@ export default function InsightCard({
         style={[
           styles.value,
           compact && styles.valueCompact,
-          { color: isGradient ? colors.text : valueColor },
+          { color: isFeatured ? colors.text : valueColor },
         ]}
         numberOfLines={1}
       >
@@ -63,7 +62,7 @@ export default function InsightCard({
       </Text>
       {sublabel && !compact && (
         <Text
-          style={[styles.sublabel, isGradient && styles.sublabelGradient]}
+          style={styles.sublabel}
           numberOfLines={1}
         >
           {sublabel}
@@ -71,24 +70,6 @@ export default function InsightCard({
       )}
     </>
   );
-
-  if (isGradient) {
-    return (
-      <LinearGradient
-        colors={gradients.button}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[
-          styles.card,
-          compact && styles.cardCompact,
-          styles.cardGradient,
-          style,
-        ]}
-      >
-        {content}
-      </LinearGradient>
-    );
-  }
 
   return (
     <View style={[styles.card, compact && styles.cardCompact, style]}>
@@ -110,9 +91,6 @@ const styles = StyleSheet.create({
     padding: 7,
     borderRadius: radius.md,
   },
-  cardGradient: {
-    borderWidth: 0,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -126,8 +104,8 @@ const styles = StyleSheet.create({
   labelCompact: {
     fontSize: 9,
   },
-  labelGradient: {
-    color: 'rgba(255,255,255,0.85)',
+  labelFeatured: {
+    color: colors.link,
   },
   value: {
     fontSize: 16,
@@ -142,8 +120,5 @@ const styles = StyleSheet.create({
     color: colors.textFaint,
     fontSize: 10,
     marginTop: 1,
-  },
-  sublabelGradient: {
-    color: 'rgba(255,255,255,0.75)',
   },
 });

@@ -37,15 +37,18 @@ export default function StatCard({
         )}
         {trendLabel && (
           <View style={styles.trendPill}>
-            <Ionicons name="trending-up-outline" size={10} color={colors.accentGreen} />
-            <Text style={styles.trendText}>{trendLabel}</Text>
+            <Text style={styles.trendText} numberOfLines={1}>
+              {trendLabel}
+            </Text>
           </View>
         )}
       </View>
       <Text style={styles.value} numberOfLines={1}>
         {value}
       </Text>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label} numberOfLines={2}>
+        {label}
+      </Text>
       <Text style={styles.sublabel} numberOfLines={1}>
         {sublabel}
       </Text>
@@ -66,6 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 6,
   },
   iconCircle: {
     width: 38,
@@ -76,10 +80,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconImagePlain: {
-    width: 38,
-    height: 38,
+    width: 34,
+    height: 34,
   },
   trendPill: {
+    flexShrink: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
@@ -89,9 +94,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   trendText: {
+    flexShrink: 1,
     color: colors.accentGreen,
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   value: {
     color: colors.text,
