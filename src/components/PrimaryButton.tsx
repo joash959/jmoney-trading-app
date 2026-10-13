@@ -29,6 +29,18 @@ export default function PrimaryButton({
 }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
   const isDisabled = disabled || loading;
+  // `style` is meant for the visible button, but flex sizing only works on
+  // the outermost wrapper - left on the inner gradient, `flex: 1` in a row
+  // collapses the button to zero width and only the label shows.
+  const {
+    flex,
+    flexGrow,
+    flexShrink,
+    flexBasis,
+    alignSelf,
+    ...visualStyle
+  } = StyleSheet.flatten(style) ?? {};
+  const layout = { flex, flexGrow, flexShrink, flexBasis, alignSelf };
 
   const handlePressIn = () => {
     if (isDisabled) return;
@@ -61,6 +73,7 @@ export default function PrimaryButton({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={isDisabled}
+      style={layout}
     >
       <Animated.View
         style={[{ transform: [{ scale }] }, isDisabled && styles.disabled]}
@@ -70,12 +83,12 @@ export default function PrimaryButton({
             colors={gradients.button}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={[styles.button, styles.gradientShadow, style]}
+            style={[styles.button, styles.gradientShadow, visualStyle]}
           >
             {content}
           </LinearGradient>
         ) : (
-          <Animated.View style={[styles.button, styles.flatButton, style]}>
+          <Animated.View style={[styles.button, styles.flatButton, visualStyle]}>
             {content}
           </Animated.View>
         )}

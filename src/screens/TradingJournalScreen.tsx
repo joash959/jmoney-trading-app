@@ -36,6 +36,15 @@ function toDateISO(date: Date) {
   return `${y}-${m}-${d}`;
 }
 
+/** "+$1,400.00" / "-$150.00" - sign before the currency symbol, with separators. */
+function formatPnl(value: number) {
+  const amount = Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${value < 0 ? '-' : '+'}$${amount}`;
+}
+
 function formatDayLabel(date: Date) {
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -306,8 +315,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
             monthlyPnl < 0 && styles.summaryValueNegative,
           ]}
         >
-          {monthlyPnl >= 0 ? '+$' : '-$'}
-          {Math.abs(monthlyPnl).toFixed(2)}
+          {formatPnl(monthlyPnl)}
         </Text>
       </LinearGradient>
 
@@ -414,8 +422,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
                   entry.profit_loss < 0 && styles.weekPnlNegative,
                 ]}
               >
-                {entry.profit_loss >= 0 ? '+' : ''}
-                ${entry.profit_loss.toFixed(2)}
+                {formatPnl(entry.profit_loss)}
               </Text>
             </Pressable>
           ))}
