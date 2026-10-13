@@ -7,9 +7,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jmoney.tradingapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.jmoney.tradingapp",
       "adaptiveIcon": {
         "backgroundColor": "#131417",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -37,6 +42,9 @@
           "photosPermission": "JMONEY needs access to your photos so you can upload a chart screenshot for the AI Super Scanner."
         }
       ]
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }
