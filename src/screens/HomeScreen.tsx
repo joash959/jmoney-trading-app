@@ -543,7 +543,10 @@ export default function HomeScreen({ navigation }: Props) {
                 style={({ pressed }) => [styles.alertCard, pressed && styles.pressed]}
               >
                 <View style={styles.alertTop}>
-                  <Icon3D name="alerts" size={38} />
+                  <Icon3D
+                    name={direction === 'long' ? 'chart-up' : direction === 'short' ? 'chart-down' : 'bell'}
+                    size={34}
+                  />
                   <View style={[styles.alertPill, { backgroundColor: `${tint}22` }]}>
                     <Text style={[styles.alertPillText, { color: tint }]}>
                       {direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : update!.label}
