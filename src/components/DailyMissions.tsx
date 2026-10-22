@@ -4,6 +4,7 @@ import Text from './AppText';
 import Icon3D, { Icon3DName } from './Icon3D';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
+import GlassSheen from './GlassSheen';
 
 export type Mission = {
   key: string;
@@ -28,6 +29,7 @@ export default function DailyMissions({
 
   return (
     <View style={[styles.card, style]}>
+      <GlassSheen />
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Icon3D name="target" size={26} />
@@ -73,6 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     padding: 16,
     paddingBottom: 8,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',

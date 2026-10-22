@@ -4,6 +4,7 @@ import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import type { Badge } from '../lib/gamification';
 import Icon3D from './Icon3D';
+import GlassSheen from './GlassSheen';
 
 /** Achievement grid: unlocked badges in full colour, locked ones dimmed
  * with a progress bar towards unlocking. */
@@ -12,6 +13,7 @@ export default function BadgeGrid({ badges }: { badges: Badge[] }) {
     <View style={styles.grid}>
       {badges.map((badge) => (
         <View key={badge.key} style={[styles.tile, badge.unlocked && styles.tileUnlocked]}>
+          <GlassSheen />
           <View style={[styles.emojiWrap, badge.unlocked && styles.emojiWrapUnlocked]}>
             <Icon3D name={badge.icon} size={46} muted={!badge.unlocked} />
           </View>
@@ -46,6 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     backgroundColor: colors.card,
     padding: 14,
+    overflow: 'hidden',
   },
   tileUnlocked: {
     backgroundColor: 'rgba(47,107,255,0.12)',

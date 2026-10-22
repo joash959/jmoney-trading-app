@@ -6,6 +6,7 @@ import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import type { GameStats } from '../lib/gamification';
 import Icon3D from './Icon3D';
+import GlassSheen from './GlassSheen';
 
 type Props = {
   stats: GameStats | null;
@@ -43,6 +44,7 @@ export default function LevelCard({ stats, onPress, style }: Props) {
       onPress={onPress}
       style={({ pressed }) => [styles.card, style, pressed && styles.pressed]}
     >
+      <GlassSheen />
       <View style={styles.topRow}>
         <LinearGradient colors={gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.levelBadge}>
           <Text style={styles.levelLabel}>LVL</Text>
