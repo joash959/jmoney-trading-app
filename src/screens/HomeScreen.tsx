@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,7 +18,6 @@ import ScreenShell from '../components/ScreenShell';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
 import SentimentPoll from '../components/SentimentPoll';
-import ListRow from '../components/ListRow';
 import LineChart, { ChartPoint } from '../components/LineChart';
 import AnimatedNumber from '../components/AnimatedNumber';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
@@ -100,6 +99,54 @@ function describeUpdate(message: string) {
   return { label: 'Update', color: colors.primary };
 }
 
+const ALERT_CARD_WIDTH = 250;
+
+/** Upcoming event: a calendar-page date block, the event, and a countdown. */
+function TimelineRow({
+  date,
+  title,
+  subtitle,
+  tag,
+  last,
+  onPress,
+}: {
+  date: Date | null;
+  title: string;
+  subtitle: string;
+  tag: string;
+  last?: boolean;
+  onPress?: () => void;
+}) {
+  const soon = tag === 'Today' || tag === 'Tomorrow';
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => [styles.timelineRow, !last && styles.timelineDivider, pressed && { opacity: 0.7 }]}
+    >
+      <View style={styles.dateBlock}>
+        <Text style={styles.dateMonth}>
+          {date ? date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : 'TBA'}
+        </Text>
+        <Text numeric style={styles.dateDay}>
+          {date ? date.getDate() : '–'}
+        </Text>
+      </View>
+      <View style={styles.timelineText}>
+        <Text style={styles.timelineTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={styles.timelineSubtitle} numberOfLines={1}>
+          {subtitle}
+        </Text>
+      </View>
+      <View style={[styles.countdown, soon && styles.countdownSoon]}>
+        <Text style={[styles.countdownText, soon && { color: colors.accentGreen }]}>{tag}</Text>
+      </View>
+    </Pressable>
+  );
+}
+
 function minutesAgo(iso: string) {
   return Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -122,10 +169,6 @@ function daysUntil(date: Date) {
   if (days <= 0) return 'Today';
   if (days === 1) return 'Tomorrow';
   return `In ${days} days`;
-}
-
-function shortDate(date: Date) {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function labelForISO(iso: string) {
@@ -461,15 +504,25 @@ export default function HomeScreen({ navigation }: Props) {
           <Text style={styles.linkText}>See all</Text>
         </Pressable>
       </View>
-      <SurfaceCard style={styles.listCard}>
-        {alerts.length === 0 ? (
+      {alerts.length === 0 ? (
+        <SurfaceCard>
           <Text style={styles.emptyText}>
             {isPremium ? 'No alerts yet today.' : 'Connect PrimeXBT to see live trade alerts.'}
           </Text>
-        ) : (
-          alerts.map((alert, i) => {
+        </SurfaceCard>
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={ALERT_CARD_WIDTH + 12}
+          style={styles.carousel}
+          contentContainerStyle={styles.carouselContent}
+        >
+          {alerts.map((alert) => {
             const direction = detectAlertDirection(alert.message);
-            const entry = parseAlertFields(alert.message).find((f) => f.label === 'Entry');
+            const fields = parseAlertFields(alert.message);
+            const field = (label: string) => fields.find((f) => f.label === label)?.value;
             const isNew = minutesAgo(alert.created_at) <= NEW_ALERT_MINUTES;
             const update = direction ? null : describeUpdate(alert.message);
             const tint =
@@ -478,23 +531,55 @@ export default function HomeScreen({ navigation }: Props) {
                 : direction === 'short'
                   ? colors.accentRed
                   : update!.color;
+            const stats = [
+              { label: 'Entry', value: field('Entry') },
+              { label: 'TP', value: field('TP1') ?? field('TP2') },
+              { label: 'SL', value: field('SL') },
+            ].filter((f) => f.value);
             return (
-              <ListRow
+              <Pressable
                 key={alert.id}
-                icon={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
-                title={alert.message.split('\n')[0].trim()}
-                subtitle={entry ? `Entry ${entry.value}` : 'Trade update'}
-                value={direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : update!.label}
-                valueColor={tint}
-                subvalue={isNew ? '● New' : timeAgo(alert.created_at)}
-                subvalueColor={isNew ? colors.primary : colors.textFaint}
                 onPress={() => navigation.navigate('Alerts')}
-                divider={i < alerts.length - 1}
-              />
+                style={({ pressed }) => [styles.alertCard, pressed && styles.pressed]}
+              >
+                <View style={styles.alertTop}>
+                  <Icon3D
+                    name={direction === 'long' ? 'chart-up' : direction === 'short' ? 'chart-down' : 'bell'}
+                    size={34}
+                  />
+                  <View style={[styles.alertPill, { backgroundColor: `${tint}22` }]}>
+                    <Text style={[styles.alertPillText, { color: tint }]}>
+                      {direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : update!.label}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.alertTitle} numberOfLines={1}>
+                  {alert.message.split('\n')[0].trim()}
+                </Text>
+                {stats.length > 0 ? (
+                  <View style={styles.alertStats}>
+                    {stats.map((f) => (
+                      <View key={f.label} style={styles.alertStat}>
+                        <Text style={styles.alertStatLabel}>{f.label}</Text>
+                        <Text numeric style={styles.alertStatValue} numberOfLines={1} adjustsFontSizeToFit>
+                          {f.value}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.alertBody} numberOfLines={2}>
+                    {alert.message.split('\n').slice(1).join(' ').trim() || 'Trade update'}
+                  </Text>
+                )}
+                <Text style={[styles.alertTime, isNew && { color: colors.link }]}>
+                  {isNew ? '● New' : timeAgo(alert.created_at)}
+                </Text>
+              </Pressable>
             );
-          })
-        )}
-      </SurfaceCard>
+          })}
+        </ScrollView>
+      )}
 
       <View style={styles.cardSpaced}>
         <SentimentPoll
@@ -512,49 +597,67 @@ export default function HomeScreen({ navigation }: Props) {
           <Text style={styles.linkText}>Live sessions</Text>
         </Pressable>
       </View>
-      <SurfaceCard style={styles.listCard}>
-        <ListRow
-          icon="videocam-outline"
+      <SurfaceCard style={styles.timelineCard}>
+        <TimelineRow
+          date={nextSession?.date ?? null}
           title={nextSession?.title ?? 'Live session'}
-          subtitle="Next live session"
-          value={nextSession ? shortDate(nextSession.date) : 'None yet'}
-          subvalue={nextSession ? daysUntil(nextSession.date) : 'Check back soon'}
-          subvalueColor={colors.primary}
+          subtitle="Live session with J Money"
+          tag={nextSession ? daysUntil(nextSession.date) : 'Check back soon'}
           onPress={() => navigation.navigate('Live')}
         />
-        <ListRow
-          icon="school-outline"
-          title={progress?.continueCourse ? progress.continueCourse.title : 'Start learning'}
-          subtitle={progress?.continueCourse ? 'Continue your course' : 'Browse trading courses'}
-          value={`${(progress?.completed ?? 0) + (progress?.inProgress ?? 0)}/${progress?.total || '—'}`}
-          subvalue="courses"
-          onPress={() =>
-            progress?.continueCourse
-              ? navigation.navigate('Courses', {
-                  screen: 'CourseDetail',
-                  params: { courseId: progress.continueCourse.id },
-                })
-              : navigation.navigate('Courses', { screen: 'CoursesHome' })
-          }
-        />
-        <ListRow
-          icon="briefcase-outline"
+        <TimelineRow
+          date={nextNFP.date}
           title="Non-Farm Payrolls"
-          subtitle="US · NFP release"
-          value={shortDate(nextNFP.date)}
-          subvalue={daysUntil(nextNFP.date)}
-          subvalueColor={colors.primary}
+          subtitle="US · High impact"
+          tag={daysUntil(nextNFP.date)}
         />
-        <ListRow
-          icon="pricetags-outline"
+        <TimelineRow
+          date={nextCPI.date}
           title="Consumer Price Index"
-          subtitle="US · CPI release"
-          value={shortDate(nextCPI.date)}
-          subvalue={daysUntil(nextCPI.date)}
-          subvalueColor={colors.primary}
-          divider={false}
+          subtitle="US · High impact"
+          tag={daysUntil(nextCPI.date)}
+          last
         />
       </SurfaceCard>
+
+      {/* Continue learning - its own banner, not another list row */}
+      <Pressable
+        onPress={() =>
+          progress?.continueCourse
+            ? navigation.navigate('Courses', {
+                screen: 'CourseDetail',
+                params: { courseId: progress.continueCourse.id },
+              })
+            : navigation.navigate('Courses', { screen: 'CoursesHome' })
+        }
+        style={({ pressed }) => [styles.learnCard, pressed && styles.pressed]}
+      >
+        <Icon3D name="books" size={52} />
+        <View style={styles.learnText}>
+          <Text style={styles.learnKicker}>
+            {progress?.continueCourse ? 'Continue learning' : 'Start learning'}
+          </Text>
+          <Text style={styles.learnTitle} numberOfLines={1}>
+            {progress?.continueCourse ? progress.continueCourse.title : 'Browse trading courses'}
+          </Text>
+          <View style={styles.learnTrack}>
+            <View
+              style={[
+                styles.learnFill,
+                {
+                  width: `${
+                    progress?.total ? Math.round(((progress.completed ?? 0) / progress.total) * 100) : 0
+                  }%`,
+                },
+              ]}
+            />
+          </View>
+          <Text numeric style={styles.learnMeta}>
+            {progress?.completed ?? 0} of {progress?.total || '—'} courses completed
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+      </Pressable>
 
       <BadgeUnlockedModal badge={celebrate} onClose={dismissCelebration} />
 
@@ -739,8 +842,175 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-  listCard: {
+  carousel: {
+    marginHorizontal: -20,
+  },
+  carouselContent: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  pressed: {
+    transform: [{ scale: 0.97 }],
+  },
+  alertCard: {
+    width: ALERT_CARD_WIDTH,
+    borderRadius: 22,
+    backgroundColor: colors.card,
+    padding: 16,
+  },
+  alertTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  alertPill: {
+    paddingHorizontal: 10,
     paddingVertical: 4,
+    borderRadius: 999,
+  },
+  alertPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+  },
+  alertTitle: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 12,
+  },
+  alertStats: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 12,
+  },
+  alertStat: {
+    flex: 1,
+    backgroundColor: colors.glassTile,
+    borderRadius: 10,
+    paddingVertical: 7,
+    paddingHorizontal: 7,
+  },
+  alertStatLabel: {
+    color: colors.textFaint,
+    fontSize: 11,
+  },
+  alertStatValue: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  alertBody: {
+    color: colors.textMuted,
+    fontSize: 13,
+    marginTop: 12,
+    minHeight: 36,
+  },
+  alertTime: {
+    color: colors.textFaint,
+    fontSize: 12,
+    marginTop: 12,
+  },
+  timelineCard: {
+    paddingVertical: 6,
+  },
+  timelineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 12,
+  },
+  timelineDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.divider,
+  },
+  dateBlock: {
+    width: 50,
+    height: 54,
+    borderRadius: 14,
+    backgroundColor: colors.glassTile,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dateMonth: {
+    color: colors.link,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  dateDay: {
+    color: colors.text,
+    fontSize: 21,
+    lineHeight: 25,
+    fontWeight: '700',
+  },
+  timelineText: {
+    flex: 1,
+  },
+  timelineTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  timelineSubtitle: {
+    color: colors.textFaint,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  countdown: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: colors.glassTile,
+  },
+  countdownSoon: {
+    backgroundColor: 'rgba(46,230,166,0.14)',
+  },
+  countdownText: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  learnCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginTop: 12,
+    borderRadius: 22,
+    backgroundColor: colors.card,
+    padding: 16,
+  },
+  learnText: {
+    flex: 1,
+  },
+  learnKicker: {
+    color: colors.link,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  learnTitle: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  learnTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.surfaceTrack,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+  learnFill: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+  },
+  learnMeta: {
+    color: colors.textFaint,
+    fontSize: 12,
+    marginTop: 6,
   },
   emptyText: {
     color: colors.textMuted,

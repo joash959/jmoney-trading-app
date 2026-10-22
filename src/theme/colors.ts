@@ -11,9 +11,9 @@ export const colors = {
   buttonSecondary: 'rgba(255,255,255,0.07)',
   buttonSecondaryPressed: 'rgba(255,255,255,0.12)',
 
-  // Every card: a deep blue-black, a step above the background - richer
-  // and more "exclusive" than a flat grey.
-  card: '#10131D',
+  // Every card: translucent neutral glass - the backdrop shows through
+  // faintly, with no colour tint of its own.
+  card: 'rgba(28,30,38,0.55)',
   // Edgeless glass: cards and tiles have no outline. Kept as tokens so
   // every surface stays in sync if that ever changes.
   cardBorder: 'transparent',
@@ -54,9 +54,8 @@ export const gradients = {
   premiumGlow: ['rgba(124,58,237,0.35)', 'rgba(47,111,239,0)'] as const,
   // Hero / featured cards: a slightly brighter neutral glass, no tint.
   heroCard: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.025)', 'rgba(255,255,255,0.01)'] as const,
-  // Top-left sheen on every glass card.
-  // A faint cool-blue light across the top of every card.
-  glassSheen: ['rgba(90,130,255,0.09)', 'rgba(90,130,255,0)'] as const,
+  // A faint white light across the top of every glass card.
+  glassSheen: ['rgba(255,255,255,0.06)', 'rgba(255,255,255,0)'] as const,
   whatsapp: ['#34D399', '#128C7E'] as const,
   telegram: ['#3D7BFF', '#2459F0'] as const,
 };

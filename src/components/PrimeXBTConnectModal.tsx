@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   sheet: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     padding: spacing.lg,
     ...shadows.md,

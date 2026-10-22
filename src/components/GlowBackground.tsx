@@ -13,8 +13,8 @@ type GlowSpec = {
 // Two faint, still glows near the top - enough colour for the glass
 // navigation to pick up, calm enough for a finance app.
 const GLOWS: GlowSpec[] = [
-  { x: 0.1, y: 0.04, size: 420, rgb: '47,107,255', alpha: 0.16 },
-  { x: 0.95, y: 0.16, size: 380, rgb: '40,150,255', alpha: 0.12 },
+  { x: 0.1, y: 0.04, size: 420, rgb: '47,107,255', alpha: 0.12 },
+  { x: 0.95, y: 0.16, size: 380, rgb: '40,150,255', alpha: 0.08 },
 ];
 
 const RINGS = 28;
