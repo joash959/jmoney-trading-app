@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
+import Icon3D from './Icon3D';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
@@ -15,6 +16,8 @@ type Props = {
   /** 1st place gets a gradient card + glow instead of a flat tinted tile. */
   featured?: boolean;
   gradient?: readonly [string, string, ...string[]];
+  /** 3D medal shown instead of the line icon. */
+  medal?: 'gold' | 'silver' | 'bronze';
 };
 
 export default function PrizeTile({
@@ -26,6 +29,7 @@ export default function PrizeTile({
   backgroundColor,
   featured,
   gradient,
+  medal,
 }: Props) {
   const content = (
     <>
@@ -39,11 +43,15 @@ export default function PrizeTile({
           },
         ]}
       >
-        <Ionicons
-          name={icon}
-          size={20}
-          color={featured ? colors.text : iconColor}
-        />
+        {medal ? (
+          <Icon3D name={medal} size={30} />
+        ) : (
+          <Ionicons
+            name={icon}
+            size={20}
+            color={featured ? colors.text : iconColor}
+          />
+        )}
       </View>
       <Text style={[styles.label, featured && styles.labelFeatured]}>
         {label}

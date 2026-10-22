@@ -13,6 +13,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import Icon3D from '../components/Icon3D';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -250,9 +251,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       {settings?.show_podium !== false && (
         <View style={[styles.heroCard, styles.cardSpaced]}>
-          <View style={styles.heroIconCircle}>
-            <Ionicons name="trophy-outline" size={20} color={colors.text} />
-          </View>
+          <Icon3D name="trophy" size={44} />
           <Text style={styles.heroTitle}>
             {settings?.competition_name ?? 'Enter The Millionaire League Challenge'}
           </Text>
@@ -263,17 +262,13 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
           <View style={styles.podiumRow}>
             <View style={styles.podiumColumn}>
-              <View style={[styles.podiumMedal, styles.podiumMedalSilver]}>
-                <Ionicons name="trophy-outline" size={18} color="#0A0D16" />
-              </View>
+              <Icon3D name="silver" size={40} style={styles.podiumMedal} />
               <View style={[styles.podiumBar, styles.podiumSilver]}>
                 <Text style={styles.podiumNumber}>2</Text>
               </View>
             </View>
             <View style={styles.podiumColumn}>
-              <View style={[styles.podiumMedal, styles.podiumMedalGold]}>
-                <Ionicons name="trophy-outline" size={20} color="#0A0D16" />
-              </View>
+              <Icon3D name="gold" size={48} style={styles.podiumMedal} />
               <View
                 style={[styles.podiumBar, styles.podiumGold, styles.podiumTall]}
               >
@@ -281,9 +276,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
               </View>
             </View>
             <View style={styles.podiumColumn}>
-              <View style={[styles.podiumMedal, styles.podiumMedalBronze]}>
-                <Ionicons name="trophy-outline" size={18} color="#0A0D16" />
-              </View>
+              <Icon3D name="bronze" size={40} style={styles.podiumMedal} />
               <View style={[styles.podiumBar, styles.podiumBronze]}>
                 <Text style={styles.podiumNumber}>3</Text>
               </View>
@@ -302,6 +295,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           <PrizeTile
             icon="trophy-outline"
             iconColor={GOLD}
+            medal="gold"
             label="1ST PLACE"
             amount={`${currency}${prize1.toLocaleString()}`}
             amountColor={GOLD}
@@ -312,6 +306,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           <PrizeTile
             icon="trophy-outline"
             iconColor={SILVER}
+            medal="silver"
             label="2ND PLACE"
             amount={`${currency}${prize2.toLocaleString()}`}
             amountColor={SILVER}
@@ -320,6 +315,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
           <PrizeTile
             icon="trophy-outline"
             iconColor={BRONZE}
+            medal="bronze"
             label="3RD PLACE"
             amount={`${currency}${prize3.toLocaleString()}`}
             amountColor={BRONZE}
@@ -447,7 +443,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
                 rankIconColor={rankColor(participant.rank)}
                 name={participant.nickname || participant.name}
                 subtitle={participant.name}
-                lots={(participant.total_volume ?? 0).toFixed(2)}
+                lots={(participant.total_volume ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 badge={badge}
               />
             );
@@ -503,21 +499,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   podiumMedal: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  podiumMedalGold: {
-    backgroundColor: GOLD,
-  },
-  podiumMedalSilver: {
-    backgroundColor: SILVER,
-  },
-  podiumMedalBronze: {
-    backgroundColor: BRONZE,
+    marginBottom: 6,
   },
   podiumBar: {
     width: 72,

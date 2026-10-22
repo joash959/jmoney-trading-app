@@ -1,0 +1,42 @@
+import type { Icon3DName } from '../components/Icon3D';
+
+/** Line icon name -> its 3D counterpart. Icon badges and tiles look this up
+ * so every feature icon becomes 3D without touching each screen; names
+ * missing here (utility glyphs like trash, refresh) stay as line icons. */
+export const ICON_3D: Record<string, Icon3DName> = {
+  'add': 'journal',
+  'create-outline': 'journal',
+  'bookmark-outline': 'journal',
+  'scan-outline': 'scanner',
+  'locate-outline': 'target',
+  'stats-chart-outline': 'analysis',
+  'bar-chart-outline': 'analysis',
+  'trending-up': 'chart-up',
+  'trending-up-outline': 'chart-up',
+  'trending-down': 'chart-down',
+  'trending-down-outline': 'chart-down',
+  'paper-plane-outline': 'telegram',
+  'trophy-outline': 'trophy',
+  'school-outline': 'courses',
+  'book-outline': 'books',
+  'videocam-outline': 'live',
+  'flash-outline': 'alerts',
+  'notifications-outline': 'bell',
+  'briefcase-outline': 'briefcase',
+  'pricetags-outline': 'tag',
+  'link-outline': 'link',
+  'checkmark': 'check',
+  'checkmark-outline': 'check',
+  'checkmark-circle-outline': 'check',
+  'chatbubbles-outline': 'chat',
+  'call-outline': 'chat',
+  'headset-outline': 'chat',
+  'lock-closed-outline': 'lock',
+  'calendar-outline': 'calendar',
+  'log-out-outline': 'wave',
+  'open-outline': 'rocket',
+  'star-outline': 'star',
+  'diamond-outline': 'gem',
+  'card-outline': 'money-bag',
+  'globe-outline': 'bank',
+};

@@ -26,6 +26,12 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import GradientLinkCard from '../components/GradientLinkCard';
 import type { IoniconName } from '../components/IconBadge';
 import LevelCard from '../components/LevelCard';
+import DailyMissions from '../components/DailyMissions';
+import BadgeUnlockedModal from '../components/BadgeUnlockedModal';
+import { useBadgeUnlocks } from '../hooks/useBadgeUnlocks';
+import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
+import Icon3D from '../components/Icon3D';
+import { ICON_3D } from '../lib/icon3dMap';
 import XpToast, { XpToastHandle } from '../components/XpToast';
 import { useGameStats } from '../hooks/useGameStats';
 import { XP } from '../lib/gamification';
@@ -139,6 +145,8 @@ export default function HomeScreen({ navigation }: Props) {
   const connect = usePrimeXBTConnect();
   const [refreshing, setRefreshing] = useState(false);
   const { stats: gameStats, refresh: refreshGame } = useGameStats();
+  const { celebrate, dismiss: dismissCelebration } = useBadgeUnlocks(gameStats, userId);
+  const { unseenCount: unseenAlerts } = useAlertsBadge();
   const xpToast = useRef<XpToastHandle>(null);
   const [hideBalance, setHideBalance] = useState(false);
   const [range, setRange] = useState<RangeKey>('1M');
@@ -400,13 +408,42 @@ export default function HomeScreen({ navigation }: Props) {
               action.onPress();
             }}
           >
-            <LiquidGlass style={styles.actionGlass} tint={colors.primaryDim} interactive>
-              <Ionicons name={action.icon} size={24} color={colors.primary} />
+            <LiquidGlass style={styles.actionGlass} interactive>
+              <Icon3D name={ICON_3D[action.icon] ?? 'star'} size={34} />
             </LiquidGlass>
             <Text style={styles.actionLabel}>{action.label}</Text>
           </Pressable>
         ))}
       </View>
+
+      <DailyMissions
+        style={styles.cardSpaced}
+        missions={[
+          {
+            key: 'log',
+            icon: 'journal',
+            title: "Log today's trades",
+            xp: XP.journalEntry,
+            done: !!gameStats?.loggedToday,
+            onPress: () => goMore('TradingJournal'),
+          },
+          {
+            key: 'vote',
+            icon: 'ballot',
+            title: 'Vote in the market poll',
+            xp: XP.pollVote,
+            done: !!gameStats?.votedToday,
+          },
+          {
+            key: 'alerts',
+            icon: 'alerts',
+            title: 'Catch up on trade alerts',
+            xp: 0,
+            done: unseenAlerts === 0,
+            onPress: () => navigation.navigate('Alerts'),
+          },
+        ]}
+      />
 
       {!isPremium && (
         <GradientLinkCard
@@ -519,6 +556,8 @@ export default function HomeScreen({ navigation }: Props) {
           divider={false}
         />
       </SurfaceCard>
+
+      <BadgeUnlockedModal badge={celebrate} onClose={dismissCelebration} />
 
       <PrimeXBTConnectModal
         visible={connect.visible}

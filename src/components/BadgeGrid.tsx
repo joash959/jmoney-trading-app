@@ -3,6 +3,7 @@ import Text from './AppText';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import type { Badge } from '../lib/gamification';
+import Icon3D from './Icon3D';
 
 /** Achievement grid: unlocked badges in full colour, locked ones dimmed
  * with a progress bar towards unlocking. */
@@ -12,7 +13,7 @@ export default function BadgeGrid({ badges }: { badges: Badge[] }) {
       {badges.map((badge) => (
         <View key={badge.key} style={[styles.tile, badge.unlocked && styles.tileUnlocked]}>
           <View style={[styles.emojiWrap, badge.unlocked && styles.emojiWrapUnlocked]}>
-            <Text style={[styles.emoji, !badge.unlocked && styles.emojiLocked]}>{badge.emoji}</Text>
+            <Icon3D name={badge.icon} size={34} muted={!badge.unlocked} />
           </View>
           <Text style={[styles.title, !badge.unlocked && styles.titleLocked]} numberOfLines={1}>
             {badge.title}
@@ -59,12 +60,6 @@ const styles = StyleSheet.create({
   },
   emojiWrapUnlocked: {
     backgroundColor: 'rgba(47,107,255,0.22)',
-  },
-  emoji: {
-    fontSize: 28,
-  },
-  emojiLocked: {
-    opacity: 0.35,
   },
   title: {
     color: colors.text,

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import Text from './AppText';
 import { colors, gradients } from '../theme/colors';
+import Icon3D from './Icon3D';
 
 export type XpToastHandle = { show: (amount: number, label?: string) => void };
 
@@ -40,7 +41,7 @@ const XpToast = forwardRef<XpToastHandle>(function XpToast(_, ref) {
       ]}
     >
       <LinearGradient colors={gradients.button} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.pill}>
-        <Text style={styles.star}>⭐</Text>
+        <Icon3D name="star" size={24} />
         <Text numeric style={styles.amount}>+{content.amount} XP</Text>
         {!!content.label && <Text style={styles.label}>{content.label}</Text>}
       </LinearGradient>
@@ -71,9 +72,6 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
     elevation: 10,
-  },
-  star: {
-    fontSize: 18,
   },
   amount: {
     color: colors.text,

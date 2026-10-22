@@ -5,6 +5,7 @@ import Text from './AppText';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import type { GameStats } from '../lib/gamification';
+import Icon3D from './Icon3D';
 
 type Props = {
   stats: GameStats | null;
@@ -69,7 +70,7 @@ export default function LevelCard({ stats, onPress, style }: Props) {
           </Text>
         </View>
         <View style={[styles.streak, (stats?.streak ?? 0) > 0 && styles.streakActive]}>
-          <Text style={styles.streakEmoji}>🔥</Text>
+          <Icon3D name="fire" size={28} muted={(stats?.streak ?? 0) === 0} />
           <Text numeric style={styles.streakNumber}>
             {stats?.streak ?? 0}
           </Text>
@@ -78,13 +79,19 @@ export default function LevelCard({ stats, onPress, style }: Props) {
       </View>
 
       <View style={styles.bottomRow}>
-        <Text style={styles.badgeCount}>
-          🏆 {unlocked}/{stats?.badges.length ?? 8} badges
-        </Text>
-        {nextBadge && (
-          <Text style={styles.nextBadge} numberOfLines={1}>
-            Next: {nextBadge.emoji} {nextBadge.title} · {Math.round(nextBadge.progress * 100)}%
+        <View style={styles.badgeCountRow}>
+          <Icon3D name="trophy" size={20} />
+          <Text style={styles.badgeCount}>
+            {unlocked}/{stats?.badges.length ?? 8} badges
           </Text>
+        </View>
+        {nextBadge && (
+          <View style={styles.nextBadgeRow}>
+            <Icon3D name={nextBadge.icon} size={18} />
+            <Text style={styles.nextBadge} numberOfLines={1}>
+              {nextBadge.title} · {Math.round(nextBadge.progress * 100)}%
+            </Text>
+          </View>
         )}
       </View>
     </Pressable>
@@ -165,9 +172,6 @@ const styles = StyleSheet.create({
   streakActive: {
     backgroundColor: 'rgba(255,140,40,0.14)',
   },
-  streakEmoji: {
-    fontSize: 20,
-  },
   streakNumber: {
     color: colors.text,
     fontSize: 18,
@@ -187,6 +191,17 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: colors.divider,
+  },
+  badgeCountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  nextBadgeRow: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   badgeCount: {
     color: colors.textMuted,

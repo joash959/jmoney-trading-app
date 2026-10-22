@@ -19,18 +19,19 @@ export function useGameStats() {
         .select('trade_date, profit_loss')
         .eq('user_id', userId),
       supabase.from('user_course_progress').select('completed_at').eq('user_id', userId),
-      supabase
-        .from('market_sentiment_votes')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId),
+      supabase.from('market_sentiment_votes').select('vote_date').eq('user_id', userId),
     ]);
     const progress = (progressRes.data ?? []) as { completed_at: string | null }[];
+    const votes = (votesRes.data ?? []) as { vote_date: string }[];
+    // Same "today" the poll uses when it saves a vote (UTC date).
+    const today = new Date().toISOString().slice(0, 10);
     setStats(
       computeGameStats({
         entries: (journalRes.data ?? []) as { trade_date: string; profit_loss: number }[],
         coursesStarted: progress.length,
         coursesCompleted: progress.filter((p) => p.completed_at).length,
-        pollVotes: votesRes.count ?? 0,
+        pollVotes: votes.length,
+        votedToday: votes.some((v) => v.vote_date === today),
       })
     );
   }, [userId]);

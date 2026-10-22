@@ -1,3 +1,5 @@
+import type { Icon3DName } from '../components/Icon3D';
+
 // Levels, XP, streaks and badges - all derived from data the app already
 // stores (journal entries, course progress, sentiment votes), so there's
 // nothing extra to save or keep in sync.
@@ -8,11 +10,13 @@ export type GameInput = {
   coursesStarted: number;
   coursesCompleted: number;
   pollVotes: number;
+  /** Voted in today's poll. */
+  votedToday?: boolean;
 };
 
 export type Badge = {
   key: string;
-  emoji: string;
+  icon: Icon3DName;
   title: string;
   description: string;
   unlocked: boolean;
@@ -30,6 +34,9 @@ export type GameStats = {
   /** Consecutive trading days (weekdays) logged, ending today or the last trading day. */
   streak: number;
   badges: Badge[];
+  /** Daily missions state. */
+  loggedToday: boolean;
+  votedToday: boolean;
 };
 
 export const XP = {
@@ -108,14 +115,14 @@ export function computeGameStats(input: GameInput): GameStats {
 
   const badge = (
     key: string,
-    emoji: string,
+    icon: Icon3DName,
     title: string,
     description: string,
     value: number,
     target: number
   ): Badge => ({
     key,
-    emoji,
+    icon,
     title,
     description,
     unlocked: value >= target,
@@ -123,14 +130,14 @@ export function computeGameStats(input: GameInput): GameStats {
   });
 
   const badges = [
-    badge('first-trade', '📝', 'First entry', 'Log your first trade', input.entries.length, 1),
-    badge('green-day', '💚', 'Green day', 'Finish a day in profit', greenDays, 1),
-    badge('on-fire', '🔥', 'On fire', '5-day journal streak', streak, 5),
-    badge('consistent', '📅', 'Consistent', 'Log 20 trading days', days.size, 20),
-    badge('student', '🎓', 'Student', 'Start a course', input.coursesStarted, 1),
-    badge('graduate', '🏅', 'Graduate', 'Complete a course', input.coursesCompleted, 1),
-    badge('market-voice', '🗳️', 'Market voice', 'Vote in 5 sentiment polls', input.pollVotes, 5),
-    badge('profitable-month', '💰', 'Profitable month', 'End this month in profit', monthPnl > 0 ? 1 : 0, 1),
+    badge('first-trade', 'journal', 'First entry', 'Log your first trade', input.entries.length, 1),
+    badge('green-day', 'green-heart', 'Green day', 'Finish a day in profit', greenDays, 1),
+    badge('on-fire', 'fire', 'On fire', '5-day journal streak', streak, 5),
+    badge('consistent', 'calendar', 'Consistent', 'Log 20 trading days', days.size, 20),
+    badge('student', 'courses', 'Student', 'Start a course', input.coursesStarted, 1),
+    badge('graduate', 'medal', 'Graduate', 'Complete a course', input.coursesCompleted, 1),
+    badge('market-voice', 'ballot', 'Market voice', 'Vote in 5 sentiment polls', input.pollVotes, 5),
+    badge('profitable-month', 'money-bag', 'Profitable month', 'End this month in profit', monthPnl > 0 ? 1 : 0, 1),
   ];
 
   return {
@@ -141,5 +148,7 @@ export function computeGameStats(input: GameInput): GameStats {
     levelCeil: next ? next.at : LEVELS[levelIndex].at,
     streak,
     badges,
+    loggedToday: days.has(toISO(now)),
+    votedToday: !!input.votedToday,
   };
 }

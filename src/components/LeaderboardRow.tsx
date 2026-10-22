@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
+import Icon3D from './Icon3D';
 import { colors } from '../theme/colors';
 
 type Badge =
@@ -31,7 +32,7 @@ export default function LeaderboardRow({
     <View style={styles.row}>
       <View style={styles.rankColumn}>
         {isTopThree ? (
-          <Ionicons name="trophy-outline" size={22} color={rankIconColor} />
+          <Icon3D name={rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze'} size={30} />
         ) : (
           <View style={styles.rankBadge}>
             <Text style={styles.rankBadgeText}>{rank ?? '—'}</Text>
@@ -71,7 +72,7 @@ export default function LeaderboardRow({
 
       <View style={styles.lotsColumn}>
         <Text numeric style={styles.lotsValue}>{lots}</Text>
-        <Text style={styles.lotsLabel}>LOTS</Text>
+        <Text style={styles.lotsLabel}>lots</Text>
       </View>
     </View>
   );

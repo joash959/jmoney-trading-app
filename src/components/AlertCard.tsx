@@ -8,6 +8,7 @@ import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { detectAlertDirection, parseAlertFields } from '../lib/tradeAlertParser';
 import GlassSheen from './GlassSheen';
+import Icon3D from './Icon3D';
 
 type Props = {
   message: string;
@@ -61,13 +62,12 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
         <View
           style={[
             styles.directionIcon,
-            { backgroundColor: colors.primaryDim },
+            { backgroundColor: colors.glassTile },
           ]}
         >
-          <Ionicons
-            name={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
-            size={18}
-            color={colors.primary}
+          <Icon3D
+            name={direction === 'long' ? 'chart-up' : direction === 'short' ? 'chart-down' : 'alerts'}
+            size={28}
           />
         </View>
         <View style={styles.titleCol}>

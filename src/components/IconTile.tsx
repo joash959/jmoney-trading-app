@@ -4,6 +4,8 @@ import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import LiquidGlass from './LiquidGlass';
+import Icon3D from './Icon3D';
+import { ICON_3D } from '../lib/icon3dMap';
 import type { IoniconName } from './IconBadge';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -29,7 +31,11 @@ export default function IconTile({ icon, label, onPress, style }: Props) {
       onPress={handlePress}
     >
       <LiquidGlass style={styles.glass} interactive>
-        <Ionicons name={icon} size={22} color={colors.text} />
+        {ICON_3D[icon] ? (
+          <Icon3D name={ICON_3D[icon]} size={34} />
+        ) : (
+          <Ionicons name={icon} size={22} color={colors.text} />
+        )}
         <Text style={styles.label} numberOfLines={1}>
           {label}
         </Text>
