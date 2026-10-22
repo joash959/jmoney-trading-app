@@ -14,34 +14,38 @@ import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import SurfaceCard from '../components/SurfaceCard';
-import GradientLinkCard from '../components/GradientLinkCard';
-import InsightCard from '../components/InsightCard';
 import PrimaryButton from '../components/PrimaryButton';
-import RatingCard from '../components/RatingCard';
-import FeatureCard from '../components/FeatureCard';
 import EmptyStateCard from '../components/EmptyStateCard';
+import Icon3D, { Icon3DName } from '../components/Icon3D';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'RecommendedBroker'>;
 
 const STATS = [
-  { icon: 'time-outline' as const, value: '2018+', label: 'Operating Since' },
-  { icon: 'trending-up-outline' as const, value: '100+', label: 'Markets' },
-  { icon: 'flash-outline' as const, value: '1:1000', label: 'Max Leverage' },
-  { icon: 'headset-outline' as const, value: '24/7', label: 'Support' },
+  { value: '2018', label: 'Founded' },
+  { value: '100+', label: 'Markets' },
+  { value: '1:1000', label: 'Max leverage' },
+  { value: '24/7', label: 'Support' },
 ];
 
 const RATINGS = [
-  { name: 'Trustpilot', rating: '4.5/5' },
-  { name: 'Google Reviews', rating: '4.4/5' },
-  { name: 'TradingView', rating: '4.2/5' },
+  { name: 'Trustpilot', rating: '4.5' },
+  { name: 'Google', rating: '4.4' },
+  { name: 'TradingView', rating: '4.2' },
 ];
 
-const ASSET_CLASSES = [
-  { title: 'Crypto', description: 'Bitcoin, Ethereum, altcoins & more' },
-  { title: 'Forex', description: 'Major, minor and exotic pairs' },
-  { title: 'Indices', description: 'US, Europe and Asia stock indices' },
-  { title: 'Commodities', description: 'Gold, oil, silver and energies' },
+const MARKETS: { icon: Icon3DName; title: string; description: string }[] = [
+  { icon: 'gem', title: 'Crypto', description: 'BTC, ETH & more' },
+  { icon: 'bank', title: 'Forex', description: 'Majors & minors' },
+  { icon: 'chart-up', title: 'Indices', description: 'US, EU & Asia' },
+  { icon: 'money-bag', title: 'Commodities', description: 'Gold, oil & more' },
+];
+
+const REASONS = [
+  'Crypto, forex, indices and commodities in one account',
+  'Professional TradingView charts and analysis tools',
+  'Fund with crypto, card or local payment methods',
+  'Trade on the web, the PrimeXBT app or MetaTrader 5',
 ];
 
 const AFFILIATE_LINK =
@@ -139,6 +143,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         title="Recommended broker"
       />
 
+      {/* The broker at a glance: who, key numbers, and the one action. */}
       <SurfaceCard style={styles.cardSpaced}>
         <View style={styles.brokerHeader}>
           <Image
@@ -147,153 +152,91 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
             resizeMode="contain"
           />
           <View style={styles.brokerHeaderText}>
-            <Text style={styles.brokerName}>PrimeXBT Trading Broker</Text>
-            <Text style={styles.brokerTagline}>
-              Premium conditions for active traders
-            </Text>
+            <Text style={styles.brokerName}>PrimeXBT</Text>
+            <View style={styles.partnerRow}>
+              <Ionicons name="shield-checkmark" size={14} color={colors.accentGreen} />
+              <Text style={styles.partnerText}>Official JMONEY partner</Text>
+            </View>
           </View>
         </View>
 
         <Text style={styles.brokerDescription}>
-          Trade crypto, forex, indices and commodities with powerful tools
-          and competitive conditions.
+          Trade crypto, forex, indices and commodities with powerful tools and
+          competitive conditions.
         </Text>
 
-        <View style={styles.badgeRow}>
-          <View style={styles.badgePill}>
-            <Ionicons name="trophy-outline" size={13} color={colors.textMuted} />
-            <Text style={styles.badgeText}>Official Partner</Text>
+        <View style={styles.statsRow}>
+          {STATS.map((stat, i) => (
+            <View key={stat.label} style={[styles.stat, i > 0 && styles.statDivider]}>
+              <Text numeric style={styles.statValue}>
+                {stat.value}
+              </Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        <PrimaryButton
+          label="Open a PrimeXBT account"
+          icon="open-outline"
+          onPress={openAffiliateLink}
+          style={styles.cardSpaced}
+        />
+      </SurfaceCard>
+
+      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>Rated by traders</Text>
+      <SurfaceCard style={[styles.fieldSpaced, styles.ratingsCard]}>
+        {RATINGS.map((r, i) => (
+          <View key={r.name} style={[styles.rating, i > 0 && styles.statDivider]}>
+            <View style={styles.ratingValueRow}>
+              <Ionicons name="star" size={15} color={colors.warning} />
+              <Text numeric style={styles.ratingValue}>
+                {r.rating}
+              </Text>
+            </View>
+            <Text style={styles.statLabel}>{r.name}</Text>
           </View>
-          <View style={styles.badgePill}>
-            <Ionicons name="shield-outline" size={13} color={colors.textMuted} />
-            <Text style={styles.badgeText}>Secure Platform</Text>
-          </View>
+        ))}
+      </SurfaceCard>
+
+      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>What you can trade</Text>
+      <SurfaceCard style={styles.fieldSpaced}>
+        <View style={styles.marketGrid}>
+          {MARKETS.map((m) => (
+            <View key={m.title} style={styles.market}>
+              <Icon3D name={m.icon} size={34} />
+              <View style={styles.marketText}>
+                <Text style={styles.marketTitle}>{m.title}</Text>
+                <Text style={styles.marketDescription} numberOfLines={1}>
+                  {m.description}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
       </SurfaceCard>
 
-      <GradientLinkCard
-        title="Open a PrimeXBT Account"
-        subtitle="Trade crypto, forex, indices & commodities"
+      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>Why PrimeXBT</Text>
+      <SurfaceCard style={styles.fieldSpaced}>
+        {REASONS.map((reason, i) => (
+          <View key={reason} style={[styles.reason, i > 0 && styles.reasonDivider]}>
+            <View style={styles.check}>
+              <Ionicons name="checkmark" size={14} color={colors.accentGreen} />
+            </View>
+            <Text style={styles.reasonText}>{reason}</Text>
+          </View>
+        ))}
+      </SurfaceCard>
+
+      <PrimaryButton
+        label="Open live account"
         icon="open-outline"
         onPress={openAffiliateLink}
-        style={styles.cardSpaced}
+        style={styles.sectionSpaced}
       />
-
-      <View style={[styles.row, styles.cardSpaced]}>
-        {STATS.slice(0, 2).map((stat) => (
-          <InsightCard
-            key={stat.label}
-            variant="gradient"
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-          />
-        ))}
-      </View>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        {STATS.slice(2, 4).map((stat) => (
-          <InsightCard
-            key={stat.label}
-            variant="gradient"
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-          />
-        ))}
-      </View>
-
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
-        Trusted by Traders Worldwide
+      <Text style={styles.footnote}>
+        Trading involves risk. Only trade what you can afford to lose.
       </Text>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        {RATINGS.map((r) => (
-          <RatingCard key={r.name} name={r.name} rating={r.rating} />
-        ))}
-      </View>
-
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
-        Why Choose PrimeXBT?
-      </Text>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        <FeatureCard
-          icon="globe-outline"
-          title="All-in-One Platform"
-          description="Trade crypto, forex, indices and commodities from a single account."
-        />
-        <FeatureCard
-          icon="bar-chart-outline"
-          title="Advanced Charting"
-          description="Professional TradingView charts and technical analysis tools."
-        />
-      </View>
-      <FeatureCard
-        icon="card-outline"
-        title="Easy Funding"
-        description="Fund via crypto, card, or local payment methods quickly."
-        style={styles.fieldSpaced}
-      />
-
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
-        100+ Trading Opportunities
-      </Text>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        <FeatureCard
-          title={ASSET_CLASSES[0].title}
-          description={ASSET_CLASSES[0].description}
-          align="center"
-        />
-        <FeatureCard
-          title={ASSET_CLASSES[1].title}
-          description={ASSET_CLASSES[1].description}
-          align="center"
-        />
-      </View>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        <FeatureCard
-          title={ASSET_CLASSES[2].title}
-          description={ASSET_CLASSES[2].description}
-          align="center"
-        />
-        <FeatureCard
-          title={ASSET_CLASSES[3].title}
-          description={ASSET_CLASSES[3].description}
-          align="center"
-        />
-      </View>
-
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>
-        Trading Platforms
-      </Text>
-      <View style={[styles.row, styles.fieldSpaced]}>
-        <FeatureCard
-          title="PrimeXBT Web"
-          description="Full-featured trading from your browser"
-        />
-        <FeatureCard
-          title="PrimeXBT Mobile App"
-          description="Trade and manage positions on the go"
-        />
-      </View>
-      <FeatureCard
-        title="MetaTrader 5"
-        description="Advanced charting and automated trading"
-        style={styles.fieldSpaced}
-      />
-
-      <SurfaceCard style={[styles.cardSpaced, styles.ctaCard]}>
-        <Ionicons name="globe-outline" size={30} color={colors.link} />
-        <Text style={styles.ctaTitle}>Ready to Start Trading?</Text>
-        <Text style={styles.ctaDescription}>
-          Join thousands of active traders on PrimeXBT. Open your account
-          today and start your trading journey.
-        </Text>
-        <PrimaryButton
-          label="Open Live Account"
-          icon="open-outline"
-          onPress={openAffiliateLink}
-          style={styles.fieldSpaced}
-        />
-      </SurfaceCard>
     </ScreenShell>
   );
 }
@@ -302,82 +245,148 @@ const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
   },
+  fieldSpaced: {
+    marginTop: 12,
+  },
+  sectionSpaced: {
+    marginTop: 28,
+  },
   brokerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
   },
   brokerLogo: {
-    width: 52,
-    height: 52,
+    width: 56,
+    height: 56,
   },
   brokerHeaderText: {
     flex: 1,
   },
   brokerName: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '800',
   },
-  brokerTagline: {
-    color: colors.textMuted,
+  partnerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  partnerText: {
+    color: colors.accentGreen,
     fontSize: 13,
-    marginTop: 2,
+    fontWeight: '600',
   },
   brokerDescription: {
     color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
-    marginTop: 16,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 10,
     marginTop: 14,
   },
-  badgePill: {
+  statsRow: {
     flexDirection: 'row',
+    marginTop: 18,
+    paddingVertical: 14,
+    borderRadius: 16,
+    backgroundColor: colors.glassTile,
+  },
+  stat: {
+    flex: 1,
     alignItems: 'center',
-    gap: 6,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
   },
-  badgeText: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '600',
+  statDivider: {
+    borderLeftWidth: 1,
+    borderLeftColor: colors.divider,
   },
-  fieldSpaced: {
-    marginTop: 14,
+  statValue: {
+    color: colors.text,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  statLabel: {
+    color: colors.textFaint,
+    fontSize: 11,
+    marginTop: 3,
+    textAlign: 'center',
   },
   sectionTitle: {
     color: colors.text,
     fontSize: 18,
     fontWeight: '800',
   },
-  sectionSpaced: {
-    marginTop: 28,
-  },
-  row: {
+  ratingsCard: {
     flexDirection: 'row',
-    gap: 12,
+    paddingVertical: 16,
   },
-  ctaCard: {
+  rating: {
+    flex: 1,
     alignItems: 'center',
-    paddingVertical: 28,
   },
-  ctaTitle: {
+  ratingValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  ratingValue: {
     color: colors.text,
-    fontSize: 19,
-    fontWeight: '800',
-    marginTop: 12,
+    fontSize: 20,
+    fontWeight: '700',
   },
-  ctaDescription: {
+  marketGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: 16,
+  },
+  market: {
+    width: '50%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingRight: 8,
+  },
+  marketText: {
+    flex: 1,
+  },
+  marketTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  marketDescription: {
+    color: colors.textFaint,
+    fontSize: 12,
+    marginTop: 1,
+  },
+  reason: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+  },
+  reasonDivider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  check: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(46,230,166,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reasonText: {
+    flex: 1,
     color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  footnote: {
+    color: colors.textFaint,
+    fontSize: 12,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 12,
   },
 });
