@@ -10,13 +10,13 @@ import {
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
-import { spacing } from '../theme/spacing';
 import FormInput from './FormInput';
 import PrimaryButton from './PrimaryButton';
-import SecondaryButton from './SecondaryButton';
+import Icon3D, { Icon3DName } from './Icon3D';
+import GlassSheen from './GlassSheen';
 
 type Props = {
   visible: boolean;
@@ -33,6 +33,17 @@ type Props = {
   confirmLabel?: string;
 };
 
+const AFFILIATE_LINK = 'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt';
+
+// What premium opens up - shown to members who are upgrading, not to
+// premium members switching accounts.
+const PERKS: { icon: Icon3DName; label: string }[] = [
+  { icon: 'alerts', label: 'Trade alerts' },
+  { icon: 'live', label: 'Live sessions' },
+  { icon: 'crown', label: 'Premium channels' },
+];
+
+/** Bottom sheet that links a PrimeXBT client ID to unlock premium. */
 export default function PrimeXBTConnectModal({
   visible,
   onClose,
@@ -42,11 +53,13 @@ export default function PrimeXBTConnectModal({
   loading,
   successMessage,
   errorMessage,
-  title = 'Connect your PrimeXBT account',
-  description = 'Enter your PrimeXBT client ID to unlock premium features instantly. Your account needs a minimum deposit of R500.',
+  title,
+  description,
   confirmLabel = 'Connect & unlock premium',
 }: Props) {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
+  const reconnecting = !!title;
 
   const openSupport = () => {
     onClose();
@@ -65,67 +78,100 @@ export default function PrimeXBTConnectModal({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <Pressable style={styles.backdrop} onPress={onClose}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.headerRow}>
-              <View style={styles.cardHeadingRow}>
-                <Ionicons name="shield-outline" size={18} color={colors.text} />
-                <Text style={styles.title}>{title}</Text>
-              </View>
-              <Pressable onPress={onClose} hitSlop={12}>
-                <Ionicons name="close-outline" size={22} color={colors.textFaint} />
-              </Pressable>
+          <Pressable
+            style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) + 8 }]}
+            onPress={() => {}}
+          >
+            <GlassSheen />
+            <View style={styles.handle} />
+            <Pressable onPress={onClose} hitSlop={12} style={styles.close}>
+              <Ionicons name="close" size={18} color={colors.textMuted} />
+            </Pressable>
+
+            <View style={styles.hero}>
+              <Icon3D name={reconnecting ? 'link' : 'gem'} size={64} />
+              <Text style={styles.title}>{title ?? 'Unlock Premium'}</Text>
+              <Text style={styles.description}>
+                {description ??
+                  'Link your funded PrimeXBT account and premium switches on instantly.'}
+              </Text>
             </View>
 
-            <Text style={styles.description}>{description}</Text>
+            {!reconnecting && (
+              <>
+                <View style={styles.perks}>
+                  {PERKS.map((perk) => (
+                    <View key={perk.label} style={styles.perk}>
+                      <Icon3D name={perk.icon} size={30} />
+                      <Text style={styles.perkLabel}>{perk.label}</Text>
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.requirement}>
+                  <Ionicons name="information-circle" size={16} color={colors.warning} />
+                  <Text style={styles.requirementText}>
+                    Requires a minimum deposit of <Text style={styles.requirementBold}>R500</Text>
+                  </Text>
+                </View>
+              </>
+            )}
 
             <FormInput
-              label="PRIMEXBT CLIENT ID"
+              label="PrimeXBT client ID"
+              icon="person-circle-outline"
               value={clientId}
               onChangeText={onChangeClientId}
               placeholder="e.g. 2629398"
               keyboardType="number-pad"
-              containerStyle={styles.fieldSpaced}
+              containerStyle={styles.field}
             />
             <Text style={styles.helperText}>
-              Use your <Text style={styles.helperBold}>PrimeXBT client ID</Text>{' '}
-              (7 digits, usually starting with 26), found in the PrimeXBT app
-              under Profile / Account settings.
+              7 digits, usually starting with 26. Find it in the PrimeXBT app
+              under Profile → Account settings.
             </Text>
 
             {successMessage && (
-              <Text style={styles.successText}>{successMessage}</Text>
+              <View style={[styles.message, styles.messageSuccess]}>
+                <Ionicons name="checkmark-circle" size={16} color={colors.accentGreen} />
+                <Text style={[styles.messageText, { color: colors.accentGreen }]}>
+                  {successMessage}
+                </Text>
+              </View>
             )}
             {errorMessage && (
-              <Text style={styles.errorText}>{errorMessage}</Text>
+              <View style={[styles.message, styles.messageError]}>
+                <Ionicons name="alert-circle" size={16} color={colors.accentRed} />
+                <Text style={[styles.messageText, { color: colors.accentRed }]}>
+                  {errorMessage}
+                </Text>
+              </View>
             )}
 
             <PrimaryButton
               label={loading ? 'Checking...' : confirmLabel}
-              icon="shield-outline"
-              variant="flat"
-              disabled={clientId.trim().length === 0 || loading}
+              icon={null}
+              loading={loading}
+              disabled={clientId.trim().length === 0}
               onPress={onConnect}
-              style={styles.fieldSpaced}
-            />
-            <SecondaryButton
-              label="Don't have an account? Open & fund PrimeXBT"
-              icon="open-outline"
-              onPress={() =>
-                Linking.openURL(
-                  'https://go.primexbt.direct/visit/?bta=53738&brand=primexbt'
-                )
-              }
-              style={styles.fieldSpaced}
+              style={styles.button}
             />
 
             <Pressable
-              onPress={openSupport}
-              style={({ pressed }) => [
-                styles.supportRow,
-                pressed && styles.supportRowPressed,
-              ]}
+              onPress={() => Linking.openURL(AFFILIATE_LINK)}
+              hitSlop={6}
+              style={({ pressed }) => [styles.linkRow, pressed && styles.pressed]}
             >
-              <Ionicons name="paper-plane-outline" size={14} color={colors.link} />
+              <Text style={styles.linkMuted}>New to PrimeXBT? </Text>
+              <Text style={styles.link}>Open & fund an account</Text>
+              <Ionicons name="open-outline" size={14} color={colors.link} />
+            </Pressable>
+
+            <Pressable
+              onPress={openSupport}
+              hitSlop={6}
+              style={({ pressed }) => [styles.supportRow, pressed && styles.pressed]}
+            >
+              <Ionicons name="paper-plane-outline" size={13} color={colors.textFaint} />
               <Text style={styles.supportText}>Need help? Contact support on Telegram</Text>
             </Pressable>
           </Pressable>
@@ -142,40 +188,88 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: colors.overlay,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
+    justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: colors.surface,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    ...shadows.md,
+    borderTopLeftRadius: radius['2xl'],
+    borderTopRightRadius: radius['2xl'],
+    paddingHorizontal: 22,
+    paddingTop: 10,
+    overflow: 'hidden',
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  handle: {
+    alignSelf: 'center',
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.borderStrong,
   },
-  cardHeadingRow: {
-    flexDirection: 'row',
+  close: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.glassTile,
     alignItems: 'center',
-    gap: 10,
-    flex: 1,
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  hero: {
+    alignItems: 'center',
+    marginTop: 14,
   },
   title: {
-    flex: 1,
     color: colors.text,
-    fontSize: 17,
+    fontSize: 24,
     fontWeight: '800',
+    textAlign: 'center',
+    marginTop: 10,
   },
   description: {
     color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: 6,
+    paddingHorizontal: 8,
   },
-  fieldSpaced: {
-    marginTop: 16,
+  perks: {
+    flexDirection: 'row',
+    marginTop: 18,
+    paddingVertical: 14,
+    borderRadius: radius.lg,
+    backgroundColor: colors.glassTile,
+  },
+  perk: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+  },
+  perkLabel: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  requirement: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+  },
+  requirementText: {
+    color: colors.textMuted,
+    fontSize: 13,
+  },
+  requirementBold: {
+    color: colors.warning,
+    fontWeight: '700',
+  },
+  field: {
+    marginTop: 18,
   },
   helperText: {
     color: colors.textFaint,
@@ -183,35 +277,57 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     marginTop: 8,
   },
-  helperBold: {
+  message: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 14,
+  },
+  messageSuccess: {
+    backgroundColor: 'rgba(46,230,166,0.1)',
+  },
+  messageError: {
+    backgroundColor: 'rgba(255,77,106,0.1)',
+  },
+  messageText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  button: {
+    marginTop: 18,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 16,
+  },
+  linkMuted: {
     color: colors.textMuted,
-    fontWeight: '700',
+    fontSize: 14,
   },
-  successText: {
-    color: colors.accentGreen,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 14,
-  },
-  errorText: {
-    color: colors.accentRed,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 14,
+  link: {
+    color: colors.link,
+    fontSize: 14,
+    fontWeight: '600',
   },
   supportRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 16,
-  },
-  supportRowPressed: {
-    opacity: 0.7,
+    marginTop: 14,
   },
   supportText: {
-    color: colors.link,
-    fontSize: 13,
-    fontWeight: '600',
+    color: colors.textFaint,
+    fontSize: 12,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
