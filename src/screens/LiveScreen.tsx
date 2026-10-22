@@ -148,9 +148,15 @@ export default function LiveScreen({ navigation }: Props) {
   };
 
   const now = new Date();
-  const upcoming = sessions.filter(
-    (session) => new Date(`${session.session_date}T${session.session_time ?? '23:59:59'}`) >= now
-  );
+  // A session stays listed until it ends (start + duration, default an
+  // hour), so one that's running right now is still there to join.
+  const startOf = (session: LiveSession) =>
+    new Date(`${session.session_date}T${session.session_time ?? '23:59:59'}`);
+  const endOf = (session: LiveSession) =>
+    new Date(startOf(session).getTime() + (session.duration ?? 60) * 60000);
+  const isLiveNow = (session: LiveSession) =>
+    session.status === 'live' || (startOf(session) <= now && now < endOf(session));
+  const upcoming = sessions.filter((session) => endOf(session) >= now);
 
   const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const thisWeekCount = upcoming.filter(
@@ -237,6 +243,7 @@ export default function LiveScreen({ navigation }: Props) {
                 const locked =
                   (session.tier === 'premium' || sectionPremium) &&
                   !hasPremiumAccess;
+                const live = isLiveNow(session);
                 return (
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
@@ -251,6 +258,12 @@ export default function LiveScreen({ navigation }: Props) {
                           </Text>
                         )}
                       </View>
+                      {live && !locked && (
+                        <View style={styles.livePill}>
+                          <View style={styles.liveDot} />
+                          <Text style={styles.livePillText}>LIVE NOW</Text>
+                        </View>
+                      )}
                       {locked && (
                         <View style={styles.premiumPill}>
                           <Ionicons name="lock-closed-outline" size={11} color={colors.warning} />
@@ -302,9 +315,9 @@ export default function LiveScreen({ navigation }: Props) {
                     )}
 
                     <PrimaryButton
-                      label={locked ? 'Connect PrimeXBT' : 'Join session'}
+                      label={locked ? 'Connect PrimeXBT' : live ? 'Join now' : 'Join session'}
                       icon={locked ? 'lock-closed-outline' : 'videocam-outline'}
-                      variant="tonal"
+                      variant={live && !locked ? 'gradient' : 'tonal'}
                       loading={joiningId === session.id}
                       onPress={() => (locked ? connect.open() : handleJoin(session))}
                       style={styles.joinButton}
@@ -430,6 +443,27 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 12,
     fontWeight: '700',
+  },
+  livePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,77,106,0.14)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.accentRed,
+  },
+  livePillText: {
+    color: colors.accentRed,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.6,
   },
   joinButton: {
     height: 44,

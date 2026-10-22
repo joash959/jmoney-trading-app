@@ -442,8 +442,12 @@ export default function LeaderboardScreen({ navigation }: Props) {
                 rank={participant.rank}
                 rankIconColor={rankColor(participant.rank)}
                 name={participant.nickname || participant.name}
-                subtitle={participant.name}
-                lots={(participant.total_volume ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                subtitle={
+                  participant.nickname && participant.nickname !== participant.name
+                    ? participant.name
+                    : undefined
+                }
+                lots={(participant.total_volume ?? 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}
                 badge={badge}
               />
             );

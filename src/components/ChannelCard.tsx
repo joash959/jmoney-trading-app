@@ -5,9 +5,12 @@ import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
 import Pill from './Pill';
+import Icon3D, { Icon3DName } from './Icon3D';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
+  /** 3D icon shown instead of the line icon tile when given. */
+  icon3d?: Icon3DName;
   iconColor?: string;
   iconBackground?: string;
   title: string;
@@ -26,6 +29,7 @@ type Props = {
 
 export default function ChannelCard({
   icon,
+  icon3d,
   iconColor = colors.link,
   iconBackground = 'rgba(47,107,255,0.15)',
   title,
@@ -42,9 +46,13 @@ export default function ChannelCard({
   return (
     <GlassCard style={styles.card}>
       <View style={styles.topRow}>
-        <View style={[styles.iconCircle, { backgroundColor: iconBackground }]}>
-          <Ionicons name={icon} size={22} color={iconColor} />
-        </View>
+        {icon3d ? (
+          <Icon3D name={icon3d} size={44} />
+        ) : (
+          <View style={[styles.iconCircle, { backgroundColor: iconBackground }]}>
+            <Ionicons name={icon} size={22} color={iconColor} />
+          </View>
+        )}
         {locked ? (
           <Pill label="Premium" color={colors.warning} backgroundColor={colors.warningDim} />
         ) : (

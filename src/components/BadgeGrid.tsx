@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
     padding: 14,
     overflow: 'hidden',
   },
-  tileUnlocked: {
-    backgroundColor: 'rgba(47,107,255,0.12)',
-  },
+  // Unlocked badges stand out through the full-colour icon and green
+  // "Unlocked" label; the card itself stays neutral like every other card.
+  tileUnlocked: {},
   emojiWrap: {
     height: 52,
     justifyContent: 'center',
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     minHeight: 32,
   },
   unlockedText: {
-    color: colors.link,
+    color: colors.accentGreen,
     fontSize: 12,
     fontWeight: '600',
     marginTop: 8,

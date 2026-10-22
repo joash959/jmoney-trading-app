@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { NotificationRow } from '../types/database';
+import Icon3D, { Icon3DName } from '../components/Icon3D';
 import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import ScreenHeader from '../components/ScreenHeader';
@@ -17,26 +18,21 @@ import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Notifications'>;
 
-const TYPE_ICON: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
-  premium_unlocked: 'shield-outline',
-  session_reminder: 'videocam-outline',
-  telegram_access: 'paper-plane-outline',
+const TYPE_ICON_3D: Record<string, Icon3DName> = {
+  premium_unlocked: 'gem',
+  session_reminder: 'live',
+  telegram_access: 'telegram',
 };
 
-const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
-  premium_unlocked: { fg: colors.warning, bg: colors.warningDim },
-  session_reminder: { fg: colors.accentGreen, bg: 'rgba(46,230,166,0.15)' },
-  telegram_access: { fg: '#22D3EE', bg: 'rgba(34,211,238,0.15)' },
-};
-
-const DEFAULT_ACCENT = { fg: colors.text, bg: colors.glassTile };
-
-function iconForType(type: string) {
-  return TYPE_ICON[type] ?? 'notifications-outline';
-}
-
-function accentForType(type: string) {
-  return TYPE_ACCENT[type] ?? DEFAULT_ACCENT;
+/** 3D icon for a notification: by type, else guessed from its title. */
+function icon3DFor(notification: NotificationRow): Icon3DName {
+  const byType = TYPE_ICON_3D[notification.type];
+  if (byType) return byType;
+  const title = notification.title.toLowerCase();
+  if (title.includes('alert')) return 'alerts';
+  if (title.includes('session') || title.includes('live')) return 'live';
+  if (title.includes('lesson') || title.includes('course')) return 'courses';
+  return 'bell';
 }
 
 function formatRelativeTime(iso: string) {
@@ -139,7 +135,6 @@ export default function NotificationsScreen({}: Props) {
       ) : (
         <View style={[styles.list, styles.cardSpaced]}>
           {notifications.map((notification) => {
-            const accent = accentForType(notification.type);
             return (
             <Pressable
               key={notification.id}
@@ -149,13 +144,7 @@ export default function NotificationsScreen({}: Props) {
               ]}
               onPress={() => handlePressNotification(notification)}
             >
-              <View style={[styles.rowIcon, { backgroundColor: accent.bg }]}>
-                <Ionicons
-                  name={iconForType(notification.type)}
-                  size={18}
-                  color={accent.fg}
-                />
-              </View>
+              <Icon3D name={icon3DFor(notification)} size={38} />
               <View style={styles.rowBody}>
                 <Text style={styles.rowTitle}>{notification.title}</Text>
                 <Text style={styles.rowMessage}>{notification.message}</Text>
@@ -209,14 +198,6 @@ const styles = StyleSheet.create({
   },
   rowUnread: {
     backgroundColor: 'rgba(255,255,255,0.07)',
-  },
-  rowIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: colors.glassTile,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   rowBody: {
     flex: 1,

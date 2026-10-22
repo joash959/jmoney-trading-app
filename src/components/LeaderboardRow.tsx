@@ -13,7 +13,8 @@ type Props = {
   rank: number | null;
   rankIconColor: string;
   name: string;
-  subtitle: string;
+  /** Real name under the nickname; omitted when it would just repeat it. */
+  subtitle?: string;
   lots: string;
   badge?: Badge;
 };
@@ -67,7 +68,7 @@ export default function LeaderboardRow({
 
       <View style={styles.body}>
         <Text style={styles.name}>{name}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
       </View>
 
       <View style={styles.lotsColumn}>

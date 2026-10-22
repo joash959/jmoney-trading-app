@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
@@ -19,6 +20,7 @@ import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
 import ChannelCard from '../components/ChannelCard';
+import Icon3D, { Icon3DName } from '../components/Icon3D';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
@@ -37,6 +39,14 @@ function categoryAccent(category: string) {
     hash = (hash * 31 + category.charCodeAt(i)) >>> 0;
   }
   return CATEGORY_ACCENTS[hash % CATEGORY_ACCENTS.length];
+}
+
+/** 3D icon for a community card, by its category. */
+function channelIcon3D(category: string | null): Icon3DName {
+  const c = (category ?? '').toLowerCase();
+  if (c.includes('discord')) return 'chat';
+  if (c.includes('alert')) return 'alerts';
+  return 'telegram';
 }
 
 export default function TelegramChannelsScreen({ navigation }: Props) {
@@ -135,14 +145,14 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
             >
               <View style={styles.featuredCard}>
+                <LinearGradient
+                  colors={gradients.brand}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <View style={styles.featuredTopRow}>
-                  <View style={styles.featuredIconCircle}>
-                    <Ionicons
-                      name={toIonicon(featured.icon_name)}
-                      size={20}
-                      color={colors.text}
-                    />
-                  </View>
+                  <Icon3D name="telegram" size={48} />
                   <View style={styles.featuredBadge}>
                     <Ionicons
                       name={isPremium ? 'lock-open-outline' : 'lock-closed-outline'}
@@ -170,7 +180,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
                 <View style={styles.featuredCta}>
                   {openingId === featured.id ? (
-                    <ActivityIndicator size="small" color={colors.text} />
+                    <ActivityIndicator size="small" color={colors.accentBlue} />
                   ) : (
                     <>
                       <Text style={styles.featuredCtaText}>
@@ -179,7 +189,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                       <Ionicons
                         name={isPremium ? 'arrow-forward-outline' : 'lock-closed-outline'}
                         size={15}
-                        color={colors.text}
+                        color={colors.accentBlue}
                       />
                     </>
                   )}
@@ -201,6 +211,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               <ChannelCard
                 key={community.id}
                 icon={toIonicon(community.icon_name)}
+                icon3d={channelIcon3D(community.category)}
                 iconColor={accent.fg}
                 iconBackground={accent.bg}
                 title={community.name}
@@ -218,9 +229,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
           <GlassCard style={styles.cardSpaced}>
             <View style={styles.tipRow}>
-              <View style={styles.tipIcon}>
-                <Ionicons name="chatbubble-outline" size={18} color={colors.link} />
-              </View>
+              <Icon3D name="telegram" size={40} />
               <View style={styles.tipBody}>
                 <Text style={styles.tipTitle}>New to Telegram?</Text>
                 <Text style={styles.tipDescription}>
@@ -266,14 +275,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  featuredIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   featuredBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -315,13 +316,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: colors.text,
     borderRadius: radius.pill,
     height: 46,
     marginTop: 16,
   },
   featuredCtaText: {
-    color: colors.text,
+    color: colors.accentBlue,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -346,14 +347,6 @@ const styles = StyleSheet.create({
   tipRow: {
     flexDirection: 'row',
     gap: 14,
-  },
-  tipIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(47,107,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   tipBody: {
     flex: 1,

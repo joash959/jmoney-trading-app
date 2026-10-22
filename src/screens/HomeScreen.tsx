@@ -226,7 +226,7 @@ export default function HomeScreen({ navigation }: Props) {
           .order('started_at', { ascending: false }),
         supabase
           .from('live_sessions')
-          .select('title, session_date, session_time')
+          .select('title, session_date, session_time, duration')
           .eq('is_active', true)
           .order('session_date', { ascending: true })
           .order('session_time', { ascending: true }),
@@ -251,9 +251,11 @@ export default function HomeScreen({ navigation }: Props) {
         : null,
     });
 
-    const upcoming = (sessionsRes.data ?? []).find(
-      (s: any) => new Date(`${s.session_date}T${s.session_time ?? '23:59:59'}`) >= now
-    ) as any;
+    // Same rule as the Live tab: a session counts until it has ended.
+    const upcoming = (sessionsRes.data ?? []).find((s: any) => {
+      const start = new Date(`${s.session_date}T${s.session_time ?? '23:59:59'}`);
+      return start.getTime() + (s.duration ?? 60) * 60000 >= now.getTime();
+    }) as any;
     setNextSession(
       upcoming
         ? { date: new Date(`${upcoming.session_date}T00:00:00`), title: upcoming.title }

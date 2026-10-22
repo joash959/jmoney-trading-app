@@ -24,6 +24,7 @@ import Pill from '../components/Pill';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
 import UploadDropzone from '../components/UploadDropzone';
+import Icon3D, { Icon3DName } from '../components/Icon3D';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
@@ -65,6 +66,12 @@ const BIAS_COLOR: Record<ChartAnalysis['bias'], string> = {
   short: colors.accentRed,
   wait: colors.textFaint,
 };
+
+const HOW_IT_WORKS: { icon: Icon3DName; title: string; body: string }[] = [
+  { icon: 'chart-up', title: 'Upload a chart', body: 'A clear screenshot of any pair and timeframe.' },
+  { icon: 'brain', title: 'AI reads the setup', body: 'Trend, support and resistance are picked out for you.' },
+  { icon: 'target', title: 'Get a trade plan', body: 'Entry, stop loss and take-profit levels to review.' },
+];
 
 export default function AISuperScannerScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
@@ -172,12 +179,26 @@ export default function AISuperScannerScreen({ navigation }: Props) {
           style={styles.cardSpaced}
         />
       ) : !imageUri ? (
-        <UploadDropzone
-          title="Tap to upload chart"
-          subtitle="PNG, JPG up to 8MB"
-          onPress={handlePick}
-          style={styles.dropzone}
-        />
+        <>
+          <UploadDropzone
+            title="Scan any chart with AI"
+            subtitle="PNG or JPG, up to 8MB"
+            onPress={handlePick}
+            style={styles.dropzone}
+          />
+          <Text style={styles.howTitle}>How it works</Text>
+          <GlassCard style={styles.howCard}>
+            {HOW_IT_WORKS.map((step, i) => (
+              <View key={step.title} style={[styles.howRow, i > 0 && styles.howDivider]}>
+                <Icon3D name={step.icon} size={36} />
+                <View style={styles.howText}>
+                  <Text style={styles.howStepTitle}>{step.title}</Text>
+                  <Text style={styles.howStepBody}>{step.body}</Text>
+                </View>
+              </View>
+            ))}
+          </GlassCard>
+        </>
       ) : (
         <GlassCard style={styles.cardSpaced}>
           <Image source={{ uri: imageUri }} style={styles.preview} />
@@ -390,6 +411,40 @@ function CopyablePlanCell({ label, value, copied, onCopy }: CopyablePlanCellProp
 }
 
 const styles = StyleSheet.create({
+  howTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: 28,
+  },
+  howCard: {
+    marginTop: 12,
+    paddingVertical: 6,
+  },
+  howRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 12,
+  },
+  howDivider: {
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  howText: {
+    flex: 1,
+  },
+  howStepTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  howStepBody: {
+    color: colors.textFaint,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 2,
+  },
   dropzone: {
     marginTop: spacing.xl,
   },
