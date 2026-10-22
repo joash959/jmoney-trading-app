@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     paddingVertical: 56,
     paddingHorizontal: 24,
     borderRadius: 22,
-    backgroundColor: 'rgba(122,77,255,0.1)',
+    backgroundColor: 'rgba(47,107,255,0.1)',
   },
   pressed: {
     opacity: 0.75,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radius.xl,
-    backgroundColor: 'rgba(122,77,255,0.18)',
+    backgroundColor: 'rgba(47,107,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },

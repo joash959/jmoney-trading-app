@@ -23,7 +23,7 @@ export const shadows: Record<'sm' | 'md' | 'lg' | 'glow', ViewStyle> = {
     elevation: 14,
   },
   glow: {
-    shadowColor: '#7A4DFF',
+    shadowColor: '#2F6BFF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.45,
     shadowRadius: 18,

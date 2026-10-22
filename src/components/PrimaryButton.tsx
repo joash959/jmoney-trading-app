@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   gradientShadow: {
-    shadowColor: '#7A4DFF',
+    shadowColor: '#2F6BFF',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.25,
     shadowRadius: 14,

@@ -27,7 +27,7 @@ type Props = {
 export default function ChannelCard({
   icon,
   iconColor = colors.link,
-  iconBackground = 'rgba(122,77,255,0.15)',
+  iconBackground = 'rgba(47,107,255,0.15)',
   title,
   titleColor = colors.text,
   tagLabel,

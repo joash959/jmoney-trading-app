@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   pillPressed: {
-    backgroundColor: 'rgba(122,77,255,0.28)',
+    backgroundColor: 'rgba(47,107,255,0.28)',
   },
   pillText: {
     color: colors.text,

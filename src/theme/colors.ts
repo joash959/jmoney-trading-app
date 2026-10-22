@@ -1,5 +1,5 @@
 // Neutral near-black "glass" theme: charcoal translucent cards with a
-// hairline edge. The JMONEY violet-to-blue is reserved for actions and
+// hairline edge. The brand blue is reserved for actions and
 // active states (buttons, links, the selected tab) - surfaces stay neutral.
 export const colors = {
   background: '#0A0A0D',
@@ -32,11 +32,11 @@ export const colors = {
   // Secondary text: ~6:1 contrast on the background, readable at small sizes.
   textFaint: '#9696A3',
 
-  // Brand purple - the app's primary colour (buttons, charts, highlights).
-  primary: '#7A4DFF',
-  primaryDim: 'rgba(122,77,255,0.2)',
-  accentBlue: '#6A3DF5',
-  accentBlueDim: 'rgba(122,77,255,0.2)',
+  // Brand blue - the app's primary colour (buttons, charts, highlights).
+  primary: '#2F6BFF',
+  primaryDim: 'rgba(47,107,255,0.2)',
+  accentBlue: '#2459F0',
+  accentBlueDim: 'rgba(47,107,255,0.2)',
   accentPurple: '#A78BFA',
   accentGreen: '#2EE6A6',
   accentRed: '#FF4D6A',
@@ -44,17 +44,17 @@ export const colors = {
   warningDim: 'rgba(245,197,24,0.14)',
   // Lighter tint of the primary for small text (links, dates) - stays
   // readable on the dark background.
-  link: '#9E80FF',
+  link: '#6E9BFF',
 };
 
 export const gradients = {
-  brand: ['#9A5CFF', '#6A3DF5'] as const,
-  button: ['#8A55FF', '#6A3DF5'] as const,
+  brand: ['#4A86FF', '#2459F0'] as const,
+  button: ['#3D7BFF', '#2459F0'] as const,
   premiumGlow: ['rgba(124,58,237,0.35)', 'rgba(47,111,239,0)'] as const,
   // Hero / featured cards: a slightly brighter neutral glass, no tint.
   heroCard: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.025)', 'rgba(255,255,255,0.01)'] as const,
   // Top-left sheen on every glass card.
   glassSheen: ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0)'] as const,
   whatsapp: ['#34D399', '#128C7E'] as const,
-  telegram: ['#8A55FF', '#6A3DF5'] as const,
+  telegram: ['#3D7BFF', '#2459F0'] as const,
 };
