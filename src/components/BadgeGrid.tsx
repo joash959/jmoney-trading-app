@@ -13,7 +13,7 @@ export default function BadgeGrid({ badges }: { badges: Badge[] }) {
       {badges.map((badge) => (
         <View key={badge.key} style={[styles.tile, badge.unlocked && styles.tileUnlocked]}>
           <View style={[styles.emojiWrap, badge.unlocked && styles.emojiWrapUnlocked]}>
-            <Icon3D name={badge.icon} size={34} muted={!badge.unlocked} />
+            <Icon3D name={badge.icon} size={46} muted={!badge.unlocked} />
           </View>
           <Text style={[styles.title, !badge.unlocked && styles.titleLocked]} numberOfLines={1}>
             {badge.title}
@@ -51,16 +51,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(47,107,255,0.12)',
   },
   emojiWrap: {
-    width: 52,
     height: 52,
-    borderRadius: 16,
-    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.glassTile,
   },
-  emojiWrapUnlocked: {
-    backgroundColor: 'rgba(47,107,255,0.22)',
-  },
+  emojiWrapUnlocked: {},
   title: {
     color: colors.text,
     fontSize: 15,

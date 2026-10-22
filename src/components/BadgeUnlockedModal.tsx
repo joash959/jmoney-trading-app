@@ -82,7 +82,7 @@ export default function BadgeUnlockedModal({
                 },
               ]}
             >
-              {badge && <Icon3D name={badge.icon} size={96} />}
+              {badge && <Icon3D name={badge.icon} size={120} />}
             </Animated.View>
           </View>
           <Text style={styles.kicker}>Badge unlocked!</Text>
@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: 'rgba(47,107,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },

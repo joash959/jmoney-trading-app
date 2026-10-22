@@ -62,12 +62,11 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
         <View
           style={[
             styles.directionIcon,
-            { backgroundColor: colors.glassTile },
           ]}
         >
           <Icon3D
             name={direction === 'long' ? 'chart-up' : direction === 'short' ? 'chart-down' : 'alerts'}
-            size={28}
+            size={38}
           />
         </View>
         <View style={styles.titleCol}>

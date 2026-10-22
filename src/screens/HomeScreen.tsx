@@ -18,7 +18,6 @@ import ScreenShell from '../components/ScreenShell';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
 import SentimentPoll from '../components/SentimentPoll';
-import LiquidGlass from '../components/LiquidGlass';
 import ListRow from '../components/ListRow';
 import LineChart, { ChartPoint } from '../components/LineChart';
 import AnimatedNumber from '../components/AnimatedNumber';
@@ -408,9 +407,9 @@ export default function HomeScreen({ navigation }: Props) {
               action.onPress();
             }}
           >
-            <LiquidGlass style={styles.actionGlass} interactive>
-              <Icon3D name={ICON_3D[action.icon] ?? 'star'} size={34} />
-            </LiquidGlass>
+            <View style={styles.actionGlass}>
+              <Icon3D name={ICON_3D[action.icon] ?? 'star'} size={52} />
+            </View>
             <Text style={styles.actionLabel}>{action.label}</Text>
           </Pressable>
         ))}
@@ -712,7 +711,6 @@ const styles = StyleSheet.create({
   actionGlass: {
     width: 58,
     height: 58,
-    borderRadius: 29,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -45,7 +45,7 @@ export default function DailyMissions({
           style={({ pressed }) => [styles.row, pressed && !mission.done && styles.rowPressed]}
         >
           <View style={[styles.iconTile, mission.done && styles.iconTileDone]}>
-            <Icon3D name={mission.icon} size={26} />
+            <Icon3D name={mission.icon} size={34} />
           </View>
           <Text style={[styles.missionTitle, mission.done && styles.missionTitleDone]} numberOfLines={1}>
             {mission.title}
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 13,
-    backgroundColor: colors.glassTile,
     alignItems: 'center',
     justifyContent: 'center',
   },

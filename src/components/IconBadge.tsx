@@ -37,13 +37,14 @@ export default function IconBadge({
           width: size,
           height: size,
           borderRadius: Math.round(size * 0.32),
-          backgroundColor: backgroundColor ?? (icon3d ? colors.glassTile : colors.primaryDim),
+          // 3D icons float on their own - no tile behind them.
+          backgroundColor: icon3d ? 'transparent' : backgroundColor ?? colors.primaryDim,
         },
         style,
       ]}
     >
       {icon3d ? (
-        <Icon3D name={icon3d} size={Math.round(size * 0.64)} />
+        <Icon3D name={icon3d} size={Math.round(size * 0.86)} />
       ) : (
         <Ionicons name={icon} size={Math.round(size * 0.46)} color={color} />
       )}

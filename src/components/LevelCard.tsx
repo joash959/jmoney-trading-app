@@ -70,7 +70,7 @@ export default function LevelCard({ stats, onPress, style }: Props) {
           </Text>
         </View>
         <View style={[styles.streak, (stats?.streak ?? 0) > 0 && styles.streakActive]}>
-          <Icon3D name="fire" size={28} muted={(stats?.streak ?? 0) === 0} />
+          <Icon3D name="fire" size={34} muted={(stats?.streak ?? 0) === 0} />
           <Text numeric style={styles.streakNumber}>
             {stats?.streak ?? 0}
           </Text>
@@ -165,13 +165,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 16,
-    backgroundColor: colors.glassTile,
     minWidth: 64,
   },
-  streakActive: {
-    backgroundColor: 'rgba(255,140,40,0.14)',
-  },
+  streakActive: {},
   streakNumber: {
     color: colors.text,
     fontSize: 18,

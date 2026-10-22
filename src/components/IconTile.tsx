@@ -1,4 +1,4 @@
-import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
@@ -30,16 +30,22 @@ export default function IconTile({ icon, label, onPress, style }: Props) {
       style={({ pressed }) => [styles.tile, style, pressed && styles.pressed]}
       onPress={handlePress}
     >
-      <LiquidGlass style={styles.glass} interactive>
-        {ICON_3D[icon] ? (
-          <Icon3D name={ICON_3D[icon]} size={34} />
-        ) : (
+      {ICON_3D[icon] ? (
+        // 3D icons float on their own - no tile behind them.
+        <View style={styles.glass}>
+          <Icon3D name={ICON_3D[icon]} size={48} />
+          <Text style={styles.label} numberOfLines={1}>
+            {label}
+          </Text>
+        </View>
+      ) : (
+        <LiquidGlass style={styles.glass} interactive>
           <Ionicons name={icon} size={22} color={colors.text} />
-        )}
-        <Text style={styles.label} numberOfLines={1}>
-          {label}
-        </Text>
-      </LiquidGlass>
+          <Text style={styles.label} numberOfLines={1}>
+            {label}
+          </Text>
+        </LiquidGlass>
+      )}
     </Pressable>
   );
 }
