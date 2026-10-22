@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.cardBorder,
   },
   tint: {
-    backgroundColor: 'rgba(8,8,11,0.78)',
+    backgroundColor: 'rgba(9,8,15,0.78)',
   },
   row: {
     flexDirection: 'row',

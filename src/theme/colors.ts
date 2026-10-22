@@ -2,7 +2,7 @@
 // the background light streaks glow through them, accents are the JMONEY
 // logo's violet-to-blue.
 export const colors = {
-  background: '#08080B',
+  background: '#09080F',
   // Solid fills - for sheets/modals and anything that must hide what's
   // underneath it.
   surface: '#111116',
@@ -12,7 +12,7 @@ export const colors = {
   buttonSecondaryPressed: 'rgba(255,255,255,0.12)',
 
   // Translucent glass - every card in the app.
-  card: 'rgba(22,22,30,0.72)',
+  card: 'rgba(22,20,36,0.72)',
   cardBorder: 'rgba(255,255,255,0.07)',
   cardBorderTop: 'rgba(255,255,255,0.12)',
   // Tiles and chips sitting on top of a card.
@@ -42,7 +42,7 @@ export const gradients = {
   button: ['#7B61FF', '#4F6BFF'] as const,
   premiumGlow: ['rgba(124,58,237,0.35)', 'rgba(47,111,239,0)'] as const,
   // Hero / featured cards: a faint violet wash over glass.
-  heroCard: ['rgba(123,97,255,0.22)', 'rgba(79,107,255,0.06)', 'rgba(22,22,30,0.6)'] as const,
+  heroCard: ['rgba(123,97,255,0.22)', 'rgba(79,107,255,0.06)', 'rgba(22,20,36,0.6)'] as const,
   // Top-left sheen on every glass card.
   glassSheen: ['rgba(255,255,255,0.06)', 'rgba(255,255,255,0)'] as const,
   whatsapp: ['#34D399', '#128C7E'] as const,
