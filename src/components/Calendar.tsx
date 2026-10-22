@@ -218,16 +218,12 @@ const styles = StyleSheet.create({
   },
   weekRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
   },
   dayCell: {
     flex: 1,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRightWidth: 1,
-    borderRightColor: colors.cardBorder,
   },
   dayCellSelected: {
     backgroundColor: colors.accentBlueDim,

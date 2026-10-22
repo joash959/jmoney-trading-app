@@ -6,16 +6,31 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { parseAlertFields } from '../lib/tradeAlertParser';
+import { detectAlertDirection, parseAlertFields } from '../lib/tradeAlertParser';
+import GlassSheen from './GlassSheen';
 
 type Props = {
   message: string;
   time: string;
 };
 
+const GREEN_DIM = 'rgba(46,230,166,0.12)';
+const RED_DIM = 'rgba(255,77,106,0.12)';
+
+/** One trade alert: instrument + direction header, the alert's price levels
+ * as tap-to-copy tiles, and any extra lines of the message below. */
 export default function AlertCard({ message, time }: Props) {
   const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
   const fields = parseAlertFields(message);
+  const direction = detectAlertDirection(message);
+
+  const lines = message.split('\n').map((l) => l.trim()).filter(Boolean);
+  const title = lines[0] ?? message;
+  // Lines already shown as price tiles are dropped; anything else (e.g.
+  // "Move SL to entry") is kept so no part of the alert is hidden.
+  const extraLines = lines
+    .slice(1)
+    .filter((line) => parseAlertFields(line).length === 0);
 
   const handleCopy = async (label: string, value: string) => {
     await Clipboard.setStringAsync(value);
@@ -24,107 +39,164 @@ export default function AlertCard({ message, time }: Props) {
     setTimeout(() => setCopiedLabel((current) => (current === label ? null : current)), 1500);
   };
 
-  return (
-    <View style={styles.row}>
-      <View style={styles.bubble}>
-        <Text style={styles.sender}>JMONEY Trade Alerts</Text>
-        <Text style={styles.message}>
-          {message}
-          <Text style={styles.time}>{'  '}{time}</Text>
-        </Text>
+  const tint =
+    direction === 'long' ? colors.accentGreen : direction === 'short' ? colors.accentRed : colors.link;
 
-        {fields.length > 0 && (
-          <View style={styles.fieldsWrap}>
-            {fields.map((field) => {
-              const copied = copiedLabel === field.label;
-              return (
-                <Pressable
-                  key={field.label}
-                  style={({ pressed }) => [
-                    styles.fieldChip,
-                    copied && styles.fieldChipCopied,
-                    pressed && styles.fieldChipPressed,
-                  ]}
-                  onPress={() => handleCopy(field.label, field.value)}
-                >
-                  <Text style={styles.fieldLabel}>{field.label}</Text>
-                  <Text style={styles.fieldValue}>{field.value}</Text>
-                  <Ionicons
-                    name={copied ? 'checkmark-outline' : 'copy-outline'}
-                    size={11}
-                    color={copied ? colors.accentGreen : colors.textFaint}
-                  />
-                </Pressable>
-              );
-            })}
+  return (
+    <View style={styles.card}>
+      <GlassSheen />
+      <View style={styles.headerRow}>
+        <View
+          style={[
+            styles.directionIcon,
+            { backgroundColor: direction === 'long' ? GREEN_DIM : direction === 'short' ? RED_DIM : colors.accentBlueDim },
+          ]}
+        >
+          <Ionicons
+            name={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
+            size={18}
+            color={tint}
+          />
+        </View>
+        <View style={styles.titleCol}>
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
+          <Text style={styles.meta}>JMONEY alert · {time}</Text>
+        </View>
+        {direction && (
+          <View style={[styles.directionPill, { backgroundColor: direction === 'long' ? GREEN_DIM : RED_DIM }]}>
+            <Text style={[styles.directionText, { color: tint }]}>
+              {direction === 'long' ? 'BUY' : 'SELL'}
+            </Text>
           </View>
         )}
       </View>
+
+      {fields.length > 0 && (
+        <View style={styles.fieldsGrid}>
+          {fields.map((field) => {
+            const copied = copiedLabel === field.label;
+            const fieldTint =
+              field.label === 'SL' ? colors.accentRed : field.label.startsWith('TP') ? colors.accentGreen : colors.text;
+            return (
+              <Pressable
+                key={field.label}
+                style={({ pressed }) => [
+                  styles.fieldTile,
+                  copied && styles.fieldTileCopied,
+                  pressed && styles.fieldTilePressed,
+                ]}
+                onPress={() => handleCopy(field.label, field.value)}
+              >
+                <View style={styles.fieldLabelRow}>
+                  <Text style={styles.fieldLabel}>{field.label}</Text>
+                  <Ionicons
+                    name={copied ? 'checkmark' : 'copy-outline'}
+                    size={11}
+                    color={copied ? colors.accentGreen : colors.textFaint}
+                  />
+                </View>
+                <Text style={[styles.fieldValue, { color: fieldTint }]}>{field.value}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
+
+      {extraLines.length > 0 && (
+        <Text style={styles.body}>{extraLines.join('\n')}</Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
+    padding: 16,
+    overflow: 'hidden',
   },
-  bubble: {
-    maxWidth: '86%',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: 16,
-    borderBottomLeftRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  sender: {
-    color: colors.accentBlue,
-    fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 3,
-  },
-  message: {
-    color: colors.text,
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  time: {
-    color: colors.textFaint,
-    fontSize: 11,
-    fontWeight: '400',
-  },
-  fieldsWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 10,
-  },
-  fieldChip: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.inputBackground,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: radius.md,
+    gap: 12,
+  },
+  directionIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleCol: {
+    flex: 1,
+  },
+  title: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  meta: {
+    color: colors.textFaint,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  directionPill: {
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 4,
+    borderRadius: 999,
   },
-  fieldChipCopied: {
-    borderColor: 'rgba(37,211,102,0.4)',
-    backgroundColor: 'rgba(37,211,102,0.1)',
+  directionText: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
-  fieldChipPressed: {
+  fieldsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 8,
+    marginTop: 14,
+  },
+  fieldTile: {
+    width: '48.5%',
+    backgroundColor: colors.glassTile,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
+    borderRadius: radius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  fieldTileCopied: {
+    borderColor: 'rgba(46,230,166,0.4)',
+    backgroundColor: GREEN_DIM,
+  },
+  fieldTilePressed: {
     opacity: 0.7,
+  },
+  fieldLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   fieldLabel: {
     color: colors.textFaint,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   fieldValue: {
-    color: colors.text,
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+  body: {
+    color: colors.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 12,
   },
 });

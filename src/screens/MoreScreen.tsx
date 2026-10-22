@@ -1,10 +1,10 @@
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { radius } from '../theme/radius';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,24 +13,13 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
-import IconTile, { iconTileGradients } from '../components/IconTile';
+import IconTile from '../components/IconTile';
 import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
+import ListRow from '../components/ListRow';
 import DisclaimerCard from '../components/DisclaimerCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
-
-// ScreenShell's scroll content padding (20/side) + SurfaceCard's own
-// padding (spacing.lg = 20/side) eaten out of the screen width, so
-// percentage-based tile widths can't be trusted to land on exact row
-// counts - compute pixel widths instead so rows never wrap unexpectedly.
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const GRID_WIDTH = SCREEN_WIDTH - 20 * 2 - spacing.lg * 2;
-const TILE_GAP = spacing.md;
-
-function tileWidth(columns: number) {
-  return (GRID_WIDTH - TILE_GAP * (columns - 1)) / columns;
-}
 
 function getInitials(name: string) {
   return name
@@ -56,98 +45,21 @@ export default function MoreScreen({ navigation }: Props) {
     // the session clears - no manual navigation needed here.
   };
 
-  const mainMenu = [
-    {
-      icon: 'grid-outline' as const,
-      label: 'Dashboard',
-      gradient: iconTileGradients.blue,
-      image: require('../../assets/dashboard.png'),
-      onPress: () => tabNavigation?.navigate('Home'),
-    },
-    {
-      icon: 'book-outline' as const,
-      label: 'Courses',
-      gradient: iconTileGradients.blue,
-      image: require('../../assets/courses.png'),
-      onPress: () =>
-        tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }),
-    },
-    {
-      icon: 'flash-outline' as const,
-      label: 'Trade Alerts',
-      gradient: iconTileGradients.gold,
-      image: require('../../assets/tradealerts.png'),
-      onPress: () => tabNavigation?.navigate('Alerts'),
-    },
-    {
-      icon: 'locate-outline' as const,
-      label: 'AI Scanner',
-      gradient: iconTileGradients.purple,
-      image: require('../../assets/aiscanner.png'),
-      onPress: () => navigation.navigate('AIScanner'),
-    },
-    {
-      icon: 'paper-plane-outline' as const,
-      label: 'Telegram',
-      gradient: iconTileGradients.teal,
-      image: require('../../assets/telegram.png'),
-      onPress: () => navigation.navigate('TelegramChannels'),
-    },
-    {
-      icon: 'videocam-outline' as const,
-      label: 'Live Sessions',
-      gradient: iconTileGradients.green,
-      image: require('../../assets/livesessions.png'),
-      onPress: () => tabNavigation?.navigate('Live'),
-    },
+  const shortcuts = [
+    { icon: 'school-outline' as const, label: 'Courses', onPress: () => tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }) },
+    { icon: 'flash-outline' as const, label: 'Alerts', onPress: () => tabNavigation?.navigate('Alerts') },
+    { icon: 'scan-outline' as const, label: 'Scanner', onPress: () => navigation.navigate('AIScanner') },
+    { icon: 'videocam-outline' as const, label: 'Live', onPress: () => tabNavigation?.navigate('Live') },
+    { icon: 'create-outline' as const, label: 'Journal', onPress: () => navigation.navigate('TradingJournal') },
+    { icon: 'stats-chart-outline' as const, label: 'Analysis', onPress: () => navigation.navigate('MarketAnalysis') },
+    { icon: 'paper-plane-outline' as const, label: 'Telegram', onPress: () => navigation.navigate('TelegramChannels') },
+    { icon: 'trophy-outline' as const, label: 'Ranks', onPress: () => navigation.navigate('Leaderboard') },
   ];
 
-  const tradingTools = [
-    {
-      icon: 'bookmark-outline' as const,
-      label: 'Journal',
-      gradient: iconTileGradients.gold,
-      image: require('../../assets/tradingjournal.png'),
-      onPress: () => navigation.navigate('TradingJournal'),
-    },
-    {
-      icon: 'briefcase-outline' as const,
-      label: 'Broker',
-      gradient: iconTileGradients.green,
-      image: require('../../assets/broker.png'),
-      onPress: () => navigation.navigate('RecommendedBroker'),
-    },
-    {
-      icon: 'bar-chart-outline' as const,
-      label: 'Market Analysis',
-      gradient: iconTileGradients.blue,
-      image: require('../../assets/marketanalysis.png'),
-      onPress: () => navigation.navigate('MarketAnalysis'),
-    },
-  ];
-
-  const account = [
-    {
-      icon: 'notifications-outline' as const,
-      label: 'Notifications',
-      gradient: iconTileGradients.teal,
-      image: require('../../assets/notifications.png'),
-      onPress: () => navigation.navigate('Notifications'),
-    },
-    {
-      icon: 'call-outline' as const,
-      label: 'Contact Us',
-      gradient: iconTileGradients.purple,
-      image: require('../../assets/contactus.png'),
-      onPress: () => navigation.navigate('ContactUs'),
-    },
-    {
-      icon: 'trophy-outline' as const,
-      label: 'Leaderboard',
-      gradient: iconTileGradients.red,
-      image: require('../../assets/leaderboard.png'),
-      onPress: () => navigation.navigate('Leaderboard'),
-    },
+  const accountRows = [
+    { icon: 'notifications-outline' as const, title: 'Notifications', subtitle: unreadCount > 0 ? `${unreadCount} unread` : 'All caught up', onPress: () => navigation.navigate('Notifications') },
+    { icon: 'briefcase-outline' as const, title: 'Recommended broker', subtitle: 'PrimeXBT account and benefits', onPress: () => navigation.navigate('RecommendedBroker') },
+    { icon: 'chatbubbles-outline' as const, title: 'Contact us', subtitle: 'WhatsApp, Telegram or email', onPress: () => navigation.navigate('ContactUs') },
   ];
 
   return (
@@ -161,7 +73,13 @@ export default function MoreScreen({ navigation }: Props) {
         }
       />
 
-      <SurfaceCard style={styles.profileCard}>
+      <View style={styles.profileCard}>
+        <LinearGradient
+          colors={gradients.heroCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
@@ -174,74 +92,46 @@ export default function MoreScreen({ navigation }: Props) {
               {email}
             </Text>
           )}
-          <View style={styles.tierPill}>
+          <View style={[styles.tierPill, isPremium && styles.tierPillPremium]}>
             <Ionicons
-              name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
+              name={isPremium ? 'diamond-outline' : 'lock-closed-outline'}
               size={11}
               color={isPremium ? colors.warning : colors.textFaint}
             />
             <Text
               style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
             >
-              {isPremium ? 'PREMIUM' : 'FREE'}
+              {isPremium ? 'Premium member' : 'Free plan'}
             </Text>
           </View>
         </View>
-      </SurfaceCard>
+      </View>
 
-      <SectionLabel style={styles.headingWhite}>MAIN MENU</SectionLabel>
-      <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
-          {mainMenu.map((item) => (
-            <IconTile
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              gradient={item.gradient}
-              image={item.image}
-              onPress={item.onPress}
-              style={{ width: tileWidth(3) }}
-            />
-          ))}
-        </View>
-      </SurfaceCard>
+      <SectionLabel>Shortcuts</SectionLabel>
+      <View style={styles.grid}>
+        {shortcuts.map((item) => (
+          <IconTile
+            key={item.label}
+            icon={item.icon}
+            label={item.label}
+            onPress={item.onPress}
+          />
+        ))}
+      </View>
 
-      <SectionLabel style={styles.headingWhite}>TRADING TOOLS</SectionLabel>
-      <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
-          {tradingTools.map((item) => (
-            <IconTile
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              gradient={item.gradient}
-              image={item.image}
-              onPress={item.onPress}
-              style={{ width: tileWidth(3) }}
-            />
-          ))}
-        </View>
-      </SurfaceCard>
-
-      <SectionLabel style={styles.headingWhite}>ACCOUNT</SectionLabel>
-      <SurfaceCard style={styles.sectionCard}>
-        <View style={styles.grid}>
-          {account.map((item) => (
-            <IconTile
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              gradient={item.gradient}
-              image={item.image}
-              onPress={item.onPress}
-              style={{ width: tileWidth(3) }}
-            />
-          ))}
-        </View>
-      </SurfaceCard>
-
-      <SurfaceCard style={styles.signOutCard}>
-        <MenuRow icon="log-out-outline" label="Sign Out" destructive onPress={handleSignOut} />
+      <SectionLabel>Account</SectionLabel>
+      <SurfaceCard style={styles.listCard}>
+        {accountRows.map((row) => (
+          <ListRow
+            key={row.title}
+            icon={row.icon}
+            title={row.title}
+            subtitle={row.subtitle}
+            onPress={row.onPress}
+            chevron
+          />
+        ))}
+        <MenuRow icon="log-out-outline" label="Sign out" destructive onPress={handleSignOut} />
       </SurfaceCard>
 
       <DisclaimerCard style={styles.disclaimerSpaced} />
@@ -254,7 +144,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    marginTop: 12,
+    marginTop: 8,
+    padding: 20,
+    borderRadius: radius['2xl'],
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
   avatar: {
     width: 56,
@@ -265,16 +161,16 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
   },
   profileTextWrap: {
     flex: 1,
   },
   profileName: {
     color: colors.text,
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 19,
+    fontWeight: '700',
   },
   profileEmail: {
     color: colors.textMuted,
@@ -290,35 +186,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginTop: 8,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.glassTile,
+  },
+  tierPillPremium: {
+    backgroundColor: colors.warningDim,
   },
   tierPillText: {
     color: colors.textFaint,
     fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontWeight: '600',
   },
   tierPillTextPremium: {
     color: colors.warning,
   },
-  sectionCard: {
-    marginTop: 6,
-  },
-  headingWhite: {
-    color: colors.text,
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    columnGap: TILE_GAP,
-    rowGap: 18,
+    justifyContent: 'space-between',
+    rowGap: 10,
+    marginTop: 10,
   },
-  signOutCard: {
-    marginTop: 20,
-    marginBottom: 8,
-    padding: spacing.md,
+  listCard: {
+    marginTop: 10,
+    paddingVertical: 4,
   },
   disclaimerSpaced: {
-    marginTop: 4,
+    marginTop: 20,
   },
 });

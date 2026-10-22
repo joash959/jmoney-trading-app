@@ -1,37 +1,52 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { supabase } from '../lib/supabase';
 import { getCommunityCount } from '../lib/communityCount';
 import { getNextNFP, getNextCPI } from '../lib/economicCalendar';
+import { detectAlertDirection, parseAlertFields } from '../lib/tradeAlertParser';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
-import SegmentedBar from '../components/SegmentedBar';
+import GlassSheen from '../components/GlassSheen';
 import PromoCarousel from '../components/PromoCarousel';
 import SentimentPoll from '../components/SentimentPoll';
-import PrimaryButton from '../components/PrimaryButton';
-import StatCard from '../components/StatCard';
-import IconTile, { iconTileGradients } from '../components/IconTile';
+import IconTile from '../components/IconTile';
+import IconBadge from '../components/IconBadge';
+import ListRow from '../components/ListRow';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import GradientLinkCard from '../components/GradientLinkCard';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
-type ContinueCourse = {
-  courseId: string;
-  title: string;
+type JournalSummary = {
+  total: number;
+  daysLogged: number;
+  winDays: number;
+  lastPnl: number | null;
+  lastDate: string | null;
 };
 
-const PROGRESS_SEGMENTS_MAX = 10;
+type LatestAlert = {
+  message: string;
+  createdAt: string;
+};
+
+type ProgressSummary = {
+  total: number;
+  completed: number;
+  inProgress: number;
+  continueCourse: { id: string; title: string } | null;
+};
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -40,88 +55,139 @@ function getGreeting() {
   return 'Good evening';
 }
 
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function toDateISO(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** "+$1,400.00" / "-$150.00" */
+function formatPnl(value: number) {
+  const amount = Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${value < 0 ? '-' : '+'}$${amount}`;
+}
+
+function timeAgo(iso: string) {
+  const minutes = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
+function daysUntil(date: Date) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+  const days = Math.round((target.getTime() - today.getTime()) / 86400000);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  return `In ${days} days`;
+}
+
+function shortDate(date: Date) {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 export default function HomeScreen({ navigation }: Props) {
-  const { profile, isPremium, refreshProfile } = useAuth();
+  const { session, profile, isPremium, refreshProfile } = useAuth();
+  const userId = session?.user.id;
   const { count: unreadCount } = useUnreadNotificationsCount();
   const connect = usePrimeXBTConnect();
-  const [continueCourse, setContinueCourse] = useState<ContinueCourse | null>(
-    null
-  );
-  const [coursesTotal, setCoursesTotal] = useState(0);
-  const [coursesStarted, setCoursesStarted] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const [nextSession, setNextSession] = useState<{
-    dateLabel: string;
-    title: string;
-  } | null>(null);
+  const [hideBalance, setHideBalance] = useState(false);
+  const [journal, setJournal] = useState<JournalSummary | null>(null);
+  const [latestAlert, setLatestAlert] = useState<LatestAlert | null>(null);
+  const [progress, setProgress] = useState<ProgressSummary | null>(null);
+  const [nextSession, setNextSession] = useState<{ date: Date; title: string } | null>(null);
 
-  const firstName = profile?.display_name?.split(' ')[0] || 'Trader';
+  const displayName = profile?.display_name || 'Trader';
+  const firstName = displayName.split(' ')[0];
 
-  const fetchData = async () => {
-    const [
-      { data: progressData },
-      { count: totalCount },
-      { data: progressRows },
-      { data: sessionRows },
-    ] = await Promise.all([
-      supabase
-        .from('user_course_progress')
-        .select('course_id, updated_at, courses(title)')
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase.from('courses').select('id', { count: 'exact', head: true }),
-      supabase.from('user_course_progress').select('course_id'),
-      supabase
-        .from('live_sessions')
-        .select('title, session_date, session_time')
-        .eq('is_active', true)
-        .order('session_date', { ascending: true })
-        .order('session_time', { ascending: true }),
-    ]);
-
-    const progressRow = progressData as any;
-    setContinueCourse(
-      progressRow?.course_id
-        ? {
-            courseId: progressRow.course_id,
-            title: progressRow.courses?.title ?? 'Your course',
-          }
-        : null
-    );
-
-    setCoursesTotal(totalCount ?? 0);
-    setCoursesStarted(
-      new Set((progressRows ?? []).map((row: any) => row.course_id)).size
-    );
-
+  const fetchData = useCallback(async () => {
+    if (!userId) return;
     const now = new Date();
-    const upcoming = (sessionRows ?? []).find(
-      (s: any) =>
-        new Date(`${s.session_date}T${s.session_time ?? '23:59:59'}`) >= now
-    );
+    const monthStart = toDateISO(new Date(now.getFullYear(), now.getMonth(), 1));
+
+    const [journalRes, alertRes, coursesRes, progressRes, sessionsRes] =
+      await Promise.all([
+        supabase
+          .from('trade_journal_entries')
+          .select('trade_date, profit_loss')
+          .eq('user_id', userId)
+          .gte('trade_date', monthStart)
+          .order('trade_date', { ascending: false }),
+        supabase
+          .from('trade_alerts')
+          .select('message, created_at')
+          .order('created_at', { ascending: false })
+          .limit(1),
+        supabase.from('courses').select('id', { count: 'exact', head: true }),
+        supabase
+          .from('user_course_progress')
+          .select('course_id, completed_at, started_at, courses(title)')
+          .order('started_at', { ascending: false }),
+        supabase
+          .from('live_sessions')
+          .select('title, session_date, session_time')
+          .eq('is_active', true)
+          .order('session_date', { ascending: true })
+          .order('session_time', { ascending: true }),
+      ]);
+
+    const entries = (journalRes.data ?? []) as { trade_date: string; profit_loss: number }[];
+    setJournal({
+      total: entries.reduce((sum, e) => sum + Number(e.profit_loss), 0),
+      daysLogged: entries.length,
+      winDays: entries.filter((e) => Number(e.profit_loss) > 0).length,
+      lastPnl: entries[0] ? Number(entries[0].profit_loss) : null,
+      lastDate: entries[0]?.trade_date ?? null,
+    });
+
+    const alertRow = (alertRes.data ?? [])[0] as { message: string; created_at: string } | undefined;
+    setLatestAlert(alertRow ? { message: alertRow.message, createdAt: alertRow.created_at } : null);
+
+    const rows = (progressRes.data ?? []) as any[];
+    const completed = rows.filter((r) => r.completed_at).length;
+    const current = rows.find((r) => !r.completed_at) ?? rows[0];
+    setProgress({
+      total: coursesRes.count ?? 0,
+      completed,
+      inProgress: rows.length - completed,
+      continueCourse: current
+        ? { id: current.course_id, title: current.courses?.title ?? 'Your course' }
+        : null,
+    });
+
+    const upcoming = (sessionsRes.data ?? []).find(
+      (s: any) => new Date(`${s.session_date}T${s.session_time ?? '23:59:59'}`) >= now
+    ) as any;
     setNextSession(
       upcoming
-        ? {
-            dateLabel: new Date(
-              `${upcoming.session_date}T00:00:00`
-            ).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            }),
-            title: upcoming.title,
-          }
+        ? { date: new Date(`${upcoming.session_date}T00:00:00`), title: upcoming.title }
         : null
     );
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  const nextNFP = getNextNFP();
-  const nextCPI = getNextCPI();
+  }, [fetchData]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -129,164 +195,178 @@ export default function HomeScreen({ navigation }: Props) {
     setRefreshing(false);
   };
 
-  const openCourse = (courseId: string, lessonId?: string) => {
-    navigation.navigate('Courses', {
-      screen: 'CourseDetail',
-      params: { courseId, lessonId },
-    });
-  };
+  const nextNFP = getNextNFP();
+  const nextCPI = getNextCPI();
+
+  const goMore = (screen: 'TradingJournal' | 'AIScanner' | 'Leaderboard' | 'TelegramChannels' | 'MarketAnalysis' | 'Notifications') =>
+    navigation.navigate('More', { screen });
 
   const quickActions = [
-    {
-      icon: 'book-outline' as const,
-      label: 'Courses',
-      gradient: iconTileGradients.blue,
-      image: require('../../assets/courses.png'),
-      onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
-    },
-    {
-      icon: 'locate-outline' as const,
-      label: 'AI Scanner',
-      gradient: iconTileGradients.purple,
-      image: require('../../assets/aiscanner.png'),
-      onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
-    },
-    {
-      icon: 'paper-plane-outline' as const,
-      label: 'Telegram',
-      gradient: iconTileGradients.teal,
-      image: require('../../assets/telegram.png'),
-      onPress: () =>
-        navigation.navigate('More', { screen: 'TelegramChannels' }),
-    },
-    {
-      icon: 'videocam-outline' as const,
-      label: 'Live Sessions',
-      gradient: iconTileGradients.green,
-      image: require('../../assets/livesessions.png'),
-      onPress: () => navigation.navigate('Live'),
-    },
-    {
-      icon: 'bookmark-outline' as const,
-      label: 'Journal',
-      gradient: iconTileGradients.gold,
-      image: require('../../assets/tradingjournal.png'),
-      onPress: () =>
-        navigation.navigate('More', { screen: 'TradingJournal' }),
-    },
-    {
-      icon: 'trophy-outline' as const,
-      label: 'Leaderboard',
-      gradient: iconTileGradients.red,
-      image: require('../../assets/leaderboard.png'),
-      onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
-    },
-    {
-      icon: 'bar-chart-outline' as const,
-      label: 'Market Analysis',
-      gradient: iconTileGradients.blue,
-      image: require('../../assets/marketanalysis.png'),
-      onPress: () =>
-        navigation.navigate('More', { screen: 'MarketAnalysis' }),
-    },
-    {
-      icon: 'call-outline' as const,
-      label: 'Contact Us',
-      gradient: iconTileGradients.purple,
-      image: require('../../assets/contactus.png'),
-      onPress: () => navigation.navigate('More', { screen: 'ContactUs' }),
-    },
+    { icon: 'create-outline' as const, label: 'Journal', onPress: () => goMore('TradingJournal') },
+    { icon: 'scan-outline' as const, label: 'Scanner', onPress: () => goMore('AIScanner') },
+    { icon: 'trophy-outline' as const, label: 'Ranks', onPress: () => goMore('Leaderboard') },
+    { icon: 'grid-outline' as const, label: 'Menu', onPress: () => navigation.navigate('More', { screen: 'MoreHome' }) },
   ];
 
   const promoItems = [
     {
-      icon: 'locate-outline' as const,
-      image: require('../../assets/aiscanner.png'),
+      icon: 'paper-plane-outline' as const,
+      title: 'Join the community',
+      subtitle: `${getCommunityCount().toLocaleString('en-US')} traders get live alerts and mentorship on Telegram.`,
+      onPress: () => goMore('TelegramChannels'),
+    },
+    {
+      icon: 'stats-chart-outline' as const,
+      title: 'Market analysis',
+      subtitle: 'Live charts for gold, indices and forex.',
+      onPress: () => goMore('MarketAnalysis'),
+    },
+    {
+      icon: 'scan-outline' as const,
       title: 'Scan any chart',
       subtitle: 'Let AI mark key levels and call the trend instantly.',
-      gradient: iconTileGradients.purple,
-      onPress: () => navigation.navigate('More', { screen: 'AIScanner' }),
-    },
-    {
-      icon: 'paper-plane-outline' as const,
-      image: require('../../assets/telegram.png'),
-      title: 'Join the community',
-      subtitle: 'Live trade alerts and mentorship, the moment you\'re funded.',
-      gradient: iconTileGradients.teal,
-      onPress: () =>
-        navigation.navigate('More', { screen: 'TelegramChannels' }),
-    },
-    {
-      icon: 'trophy-outline' as const,
-      image: require('../../assets/leaderboard.png'),
-      title: 'Climb the leaderboard',
-      subtitle: 'Compete with other traders for real prizes.',
-      gradient: iconTileGradients.gold,
-      onPress: () => navigation.navigate('More', { screen: 'Leaderboard' }),
-    },
-    {
-      icon: 'book-outline' as const,
-      image: require('../../assets/courses.png'),
-      title: 'Keep learning',
-      subtitle: "New lessons added regularly — pick up where you left off.",
-      gradient: iconTileGradients.blue,
-      onPress: () => navigation.navigate('Courses', { screen: 'CoursesHome' }),
+      onPress: () => goMore('AIScanner'),
     },
   ];
 
-  const displaySegments = Math.max(Math.min(coursesTotal, PROGRESS_SEGMENTS_MAX), 1);
-  const filledSegments =
-    coursesTotal > 0
-      ? Math.max(
-          Math.round((coursesStarted / coursesTotal) * displaySegments),
-          coursesStarted > 0 ? 1 : 0
-        )
-      : 0;
+  const pnl = journal?.total ?? 0;
+  const alertDirection = latestAlert ? detectAlertDirection(latestAlert.message) : null;
+  const alertTitle = latestAlert
+    ? latestAlert.message.split('\n')[0].trim().slice(0, 40)
+    : 'Trade alerts';
+  const alertEntry = latestAlert
+    ? parseAlertFields(latestAlert.message).find((f) => f.label === 'Entry')
+    : undefined;
+
+  const progressTotal = Math.max(progress?.total ?? 0, 1);
+  const completedPct = ((progress?.completed ?? 0) / progressTotal) * 100;
+  const inProgressPct = ((progress?.inProgress ?? 0) / progressTotal) * 100;
 
   return (
-    <ScreenShell
-      refreshing={refreshing}
-      onRefresh={handleRefresh}
-    >
-      <TopBar
-        rightElement={
-          <NotificationBell
-            count={unreadCount}
-            onPress={() =>
-              navigation.navigate('More', { screen: 'Notifications' })
-            }
-          />
-        }
-      />
+    <ScreenShell refreshing={refreshing} onRefresh={handleRefresh}>
+      {/* Header: avatar + greeting, bell on the right */}
+      <View style={styles.header}>
+        <Pressable
+          style={styles.profileRow}
+          onPress={() => navigation.navigate('More', { screen: 'MoreHome' })}
+        >
+          <LinearGradient colors={gradients.brand} style={styles.avatar}>
+            <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
+          </LinearGradient>
+          <View style={styles.greetingCol}>
+            <Text style={styles.greetingLabel}>{getGreeting()}</Text>
+            <Text style={styles.greetingName} numberOfLines={1}>
+              Hello, {firstName}!
+            </Text>
+          </View>
+        </Pressable>
+        <NotificationBell count={unreadCount} onPress={() => goMore('Notifications')} />
+      </View>
 
+      {/* Hero balance card */}
       <View style={styles.heroCard}>
+        <LinearGradient
+          colors={gradients.heroCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <GlassSheen />
         <View style={styles.heroTopRow}>
-          <Text style={styles.greetingLabel}>{getGreeting()},</Text>
-          <View style={styles.tierPill}>
+          <Text style={styles.heroLabel}>This month's P&L</Text>
+          <View style={[styles.tierChip, isPremium && styles.tierChipPremium]}>
             <Ionicons
-              name={isPremium ? 'trophy-outline' : 'lock-closed-outline'}
+              name={isPremium ? 'diamond-outline' : 'lock-closed-outline'}
               size={11}
               color={isPremium ? colors.warning : colors.textFaint}
             />
-            <Text
-              style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
-            >
-              {isPremium ? 'PREMIUM' : 'FREE PLAN'}
+            <Text style={[styles.tierChipText, isPremium && styles.tierChipTextPremium]}>
+              {isPremium ? 'Premium' : 'Free plan'}
             </Text>
           </View>
         </View>
-        <Text style={styles.greetingHeading} numberOfLines={2}>
-          {firstName}
-        </Text>
+        <View style={styles.balanceRow}>
+          <Text
+            style={[styles.balance, pnl < 0 && styles.balanceNegative]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {hideBalance ? '••••••' : formatPnl(pnl)}
+          </Text>
+          <Pressable hitSlop={10} onPress={() => setHideBalance((h) => !h)}>
+            <Ionicons
+              name={hideBalance ? 'eye-outline' : 'eye-off-outline'}
+              size={20}
+              color={colors.textMuted}
+            />
+          </Pressable>
+        </View>
+        <View style={styles.chipRow}>
+          {journal && journal.daysLogged > 0 ? (
+            <>
+              {journal.lastPnl !== null && (
+                <View style={[styles.chip, journal.lastPnl < 0 ? styles.chipRed : styles.chipGreen]}>
+                  <Ionicons
+                    name={journal.lastPnl < 0 ? 'caret-down' : 'caret-up'}
+                    size={10}
+                    color={journal.lastPnl < 0 ? colors.accentRed : colors.accentGreen}
+                  />
+                  <Text style={[styles.chipText, { color: journal.lastPnl < 0 ? colors.accentRed : colors.accentGreen }]}>
+                    {hideBalance ? '•••' : formatPnl(journal.lastPnl)} last day
+                  </Text>
+                </View>
+              )}
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>
+                  {journal.winDays}/{journal.daysLogged} green days
+                </Text>
+              </View>
+            </>
+          ) : (
+            <Pressable style={styles.chip} onPress={() => goMore('TradingJournal')}>
+              <Text style={styles.chipText}>Log your first trade in the journal</Text>
+              <Ionicons name="arrow-forward" size={11} color={colors.textMuted} />
+            </Pressable>
+          )}
+        </View>
+
+        <View style={styles.actionsRow}>
+          {quickActions.map((action) => (
+            <IconTile
+              key={action.label}
+              icon={action.icon}
+              label={action.label}
+              onPress={action.onPress}
+            />
+          ))}
+        </View>
       </View>
 
+      {/* Trade alerts - latest signal */}
+      <GradientLinkCard
+        icon="flash-outline"
+        title={latestAlert ? alertTitle : 'View JMONEY trade alerts'}
+        subtitle={
+          latestAlert
+            ? [alertEntry ? `Entry ${alertEntry.value}` : null, timeAgo(latestAlert.createdAt)]
+                .filter(Boolean)
+                .join(' · ')
+            : 'Real-time trade alert insights'
+        }
+        glyph={alertDirection === 'short' ? 'trending-down' : alertDirection === 'long' ? 'trending-up' : 'arrow-forward'}
+        onPress={() => navigation.navigate('Alerts')}
+        style={styles.spaced}
+      />
+
+      {/* Broker connection */}
       {isPremium ? (
-        // Already connected - a quiet status row, not a second hero banner
-        // competing with the Trade Alerts card below.
-        <SurfaceCard onPress={connect.open} style={[styles.cardSpaced, styles.statusCard]}>
-          <View style={styles.statusIcon}>
-            <Ionicons name="checkmark" size={18} color={colors.accentGreen} />
-          </View>
+        <SurfaceCard onPress={connect.open} style={[styles.spaced, styles.statusCard]}>
+          <IconBadge
+            icon="checkmark"
+            size={40}
+            color={colors.accentGreen}
+            backgroundColor="rgba(46,230,166,0.12)"
+          />
           <View style={styles.statusText}>
             <Text style={styles.statusTitle}>PrimeXBT connected</Text>
             <Text style={styles.statusSubtitle}>Verified and funded</Text>
@@ -295,111 +375,103 @@ export default function HomeScreen({ navigation }: Props) {
         </SurfaceCard>
       ) : (
         <GradientLinkCard
+          icon="link-outline"
           title="Connect your PrimeXBT account"
           subtitle="Unlock premium features and trade alerts"
-          icon={require('../../assets/broker.png')}
           onPress={connect.open}
-          style={styles.cardSpaced}
+          style={styles.spaced}
         />
       )}
 
-      <SurfaceCard style={styles.cardSpaced}>
-        <View style={styles.quickActionsGrid}>
-          {quickActions.map((action) => (
-            <IconTile
-              key={action.label}
-              icon={action.icon}
-              label={action.label}
-              gradient={action.gradient}
-              image={action.image}
-              onPress={action.onPress}
-            />
-          ))}
+      {/* Learning progress - allocation bar */}
+      <SurfaceCard
+        style={styles.spaced}
+        onPress={() =>
+          progress?.continueCourse
+            ? navigation.navigate('Courses', {
+                screen: 'CourseDetail',
+                params: { courseId: progress.continueCourse.id },
+              })
+            : navigation.navigate('Courses', { screen: 'CoursesHome' })
+        }
+      >
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.cardTitle}>Learning progress</Text>
+          <Text style={styles.linkText}>
+            {progress?.continueCourse ? 'Continue' : 'Browse courses'}
+          </Text>
+        </View>
+        <View style={styles.progressValueRow}>
+          <Text style={styles.progressValue}>
+            {(progress?.completed ?? 0) + (progress?.inProgress ?? 0)}
+          </Text>
+          <Text style={styles.progressOf}>
+            {' '}of {progress?.total || '—'} courses started
+          </Text>
+        </View>
+        <View style={styles.allocationBar}>
+          {completedPct > 0 && (
+            <View style={[styles.allocationSegment, { flex: completedPct, backgroundColor: colors.accentGreen }]} />
+          )}
+          {inProgressPct > 0 && (
+            <View style={[styles.allocationSegment, { flex: inProgressPct, backgroundColor: colors.accentBlue }]} />
+          )}
+          <View style={[styles.allocationSegment, { flex: Math.max(100 - completedPct - inProgressPct, 0.01), backgroundColor: colors.surfaceTrack }]} />
+        </View>
+        <View style={styles.legendRow}>
+          <LegendDot color={colors.accentGreen} label={`${progress?.completed ?? 0} completed`} />
+          <LegendDot color={colors.accentBlue} label={`${progress?.inProgress ?? 0} in progress`} />
+          {progress?.continueCourse && (
+            <Text style={styles.legendCourse} numberOfLines={1}>
+              {progress.continueCourse.title}
+            </Text>
+          )}
         </View>
       </SurfaceCard>
 
-      <GradientLinkCard
-        title="View JMONEY Trade Alerts"
-        subtitle="Real-time trade alert insights"
-        icon={require('../../assets/tradealerts.png')}
-        onPress={() => navigation.navigate('Alerts')}
-        style={styles.cardSpaced}
-      />
-
-      <View style={styles.cardSpaced}>
-        <PromoCarousel items={promoItems} />
-      </View>
-
-      <View style={styles.cardSpaced}>
+      <View style={styles.spaced}>
         <SentimentPoll />
       </View>
 
-      <SurfaceCard style={styles.cardSpaced}>
-        <View style={styles.progressHeaderRow}>
-          <Text style={styles.cardHeading}>Your Progress</Text>
-          <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
-        </View>
-        <View style={styles.progressRow}>
-          <Text style={styles.progressLabel}>Courses started</Text>
-          <View style={styles.countPill}>
-            <Text style={styles.countPillText}>
-              {coursesStarted}/{coursesTotal || '—'}
-            </Text>
-          </View>
-        </View>
-        <SegmentedBar
-          segments={displaySegments}
-          filled={filledSegments}
-          filledColor={colors.warning}
-          style={styles.progressBarSpaced}
+      {/* Upcoming - watchlist-style list */}
+      <View style={styles.sectionHeaderRow}>
+        <Text style={styles.sectionTitle}>Upcoming</Text>
+        <Pressable hitSlop={8} onPress={() => navigation.navigate('Live')}>
+          <Text style={styles.linkText}>Live sessions</Text>
+        </Pressable>
+      </View>
+      <SurfaceCard style={styles.listCard}>
+        <ListRow
+          icon="videocam-outline"
+          title={nextSession?.title ?? 'Live session'}
+          subtitle="Next live session"
+          value={nextSession ? shortDate(nextSession.date) : 'None yet'}
+          subvalue={nextSession ? daysUntil(nextSession.date) : 'Check back soon'}
+          subvalueColor={colors.link}
+          onPress={() => navigation.navigate('Live')}
         />
-        <PrimaryButton
-          label={continueCourse ? 'Continue Course' : 'Start Course'}
-          icon={null}
-          variant="flat"
-          onPress={() =>
-            continueCourse
-              ? openCourse(continueCourse.courseId)
-              : navigation.navigate('Courses', { screen: 'CoursesHome' })
-          }
-          style={styles.fieldSpaced}
+        <ListRow
+          icon="briefcase-outline"
+          title="Non-Farm Payrolls"
+          subtitle="US · NFP release"
+          value={shortDate(nextNFP.date)}
+          subvalue={daysUntil(nextNFP.date)}
+          subvalueColor={colors.link}
+        />
+        <ListRow
+          icon="pricetags-outline"
+          title="Consumer Price Index"
+          subtitle="US · CPI release"
+          value={shortDate(nextCPI.date)}
+          subvalue={daysUntil(nextCPI.date)}
+          subvalueColor={colors.link}
+          divider={false}
         />
       </SurfaceCard>
 
-      <View style={[styles.statsRow, styles.cardSpaced]}>
-        <StatCard
-          icon="videocam-outline"
-          image={require('../../assets/livesessions.png')}
-          value={nextSession?.dateLabel ?? 'No sessions'}
-          label="Next Live Session"
-          sublabel={nextSession?.title ?? 'Check back soon'}
-        />
-        <StatCard
-          icon="options-outline"
-          image={require('../../assets/marketanalysis.png')}
-          trendLabel={nextNFP.daysToGoLabel}
-          value={nextNFP.dateLabel}
-          label="Next NFP"
-          sublabel="US Non-Farm Payrolls"
-        />
-      </View>
-      <View style={[styles.statsRow, styles.fieldSpaced]}>
-        <StatCard
-          icon="bar-chart-outline"
-          image={require('../../assets/marketanalysis.png')}
-          trendLabel={nextCPI.daysToGoLabel}
-          value={nextCPI.dateLabel}
-          label="Next CPI"
-          sublabel="US Consumer Price Index"
-        />
-        <StatCard
-          icon="trophy-outline"
-          image={require('../../assets/dashboard.png')}
-          trendLabel="+Growing daily"
-          value={getCommunityCount().toLocaleString('en-US')}
-          label="Community Members"
-          sublabel="Active traders"
-        />
+      <Text style={[styles.sectionTitle, styles.exploreTitle]}>Explore</Text>
+      <View style={styles.carouselSpaced}>
+        <PromoCarousel items={promoItems} />
       </View>
 
       <PrimeXBTConnectModal
@@ -423,64 +495,147 @@ export default function HomeScreen({ navigation }: Props) {
   );
 }
 
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <View style={styles.legendItem}>
+      <View style={[styles.legendDot, { backgroundColor: color }]} />
+      <Text style={styles.legendText}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 12,
+    paddingBottom: 18,
+  },
+  profileRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  greetingCol: {
+    flex: 1,
+  },
+  greetingLabel: {
+    color: colors.textFaint,
+    fontSize: 13,
+  },
+  greetingName: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: 1,
+  },
   heroCard: {
-    marginTop: 16,
+    borderRadius: radius['2xl'],
+    padding: 20,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
   heroTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  greetingLabel: {
-    color: colors.textFaint,
-    fontSize: 15,
-    fontWeight: '500',
+  heroLabel: {
+    color: colors.textMuted,
+    fontSize: 14,
   },
-  tierPill: {
+  tierChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: colors.surfaceAlt,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: colors.glassTile,
   },
-  tierPillText: {
+  tierChipPremium: {
+    backgroundColor: colors.warningDim,
+  },
+  tierChipText: {
     color: colors.textFaint,
     fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontWeight: '600',
   },
-  tierPillTextPremium: {
+  tierChipTextPremium: {
     color: colors.warning,
   },
-  quickActionsGrid: {
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 8,
+  },
+  balance: {
+    flexShrink: 1,
+    color: colors.text,
+    fontSize: 38,
+    lineHeight: 48,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
+  balanceNegative: {
+    color: colors.accentRed,
+  },
+  chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 18,
+    gap: 8,
+    marginTop: 10,
   },
-  greetingHeading: {
-    color: colors.text,
-    fontSize: 32,
-    lineHeight: 40,
-    fontWeight: '800',
-    marginTop: 2,
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: colors.glassTile,
+  },
+  chipGreen: {
+    backgroundColor: 'rgba(46,230,166,0.12)',
+  },
+  chipRed: {
+    backgroundColor: 'rgba(255,77,106,0.12)',
+  },
+  chipText: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  spaced: {
+    marginTop: 14,
   },
   statusCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
     paddingVertical: 14,
-  },
-  statusIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: 'rgba(37,211,102,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   statusText: {
     flex: 1,
@@ -495,81 +650,92 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 1,
   },
-  cardSpaced: {
-    marginTop: 20,
-  },
-  progressHeaderRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  progressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 14,
+  cardTitle: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '700',
   },
-  progressLabel: {
+  linkText: {
+    color: colors.link,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  progressValueRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: 10,
+  },
+  progressValue: {
+    color: colors.text,
+    fontSize: 30,
+    fontWeight: '700',
+  },
+  progressOf: {
     color: colors.textMuted,
     fontSize: 14,
   },
-  countPill: {
-    backgroundColor: colors.accentBlueDim,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  allocationBar: {
+    flexDirection: 'row',
+    gap: 3,
+    height: 10,
+    marginTop: 14,
   },
-  countPillText: {
-    color: colors.accentBlue,
-    fontSize: 13,
-    fontWeight: '800',
+  allocationSegment: {
+    height: 10,
+    borderRadius: 3,
   },
-  progressBarSpaced: {
-    marginTop: 12,
-  },
-  cardHeadingRow: {
+  legendRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    flexWrap: 'wrap',
+    gap: 14,
+    marginTop: 12,
   },
-  cardHeading: {
-    color: colors.text,
-    fontSize: 17,
-    fontWeight: '800',
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  cardDescription: {
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+  },
+  legendText: {
     color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 8,
+    fontSize: 12,
   },
-  fieldSpaced: {
-    marginTop: 16,
-  },
-  helperText: {
+  legendCourse: {
+    flex: 1,
     color: colors.textFaint,
     fontSize: 12,
-    lineHeight: 17,
-    marginTop: 8,
+    textAlign: 'right',
   },
-  helperBold: {
-    color: colors.textMuted,
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 28,
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 18,
     fontWeight: '700',
   },
-  successText: {
-    color: colors.accentGreen,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 14,
+  listCard: {
+    paddingVertical: 4,
   },
-  errorText: {
-    color: colors.accentRed,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 14,
+  exploreTitle: {
+    marginTop: 28,
+    marginBottom: 10,
   },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
+  carouselSpaced: {
+    marginBottom: 8,
   },
 });

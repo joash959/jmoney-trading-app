@@ -22,7 +22,10 @@ export default function TopBar({ pillLabel, onPillPress, rightElement }: Props) 
       </View>
       {rightElement ??
         (pillLabel && (
-          <Pressable style={styles.pill} onPress={onPillPress}>
+          <Pressable
+            style={({ pressed }) => [styles.pill, pressed && styles.pillPressed]}
+            onPress={onPillPress}
+          >
             <Text style={styles.pillText}>{pillLabel}</Text>
           </Pressable>
         ))}
@@ -35,32 +38,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: 14,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   logoMark: {
-    width: 32,
-    height: 32,
+    width: 30,
+    height: 30,
   },
   logoText: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   pill: {
-    backgroundColor: colors.accentBlue,
+    borderWidth: 1,
+    borderColor: colors.accentBlue,
     paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: 20,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  pillPressed: {
+    backgroundColor: colors.accentBlueDim,
   },
   pillText: {
     color: colors.text,
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 14,
   },
 });

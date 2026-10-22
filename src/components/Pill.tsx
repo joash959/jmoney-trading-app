@@ -19,13 +19,13 @@ export default function Pill({ label, color, backgroundColor }: Props) {
 
 const styles = StyleSheet.create({
   pill: {
-    borderWidth: 1,
-    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   text: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

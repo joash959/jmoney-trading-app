@@ -6,6 +6,7 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { radius } from '../theme/radius';
 import { useFocusGlow } from '../hooks/useFocusGlow';
+import { sentenceCase } from '../lib/textCase';
 
 type Props = {
   label: string;
@@ -36,7 +37,7 @@ export default function FormInput({
 
   return (
     <View style={containerStyle}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>{sentenceCase(label)}</Text>
       <Animated.View
         style={[styles.inputWrapper, { borderColor: glow.borderColor }]}
       >
@@ -63,9 +64,8 @@ export default function FormInput({
 const styles = StyleSheet.create({
   label: {
     color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
+    fontSize: 13,
+    fontWeight: '500',
     marginBottom: 8,
   },
   inputWrapper: {
@@ -73,10 +73,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     backgroundColor: colors.inputBackground,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderRadius: radius.lg,
-    paddingHorizontal: 14,
-    height: 52,
+    paddingHorizontal: 16,
+    height: 54,
   },
   input: {
     flex: 1,

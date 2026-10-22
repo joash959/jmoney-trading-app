@@ -215,8 +215,8 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
 
           <GlassCard style={styles.cardSpaced}>
             <View style={styles.metaRow}>
-              {course.level && <Pill label={course.level} color={colors.accentGreen} backgroundColor="rgba(37,211,102,0.12)" />}
-              {course.category && <Pill label={course.category} color={colors.link} backgroundColor="rgba(78,140,255,0.12)" />}
+              {course.level && <Pill label={course.level} color={colors.accentGreen} backgroundColor="rgba(46,230,166,0.12)" />}
+              {course.category && <Pill label={course.category} color={colors.link} backgroundColor="rgba(108,99,255,0.12)" />}
             </View>
             <Text style={styles.courseTitle}>{course.title}</Text>
             {!!course.description && (
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: radius.lg,
-    backgroundColor: 'rgba(78,140,255,0.12)',
+    backgroundColor: 'rgba(108,99,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },

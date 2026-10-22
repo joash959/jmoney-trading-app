@@ -16,6 +16,7 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
+import IconBadge from '../components/IconBadge';
 import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimaryButton from '../components/PrimaryButton';
@@ -193,8 +194,7 @@ export default function LiveScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="videocam-outline"
-        image={require('../../assets/livesessions.png')}
-        title="Live Sessions"
+        title="Live sessions"
       />
 
       {loading ? (
@@ -240,9 +240,7 @@ export default function LiveScreen({ navigation }: Props) {
                 return (
                   <View key={session.id} style={styles.sessionCard}>
                     <View style={styles.sessionHeaderRow}>
-                      <View style={styles.sessionIconCircle}>
-                        <Ionicons name="videocam-outline" size={11} color={colors.link} />
-                      </View>
+                      <IconBadge icon="videocam-outline" size={42} />
                       <View style={styles.sessionTitleCol}>
                         <Text style={styles.sessionTitle} numberOfLines={2}>
                           {session.title}
@@ -306,7 +304,7 @@ export default function LiveScreen({ navigation }: Props) {
                     <PrimaryButton
                       label={locked ? 'Connect PrimeXBT' : 'Join session'}
                       icon={locked ? 'lock-closed-outline' : 'videocam-outline'}
-                      variant="flat"
+                      variant="tonal"
                       loading={joiningId === session.id}
                       onPress={() => (locked ? connect.open() : handleJoin(session))}
                       style={styles.joinButton}
@@ -352,21 +350,15 @@ const styles = StyleSheet.create({
   },
   sessionCard: {
     backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 16,
+    borderRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
+    padding: 18,
   },
   sessionHeaderRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  sessionIconCircle: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    gap: 12,
   },
   sessionTitleCol: {
     flex: 1,
@@ -374,7 +366,7 @@ const styles = StyleSheet.create({
   sessionTitle: {
     color: colors.text,
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   premiumPill: {
     flexDirection: 'row',
@@ -425,8 +417,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   passwordChipCopied: {
-    borderColor: 'rgba(37,211,102,0.4)',
-    backgroundColor: 'rgba(37,211,102,0.1)',
+    borderColor: 'rgba(46,230,166,0.4)',
+    backgroundColor: 'rgba(46,230,166,0.1)',
   },
   passwordChipPressed: {
     opacity: 0.7,

@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
   },
   segment: {
     flex: 1,
-    height: 6,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: colors.surfaceTrack,
   },
 });

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
@@ -115,6 +115,7 @@ function getWidgetHtml(symbol: string) {
 }
 
 export default function MarketAnalysisScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const connect = usePrimeXBTConnect();
@@ -170,8 +171,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
           />
           <ScreenHeader
             icon="bar-chart-outline"
-            image={require('../../assets/marketanalysis.png')}
-            title="Market Analysis"
+            title="Market analysis"
           />
           <EmptyStateCard
             icon="lock-closed-outline"
@@ -210,8 +210,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="bar-chart-outline"
-          image={require('../../assets/marketanalysis.png')}
-          title="Market Analysis"
+          title="Market analysis"
         />
       </View>
 
@@ -245,7 +244,8 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <WebView
         key={symbol}
         source={{ html: widgetHtml }}
-        style={styles.webview}
+        // Stop above the floating tab bar instead of running underneath it.
+        style={[styles.webview, { marginBottom: 62 + Math.max(insets.bottom, 10) }]}
         scrollEnabled
         originWhitelist={['*']}
       />
@@ -285,9 +285,11 @@ const styles = StyleSheet.create({
   marketPill: {
     height: 36,
     justifyContent: 'center',
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.glassTile,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
     borderRadius: 999,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
   },
   marketPillActive: {
     backgroundColor: colors.accentBlue,
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
   marketPillText: {
     color: colors.textMuted,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   marketPillTextActive: {
     color: colors.text,

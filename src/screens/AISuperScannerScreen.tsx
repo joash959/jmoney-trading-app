@@ -159,7 +159,6 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="locate-outline"
-        image={require('../../assets/aiscanner.png')}
         title="AI Super Scanner"
       />
 
@@ -511,7 +510,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     padding: spacing.sm,
     borderRadius: radius.lg,
-    backgroundColor: 'rgba(239,68,68,0.1)',
+    backgroundColor: 'rgba(255,77,106,0.1)',
   },
   warningText: {
     flex: 1,

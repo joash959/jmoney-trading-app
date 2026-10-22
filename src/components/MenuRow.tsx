@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import IconBadge from './IconBadge';
 
 type Props = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -19,7 +20,7 @@ export default function MenuRow({ icon, label, onPress, destructive }: Props) {
       onPress={onPress}
     >
       <View style={styles.left}>
-        <Ionicons name={icon} size={20} color={tint} />
+        <IconBadge icon={icon} size={38} color={tint} />
         <Text style={[styles.label, { color: tint }]}>{label}</Text>
       </View>
       {!destructive && (
@@ -34,8 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 12,
   },
   rowPressed: {
     opacity: 0.6,
@@ -43,10 +43,10 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 14,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

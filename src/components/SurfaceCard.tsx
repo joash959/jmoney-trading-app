@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors } from '../theme/colors';
-import { radius } from '../theme/radius';
-import { spacing } from '../theme/spacing';
+import GlassSheen from './GlassSheen';
+import { glassCardStyle } from './GlassCard';
 
 type Props = {
   children: ReactNode;
@@ -10,33 +9,31 @@ type Props = {
   onPress?: () => void;
 };
 
-/** Flat, solid-fill card - no blur/glass. The bold dashboard-tile look. */
+/** Glass card that can also be tappable. Same surface as GlassCard. */
 export default function SurfaceCard({ children, style, onPress }: Props) {
   if (onPress) {
     return (
       <Pressable
-        style={({ pressed }) => [
-          styles.card,
-          pressed && styles.pressed,
-          style,
-        ]}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
         onPress={onPress}
       >
+        <GlassSheen />
         {children}
       </Pressable>
     );
   }
 
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <View style={[styles.card, style]}>
+      <GlassSheen />
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-  },
+  card: glassCardStyle,
   pressed: {
-    opacity: 0.85,
+    opacity: 0.8,
   },
 });

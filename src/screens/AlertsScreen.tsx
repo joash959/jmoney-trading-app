@@ -3,7 +3,9 @@ import { Animated, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { colors } from '../theme/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
@@ -14,7 +16,7 @@ import ScreenShell from '../components/ScreenShell';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
-import InsightCard from '../components/InsightCard';
+import SegmentedTabs from '../components/SegmentedTabs';
 import AlertCard from '../components/AlertCard';
 import Skeleton from '../components/Skeleton';
 import EmptyStateCard from '../components/EmptyStateCard';
@@ -82,6 +84,7 @@ export default function AlertsScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [locked, setLocked] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'long' | 'short'>('all');
 
   useEffect(() => {
     let cancelled = false;
@@ -213,7 +216,11 @@ export default function AlertsScreen({ navigation }: Props) {
 
   const groupedAlerts = useMemo(() => {
     const groups: { label: string; items: TradeAlert[] }[] = [];
-    alerts.forEach((alert) => {
+    const visible =
+      filter === 'all'
+        ? alerts
+        : alerts.filter((alert) => detectAlertDirection(alert.message) === filter);
+    visible.forEach((alert) => {
       const label = formatDateLabel(alert.created_at);
       const lastGroup = groups[groups.length - 1];
       if (lastGroup && lastGroup.label === label) {
@@ -223,49 +230,43 @@ export default function AlertsScreen({ navigation }: Props) {
       }
     });
     return groups;
-  }, [alerts]);
+  }, [alerts, filter]);
 
+  const directedTotal = Math.max(longCount + shortCount, 1);
   const statsRow = (
-    <View style={styles.statsRow}>
-      <InsightCard
-        compact
-        variant="gradient"
-        icon="pulse-outline"
-        label="Today"
-        value={String(todayCount)}
+    <View style={styles.summaryCard}>
+      <LinearGradient
+        colors={gradients.heroCard}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
       />
-      <InsightCard
-        compact
-        variant="gradient"
-        icon="trending-up"
-        label="Long"
-        value={String(longCount)}
-      />
-      <InsightCard
-        compact
-        variant="gradient"
-        icon="trending-down"
-        label="Short"
-        value={String(shortCount)}
-      />
-      <InsightCard
-        compact
-        variant="gradient"
-        icon="time-outline"
-        label="Last Alert"
-        value={alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
-      />
+      <View style={styles.summaryTopRow}>
+        <Text style={styles.summaryLabel}>Alerts today</Text>
+        <Text style={styles.summaryMeta}>
+          Last {alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
+        </Text>
+      </View>
+      <Text style={styles.summaryValue}>{todayCount}</Text>
+      <View style={styles.splitBar}>
+        <View style={[styles.splitSegment, { flex: longCount || 0.0001, backgroundColor: colors.accentGreen }]} />
+        <View style={[styles.splitSegment, { flex: shortCount || 0.0001, backgroundColor: colors.accentRed }]} />
+        {longCount + shortCount === 0 && (
+          <View style={[styles.splitSegment, { flex: 1, backgroundColor: colors.surfaceTrack }]} />
+        )}
+      </View>
+      <View style={styles.splitLegend}>
+        <Text style={[styles.splitText, { color: colors.accentGreen }]}>
+          {longCount} buy · {Math.round((longCount / directedTotal) * 100)}%
+        </Text>
+        <Text style={[styles.splitText, { color: colors.accentRed }]}>
+          {shortCount} sell · {Math.round((shortCount / directedTotal) * 100)}%
+        </Text>
+      </View>
     </View>
   );
 
-  const statsSkeleton = (
-    <View style={styles.statsRow}>
-      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-      <Skeleton height={54} radius={12} style={styles.skeletonFlex} />
-    </View>
-  );
+  const statsSkeleton = <Skeleton height={150} radius={22} style={styles.summarySkeleton} />;
 
   if (checkingAccess) {
     return (
@@ -288,11 +289,7 @@ export default function AlertsScreen({ navigation }: Props) {
             />
           }
         />
-        <ScreenHeader
-          icon="notifications-outline"
-          image={require('../../assets/tradealerts.png')}
-          title="Trade Alerts"
-        />
+        <ScreenHeader title="Trade alerts" />
         <View style={styles.fieldSpaced}>
           {loading ? statsSkeleton : statsRow}
         </View>
@@ -335,9 +332,7 @@ export default function AlertsScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="notifications-outline"
-        image={require('../../assets/tradealerts.png')}
-        title="Trade Alerts"
+        title="Trade alerts"
         rightElement={
           <View style={styles.livePill}>
             <Animated.View
@@ -365,6 +360,17 @@ export default function AlertsScreen({ navigation }: Props) {
         <>
           {statsRow}
 
+          <SegmentedTabs
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'long', label: 'Buy' },
+              { value: 'short', label: 'Sell' },
+            ]}
+            value={filter}
+            onChange={setFilter}
+            style={styles.filterSpaced}
+          />
+
           <View style={styles.list}>
             {groupedAlerts.map((group) => (
               <View key={group.label} style={styles.group}>
@@ -382,8 +388,10 @@ export default function AlertsScreen({ navigation }: Props) {
                 </View>
               </View>
             ))}
-            {alerts.length === 0 && (
-              <Text style={styles.emptyText}>No alerts yet.</Text>
+            {groupedAlerts.length === 0 && (
+              <Text style={styles.emptyText}>
+                {alerts.length === 0 ? 'No alerts yet.' : `No ${filter === 'long' ? 'buy' : 'sell'} alerts right now.`}
+              </Text>
             )}
           </View>
         </>
@@ -397,10 +405,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(37,211,102,0.35)',
-    backgroundColor: 'rgba(37,211,102,0.12)',
-    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: 'rgba(46,230,166,0.35)',
+    backgroundColor: 'rgba(46,230,166,0.1)',
+    borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
@@ -413,7 +421,7 @@ const styles = StyleSheet.create({
   liveText: {
     color: colors.accentGreen,
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
   errorText: {
@@ -421,10 +429,59 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
-  statsRow: {
+  summaryCard: {
+    marginTop: 16,
+    padding: 20,
+    borderRadius: radius['2xl'],
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
+  },
+  summarySkeleton: {
+    marginTop: 16,
+  },
+  summaryTopRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 14,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    color: colors.textMuted,
+    fontSize: 14,
+  },
+  summaryMeta: {
+    color: colors.textFaint,
+    fontSize: 12,
+  },
+  summaryValue: {
+    color: colors.text,
+    fontSize: 40,
+    lineHeight: 50,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  splitBar: {
+    flexDirection: 'row',
+    gap: 3,
+    height: 8,
+    marginTop: 12,
+  },
+  splitSegment: {
+    height: 8,
+    borderRadius: 3,
+  },
+  splitLegend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  splitText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  filterSpaced: {
+    marginTop: 16,
   },
   fieldSpaced: {
     marginTop: 8,
@@ -448,9 +505,9 @@ const styles = StyleSheet.create({
   dateLabel: {
     color: colors.textFaint,
     fontSize: 12,
-    fontWeight: '700',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: 10,
+    fontWeight: '500',
+    backgroundColor: colors.glassTile,
+    borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
     overflow: 'hidden',
@@ -463,8 +520,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     paddingVertical: 16,
-  },
-  skeletonFlex: {
-    flex: 1,
   },
 });

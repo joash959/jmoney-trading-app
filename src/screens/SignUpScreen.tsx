@@ -352,7 +352,6 @@ const styles = StyleSheet.create({
     lineHeight: 40,
   },
   headingAccent: {
-    fontStyle: 'italic',
   },
   subtitle: {
     color: colors.textMuted,
@@ -378,7 +377,6 @@ const styles = StyleSheet.create({
     lineHeight: 27,
   },
   cardHeadingAccent: {
-    fontStyle: 'italic',
   },
   cardDescription: {
     color: colors.textMuted,

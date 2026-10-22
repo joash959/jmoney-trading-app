@@ -82,13 +82,13 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: colors.card,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth * 2,
     borderColor: colors.cardBorder,
     borderRadius: radius.lg,
-    padding: 10,
+    padding: 12,
   },
   cardCompact: {
-    padding: 7,
+    padding: 9,
     borderRadius: radius.md,
   },
   headerRow: {
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
     color: colors.link,
   },
   value: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 17,
+    fontWeight: '700',
     marginTop: 6,
   },
   valueCompact: {

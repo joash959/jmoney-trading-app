@@ -92,18 +92,43 @@ export default function SentimentPoll() {
       </View>
 
       {picked ? (
-        <View style={styles.resultRow}>
-          <Ionicons
-            name={picked === 'bullish' ? 'trending-up-outline' : 'trending-down-outline'}
-            size={16}
-            color={picked === 'bullish' ? colors.accentGreen : colors.accentRed}
-          />
-          <Text style={styles.resultText}>
-            You're feeling {picked}.{' '}
-            {counts
-              ? `${percentage(counts, 'bullish')}% Bullish · ${percentage(counts, 'bearish')}% Bearish today.`
-              : 'Check back tomorrow!'}
-          </Text>
+        <View>
+          <View style={styles.resultRow}>
+            <Ionicons
+              name={picked === 'bullish' ? 'trending-up-outline' : 'trending-down-outline'}
+              size={16}
+              color={picked === 'bullish' ? colors.accentGreen : colors.accentRed}
+            />
+            <Text style={styles.resultText}>
+              You're feeling {picked}.{counts ? '' : ' Check back tomorrow!'}
+            </Text>
+          </View>
+          {counts && (
+            <>
+              <View style={styles.splitBar}>
+                <View
+                  style={[
+                    styles.splitSegment,
+                    { flex: percentage(counts, 'bullish') || 0.0001, backgroundColor: colors.accentGreen },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.splitSegment,
+                    { flex: percentage(counts, 'bearish') || 0.0001, backgroundColor: colors.accentRed },
+                  ]}
+                />
+              </View>
+              <View style={styles.splitLegend}>
+                <Text style={[styles.splitText, { color: colors.accentGreen }]}>
+                  {percentage(counts, 'bullish')}% bullish
+                </Text>
+                <Text style={[styles.splitText, { color: colors.accentRed }]}>
+                  {percentage(counts, 'bearish')}% bearish
+                </Text>
+              </View>
+            </>
+          )}
         </View>
       ) : (
         <View style={styles.pillRow}>
@@ -137,7 +162,9 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: colors.text,
-    ...typography.bodyStrong,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
   },
   pillRow: {
     flexDirection: 'row',
@@ -150,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 6,
     borderRadius: radius.lg,
-    backgroundColor: 'rgba(239,68,68,0.14)',
+    backgroundColor: 'rgba(255,77,106,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -160,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 6,
     borderRadius: radius.lg,
-    backgroundColor: 'rgba(37,211,102,0.14)',
+    backgroundColor: 'rgba(46,230,166,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -184,5 +211,24 @@ const styles = StyleSheet.create({
   resultText: {
     color: colors.textMuted,
     ...typography.callout,
+  },
+  splitBar: {
+    flexDirection: 'row',
+    gap: 3,
+    height: 8,
+    marginTop: spacing.sm,
+  },
+  splitSegment: {
+    height: 8,
+    borderRadius: 3,
+  },
+  splitLegend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.xs,
+  },
+  splitText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
 });

@@ -1,14 +1,13 @@
-import { Image, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
+import GlassSheen from './GlassSheen';
+import IconBadge, { IoniconName } from './IconBadge';
 
 type Props = {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
-  image?: number;
+  icon: IoniconName;
   trendLabel?: string;
   value: string;
   label: string;
@@ -18,7 +17,6 @@ type Props = {
 
 export default function StatCard({
   icon,
-  image,
   trendLabel,
   value,
   label,
@@ -27,14 +25,9 @@ export default function StatCard({
 }: Props) {
   return (
     <View style={[styles.card, style]}>
+      <GlassSheen />
       <View style={styles.topRow}>
-        {image ? (
-          <Image source={image} style={styles.iconImagePlain} resizeMode="contain" />
-        ) : (
-          <View style={styles.iconCircle}>
-            <Ionicons name={icon} size={16} color={colors.link} />
-          </View>
-        )}
+        <IconBadge icon={icon} size={36} />
         {trendLabel && (
           <View style={styles.trendPill}>
             <Text style={styles.trendText} numberOfLines={1}>
@@ -60,10 +53,11 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: colors.card,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth * 2,
     borderColor: colors.cardBorder,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     padding: spacing.md,
+    overflow: 'hidden',
   },
   topRow: {
     flexDirection: 'row',
@@ -71,24 +65,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 6,
   },
-  iconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconImagePlain: {
-    width: 34,
-    height: 34,
-  },
   trendPill: {
     flexShrink: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(37,211,102,0.12)',
+    backgroundColor: 'rgba(46,230,166,0.12)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,
@@ -101,14 +80,14 @@ const styles = StyleSheet.create({
   },
   value: {
     color: colors.text,
-    fontSize: 17,
-    fontWeight: '800',
-    marginTop: 12,
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 14,
   },
   label: {
     color: colors.textMuted,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '500',
     marginTop: 2,
   },
   sublabel: {

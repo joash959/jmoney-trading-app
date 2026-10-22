@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, gradients } from '../theme/colors';
+import { radius } from '../theme/radius';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
 import { parseFunctionError } from '../lib/functionError';
@@ -23,7 +24,6 @@ import PrizeTile from '../components/PrizeTile';
 import LeaderboardRow from '../components/LeaderboardRow';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
-import { iconTileGradients } from '../components/IconTile';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Leaderboard'>;
 
@@ -194,7 +194,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="trophy-outline"
-          image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
         <EmptyStateCard
@@ -225,7 +224,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <TopBar />
         <ScreenHeader
           icon="trophy-outline"
-          image={require('../../assets/leaderboard.png')}
           title="Leaderboard"
         />
       </ScreenShell>
@@ -248,13 +246,12 @@ export default function LeaderboardScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="trophy-outline"
-        image={require('../../assets/leaderboard.png')}
         title="Leaderboard"
       />
 
       {settings?.show_podium !== false && (
         <LinearGradient
-          colors={gradients.brand}
+          colors={gradients.heroCard}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[styles.heroCard, styles.cardSpaced]}
@@ -316,7 +313,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
             amountColor={GOLD}
             backgroundColor="rgba(245,197,24,0.1)"
             featured
-            gradient={iconTileGradients.gold}
+            gradient={['#FDE047', '#F5C518']}
           />
           <PrizeTile
             icon="trophy-outline"
@@ -477,8 +474,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   heroCard: {
-    borderRadius: 14,
+    borderRadius: radius['2xl'],
     padding: 20,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
   heroIconCircle: {
     width: 44,

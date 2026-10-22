@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     lineHeight: 46,
   },
   headingAccent: {
-    fontStyle: 'italic',
   },
   subtitle: {
     color: colors.textMuted,

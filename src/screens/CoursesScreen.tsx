@@ -124,7 +124,6 @@ export default function CoursesScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="book-outline"
-        image={require('../../assets/courses.png')}
         title="Courses"
       />
 

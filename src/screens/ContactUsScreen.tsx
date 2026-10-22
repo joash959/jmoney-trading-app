@@ -1,9 +1,8 @@
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
@@ -13,6 +12,7 @@ import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
+import GradientLinkCard from '../components/GradientLinkCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'ContactUs'>;
 
@@ -36,8 +36,7 @@ export default function ContactUsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="call-outline"
-        image={require('../../assets/contactus.png')}
-        title="Contact Us"
+        title="Contact us"
       />
 
       <Text style={styles.intro}>
@@ -45,51 +44,22 @@ export default function ContactUsScreen({ navigation }: Props) {
         related. Reach out on whichever channel works best for you.
       </Text>
 
-      <Pressable
+      <GradientLinkCard
+        icon="logo-whatsapp"
+        title="WhatsApp"
+        subtitle="Chat with our support team directly."
+        gradient={['rgba(46,230,166,0.2)', 'rgba(46,230,166,0.04)', 'rgba(22,22,30,0.6)']}
         onPress={() => Linking.openURL(WHATSAPP_URL)}
-        style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
-      >
-        <LinearGradient
-          colors={gradients.whatsapp}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.contactCard}
-        >
-          <View style={styles.contactIconCircle}>
-            <Ionicons name="chatbubble-outline" size={22} color={colors.text} />
-          </View>
-          <View style={styles.contactTextWrap}>
-            <Text style={styles.contactTitle}>WhatsApp</Text>
-            <Text style={styles.contactDescription}>
-              Chat with our support team directly.
-            </Text>
-          </View>
-          <Ionicons name="arrow-forward-outline" size={18} color={colors.text} />
-        </LinearGradient>
-      </Pressable>
+        style={styles.cardSpaced}
+      />
 
-      <Pressable
+      <GradientLinkCard
+        icon="paper-plane-outline"
+        title="Telegram"
+        subtitle="Join our channels for alerts and updates."
         onPress={() => navigation.navigate('TelegramChannels')}
-        style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
-      >
-        <LinearGradient
-          colors={gradients.telegram}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.contactCard}
-        >
-          <View style={styles.contactIconCircle}>
-            <Ionicons name="paper-plane-outline" size={22} color={colors.text} />
-          </View>
-          <View style={styles.contactTextWrap}>
-            <Text style={styles.contactTitle}>Telegram</Text>
-            <Text style={styles.contactDescription}>
-              Join our channels for alerts and updates.
-            </Text>
-          </View>
-          <Ionicons name="arrow-forward-outline" size={18} color={colors.text} />
-        </LinearGradient>
-      </Pressable>
+        style={styles.cardSpaced}
+      />
 
       <GlassCard style={styles.cardSpaced}>
         <View style={styles.rowHeader}>
@@ -126,37 +96,6 @@ const styles = StyleSheet.create({
   },
   cardSpaced: {
     marginTop: 16,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  contactCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-  },
-  contactIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  contactTextWrap: {
-    flex: 1,
-  },
-  contactTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  contactDescription: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 12,
-    marginTop: 3,
   },
   rowHeader: {
     flexDirection: 'row',

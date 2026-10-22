@@ -1,41 +1,23 @@
-import { Image, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Text from './AppText';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-
-export type IconTileGradient = readonly [string, string, ...string[]];
-
-export const iconTileGradients: Record<string, IconTileGradient> = {
-  blue: ['#4E8CFF', '#2F6FEF'],
-  purple: ['#A78BFA', '#7C3AED'],
-  green: ['#4ADE80', '#16A34A'],
-  teal: ['#22D3EE', '#0891B2'],
-  gold: ['#FDE047', '#F5C518'],
-  red: ['#F87171', '#EF4444'],
-};
+import GlassSheen from './GlassSheen';
+import type { IoniconName } from './IconBadge';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: IoniconName;
   label: string;
-  gradient?: IconTileGradient;
-  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
-  image?: number;
   onPress?: () => void;
   /** Overrides the default width, letting callers control per-row column count. */
   style?: StyleProp<ViewStyle>;
 };
 
-export default function IconTile({
-  icon,
-  label,
-  gradient = iconTileGradients.blue,
-  image,
-  onPress,
-  style,
-}: Props) {
+/** Square glass action tile - line icon over a short label (the "Buy / Sell
+ * / Trade / Menu" row in the reference designs). */
+export default function IconTile({ icon, label, onPress, style }: Props) {
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.();
@@ -43,24 +25,12 @@ export default function IconTile({
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.wrap, style, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.tile, style, pressed && styles.pressed]}
       onPress={handlePress}
     >
-      {image ? (
-        <View style={styles.imageTile}>
-          <Image source={image} style={styles.image} resizeMode="contain" />
-        </View>
-      ) : (
-        <LinearGradient
-          colors={gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.tile}
-        >
-          <Ionicons name={icon} size={22} color={colors.text} />
-        </LinearGradient>
-      )}
-      <Text style={styles.label} numberOfLines={2}>
+      <GlassSheen />
+      <Ionicons name={icon} size={22} color={colors.text} />
+      <Text style={styles.label} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>
@@ -68,36 +38,26 @@ export default function IconTile({
 }
 
 const styles = StyleSheet.create({
-  wrap: {
+  tile: {
     width: '23%',
+    aspectRatio: 0.92,
+    borderRadius: radius.lg,
+    backgroundColor: colors.glassTile,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 4,
+    overflow: 'hidden',
   },
   pressed: {
-    opacity: 0.7,
-  },
-  tile: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageTile: {
-    width: 56,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: 56,
-    height: 56,
+    backgroundColor: colors.surfaceElevated,
   },
   label: {
     color: colors.textMuted,
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 14,
   },
 });

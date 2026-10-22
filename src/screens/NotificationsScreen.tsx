@@ -25,11 +25,11 @@ const TYPE_ICON: Record<string, React.ComponentProps<typeof Ionicons>['name']> =
 
 const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
   premium_unlocked: { fg: colors.warning, bg: colors.warningDim },
-  session_reminder: { fg: colors.accentGreen, bg: 'rgba(37,211,102,0.15)' },
+  session_reminder: { fg: colors.accentGreen, bg: 'rgba(46,230,166,0.15)' },
   telegram_access: { fg: '#22D3EE', bg: 'rgba(34,211,238,0.15)' },
 };
 
-const DEFAULT_ACCENT = { fg: colors.link, bg: 'rgba(78,140,255,0.12)' };
+const DEFAULT_ACCENT = { fg: colors.link, bg: 'rgba(108,99,255,0.12)' };
 
 function iconForType(type: string) {
   return TYPE_ICON[type] ?? 'notifications-outline';
@@ -109,7 +109,6 @@ export default function NotificationsScreen({}: Props) {
 
       <ScreenHeader
         icon="notifications-outline"
-        image={require('../../assets/notifications.png')}
         title="Notifications"
       />
 
@@ -210,14 +209,14 @@ const styles = StyleSheet.create({
   },
   rowUnread: {
     borderWidth: 1,
-    borderColor: 'rgba(78,140,255,0.35)',
-    backgroundColor: 'rgba(47,111,239,0.08)',
+    borderColor: 'rgba(108,99,255,0.35)',
+    backgroundColor: 'rgba(108,99,255,0.08)',
   },
   rowIcon: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: 'rgba(78,140,255,0.12)',
+    backgroundColor: 'rgba(108,99,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },

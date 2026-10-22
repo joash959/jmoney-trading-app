@@ -9,9 +9,9 @@ import {
   Inter_600SemiBold,
 } from '@expo-google-fonts/inter';
 import {
+  Poppins_500Medium,
   Poppins_600SemiBold,
   Poppins_700Bold,
-  Poppins_800ExtraBold,
 } from '@expo-google-fonts/poppins';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { AlertsBadgeProvider } from './src/contexts/AlertsBadgeContext';
@@ -26,9 +26,9 @@ export default function App() {
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
+    Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold,
-    Poppins_800ExtraBold,
   });
 
   const hideSplash = useCallback(async () => {

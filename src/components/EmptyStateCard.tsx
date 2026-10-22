@@ -1,8 +1,8 @@
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
+import IconBadge from './IconBadge';
 import { colors } from '../theme/colors';
-import { radius } from '../theme/radius';
 import GlassCard from './GlassCard';
 import PrimaryButton from './PrimaryButton';
 
@@ -25,9 +25,7 @@ export default function EmptyStateCard({
 }: Props) {
   return (
     <GlassCard style={style} contentStyle={styles.card}>
-      <View style={styles.iconCircle}>
-        <Ionicons name={icon} size={22} color={colors.link} />
-      </View>
+      <IconBadge icon={icon} size={56} color={colors.link} backgroundColor={colors.accentBlueDim} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       {buttonLabel && (
@@ -48,19 +46,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 28,
   },
-  iconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.xl,
-    backgroundColor: 'rgba(78,140,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   title: {
     color: colors.text,
-    fontSize: 17,
-    fontWeight: '800',
-    marginTop: 14,
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 16,
   },
   subtitle: {
     color: colors.textMuted,

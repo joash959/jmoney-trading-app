@@ -25,9 +25,9 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
 const CATEGORY_ACCENTS = [
-  { bg: 'rgba(47,111,239,0.15)', fg: colors.link },
+  { bg: 'rgba(108,99,255,0.15)', fg: colors.link },
   { bg: 'rgba(139,124,255,0.15)', fg: colors.accentPurple },
-  { bg: 'rgba(37,211,102,0.15)', fg: colors.accentGreen },
+  { bg: 'rgba(46,230,166,0.15)', fg: colors.accentGreen },
   { bg: 'rgba(34,211,238,0.15)', fg: '#22D3EE' },
   { bg: 'rgba(245,197,24,0.15)', fg: colors.warning },
 ];
@@ -122,8 +122,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
       <ScreenHeader
         icon="options-outline"
-        image={require('../../assets/telegram.png')}
-        title="Telegram Channels"
+        title="Telegram channels"
       />
 
       {loading ? (
@@ -137,7 +136,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
             >
               <LinearGradient
-                colors={gradients.brand}
+                colors={gradients.heroCard}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.featuredCard}
@@ -265,6 +264,10 @@ const styles = StyleSheet.create({
   featuredCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
   featuredTopRow: {
     flexDirection: 'row',
@@ -358,7 +361,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(47,111,239,0.15)',
+    backgroundColor: 'rgba(108,99,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },

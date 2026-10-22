@@ -11,6 +11,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
+/** Glass button with a hairline edge - the quieter partner to PrimaryButton. */
 export default function SecondaryButton({ label, icon, onPress, style }: Props) {
   return (
     <Pressable
@@ -21,7 +22,7 @@ export default function SecondaryButton({ label, icon, onPress, style }: Props) 
       ]}
       onPress={onPress}
     >
-      {icon && <Ionicons name={icon} size={16} color={colors.text} />}
+      {icon && <Ionicons name={icon} size={17} color={colors.text} />}
       <Text style={styles.text}>{label}</Text>
     </Pressable>
   );
@@ -36,6 +37,8 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: radius.lg,
     backgroundColor: colors.buttonSecondary,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.borderStrong,
     paddingHorizontal: 18,
   },
   buttonPressed: {
@@ -44,7 +47,7 @@ const styles = StyleSheet.create({
   text: {
     color: colors.text,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,

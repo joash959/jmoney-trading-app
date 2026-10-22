@@ -1,20 +1,17 @@
 import { useState } from 'react';
-import { Image, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../theme/colors';
+import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
-import { IconTileGradient } from './IconTile';
+import IconBadge from './IconBadge';
 
 export type PromoItem = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
-  /** Optional real icon artwork - overrides the Ionicons glyph when provided. */
-  image?: number;
   title: string;
   subtitle: string;
-  gradient: IconTileGradient;
   onPress?: () => void;
 };
 
@@ -52,36 +49,20 @@ export default function PromoCarousel({ items }: Props) {
               pressed && styles.pressed,
             ]}
           >
-            <LinearGradient
-              colors={item.gradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.card}
-            >
-              <Ionicons
-                name="arrow-forward-outline"
-                size={20}
-                color={colors.text}
-                style={styles.arrow}
+            <View style={styles.card}>
+              <LinearGradient
+                colors={gradients.heroCard}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
               />
-              <View style={styles.row}>
-                <View style={styles.textCol}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.subtitle}>{item.subtitle}</Text>
-                </View>
-                {item.image ? (
-                  <Image
-                    source={item.image}
-                    style={styles.icon}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <View style={styles.iconCircle}>
-                    <Ionicons name={item.icon} size={20} color={colors.text} />
-                  </View>
-                )}
+              <View style={styles.topRow}>
+                <IconBadge icon={item.icon} size={42} />
+                <Ionicons name="arrow-forward" size={20} color={colors.text} />
               </View>
-            </LinearGradient>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.subtitle}>{item.subtitle}</Text>
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -106,47 +87,29 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.xl,
     padding: spacing.lg,
-    minHeight: 130,
-    justifyContent: 'center',
-    position: 'relative',
+    minHeight: 150,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
-  arrow: {
-    position: 'absolute',
-    top: spacing.lg,
-    right: spacing.lg,
-  },
-  row: {
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  textCol: {
-    flex: 1,
-    paddingRight: 16,
-  },
-  iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  icon: {
-    width: 64,
-    height: 64,
+    marginBottom: 16,
   },
   title: {
     color: colors.text,
-    fontSize: 19,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     lineHeight: 24,
-    paddingRight: 24,
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textMuted,
     fontSize: 13,
-    marginTop: 6,
+    lineHeight: 19,
+    marginTop: 4,
   },
   dots: {
     flexDirection: 'row',
@@ -162,6 +125,6 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     width: 18,
-    backgroundColor: colors.accentBlue,
+    backgroundColor: colors.text,
   },
 });

@@ -249,8 +249,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
         />
         <ScreenHeader
           icon="bookmark-outline"
-          image={require('../../assets/tradingjournal.png')}
-          title="Trading Journal"
+          title="Trading journal"
         />
         <EmptyStateCard
           icon="lock-closed-outline"
@@ -286,17 +285,17 @@ export default function TradingJournalScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
-        icon="bookmark-outline"
-        image={require('../../assets/tradingjournal.png')}
-        title="Trading Journal"
+        icon="create-outline"
+        title="Trading journal"
       />
 
-      <LinearGradient
-        colors={gradients.button}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.summaryCard, styles.cardSpaced]}
-      >
+      <View style={[styles.summaryCard, styles.cardSpaced]}>
+        <LinearGradient
+          colors={gradients.heroCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.summaryTopRow}>
           <View style={styles.summaryIconCircle}>
             <Ionicons name="trending-up-outline" size={20} color={colors.text} />
@@ -317,7 +316,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
         >
           {formatPnl(monthlyPnl)}
         </Text>
-      </LinearGradient>
+      </View>
 
       <View style={styles.cardSpaced}>
         <Calendar
@@ -437,8 +436,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   summaryCard: {
-    borderRadius: radius.xl,
-    padding: 18,
+    borderRadius: radius['2xl'],
+    padding: 20,
+    backgroundColor: colors.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorderTop,
+    overflow: 'hidden',
   },
   summaryTopRow: {
     flexDirection: 'row',
@@ -449,35 +452,37 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: colors.glassTile,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
   summaryLabel: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 13,
-    fontWeight: '600',
+    color: colors.textMuted,
+    fontSize: 14,
     marginTop: 16,
   },
   summaryValue: {
     color: colors.text,
-    fontSize: 30,
-    fontWeight: '800',
-    marginTop: 4,
+    fontSize: 38,
+    lineHeight: 48,
+    fontWeight: '700',
+    marginTop: 2,
   },
   summaryValueNegative: {
-    color: '#FFD7D7',
+    color: colors.accentRed,
   },
   daysPill: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: colors.glassTile,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: radius.pill,
   },
   daysText: {
-    color: colors.text,
+    color: colors.textMuted,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   fieldSpaced: {
     marginTop: 12,
@@ -550,12 +555,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: radius.md,
-    backgroundColor: 'rgba(37,211,102,0.15)',
+    backgroundColor: 'rgba(46,230,166,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   weekIndicatorNegative: {
-    backgroundColor: 'rgba(239,68,68,0.15)',
+    backgroundColor: 'rgba(255,77,106,0.15)',
   },
   weekDate: {
     color: colors.text,

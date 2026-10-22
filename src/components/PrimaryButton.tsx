@@ -6,7 +6,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
-import { shadows } from '../theme/shadows';
 
 type Props = {
   label: string;
@@ -14,7 +13,8 @@ type Props = {
   onPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'gradient' | 'flat';
+  /** 'tonal' is a tinted glass button for repeated, lower-emphasis actions. */
+  variant?: 'gradient' | 'flat' | 'tonal';
   style?: StyleProp<ViewStyle>;
 };
 
@@ -88,7 +88,13 @@ export default function PrimaryButton({
             {content}
           </LinearGradient>
         ) : (
-          <Animated.View style={[styles.button, styles.flatButton, visualStyle]}>
+          <Animated.View
+            style={[
+              styles.button,
+              variant === 'tonal' ? styles.tonalButton : styles.flatButton,
+              visualStyle,
+            ]}
+          >
             {content}
           </Animated.View>
         )}
@@ -107,16 +113,24 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   gradientShadow: {
-    ...shadows.glow,
+    shadowColor: '#6C63FF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 8,
   },
   flatButton: {
     backgroundColor: colors.accentBlue,
-    ...shadows.sm,
+  },
+  tonalButton: {
+    backgroundColor: colors.accentBlueDim,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: 'rgba(157,151,255,0.35)',
   },
   buttonText: {
     color: colors.text,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '600',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,
