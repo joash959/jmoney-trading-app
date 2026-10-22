@@ -33,26 +33,28 @@ export const colors = {
   textFaint: '#9696A3',
 
   // Brand purple - the app's primary colour (buttons, charts, highlights).
-  primary: '#8B7CFF',
-  primaryDim: 'rgba(139,124,255,0.16)',
-  accentBlue: '#6C63FF',
-  accentBlueDim: 'rgba(108,99,255,0.16)',
+  primary: '#7A4DFF',
+  primaryDim: 'rgba(122,77,255,0.2)',
+  accentBlue: '#6A3DF5',
+  accentBlueDim: 'rgba(122,77,255,0.2)',
   accentPurple: '#A78BFA',
   accentGreen: '#2EE6A6',
   accentRed: '#FF4D6A',
   warning: '#F5C518',
   warningDim: 'rgba(245,197,24,0.14)',
-  link: '#A8A4FF',
+  // Lighter tint of the primary for small text (links, dates) - stays
+  // readable on the dark background.
+  link: '#9E80FF',
 };
 
 export const gradients = {
-  brand: ['#8B5CF6', '#4F7CFF'] as const,
-  button: ['#7B61FF', '#4F6BFF'] as const,
+  brand: ['#9A5CFF', '#6A3DF5'] as const,
+  button: ['#8A55FF', '#6A3DF5'] as const,
   premiumGlow: ['rgba(124,58,237,0.35)', 'rgba(47,111,239,0)'] as const,
   // Hero / featured cards: a slightly brighter neutral glass, no tint.
   heroCard: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.025)', 'rgba(255,255,255,0.01)'] as const,
   // Top-left sheen on every glass card.
   glassSheen: ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0)'] as const,
   whatsapp: ['#34D399', '#128C7E'] as const,
-  telegram: ['#7B61FF', '#4F6BFF'] as const,
+  telegram: ['#8A55FF', '#6A3DF5'] as const,
 };

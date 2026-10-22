@@ -24,8 +24,8 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 type Props = NativeStackScreenProps<MoreStackParamList, 'TelegramChannels'>;
 
 const CATEGORY_ACCENTS = [
-  { bg: 'rgba(108,99,255,0.15)', fg: colors.link },
-  { bg: 'rgba(139,124,255,0.15)', fg: colors.accentPurple },
+  { bg: 'rgba(122,77,255,0.15)', fg: colors.link },
+  { bg: 'rgba(122,77,255,0.15)', fg: colors.accentPurple },
   { bg: 'rgba(46,230,166,0.15)', fg: colors.accentGreen },
   { bg: 'rgba(34,211,238,0.15)', fg: '#22D3EE' },
   { bg: 'rgba(245,197,24,0.15)', fg: colors.warning },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(108,99,255,0.15)',
+    backgroundColor: 'rgba(122,77,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },

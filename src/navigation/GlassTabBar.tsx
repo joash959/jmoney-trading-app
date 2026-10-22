@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   centerLift: {
     marginTop: -34,
     borderRadius: 31,
-    shadowColor: '#6C63FF',
+    shadowColor: '#7A4DFF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 14,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerInnerActive: {
-    backgroundColor: '#1B1A26',
+    backgroundColor: '#22163F',
   },
   centerBadge: {
     top: 0,
