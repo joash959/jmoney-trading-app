@@ -3,7 +3,7 @@ import Text from './AppText';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
-import GlassSheen from './GlassSheen';
+import LiquidGlass from './LiquidGlass';
 import type { IoniconName } from './IconBadge';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -28,11 +28,12 @@ export default function IconTile({ icon, label, onPress, style }: Props) {
       style={({ pressed }) => [styles.tile, style, pressed && styles.pressed]}
       onPress={handlePress}
     >
-      <GlassSheen />
-      <Ionicons name={icon} size={22} color={colors.text} />
-      <Text style={styles.label} numberOfLines={1}>
-        {label}
-      </Text>
+      <LiquidGlass style={styles.glass} interactive>
+        <Ionicons name={icon} size={22} color={colors.text} />
+        <Text style={styles.label} numberOfLines={1}>
+          {label}
+        </Text>
+      </LiquidGlass>
     </Pressable>
   );
 }
@@ -41,18 +42,17 @@ const styles = StyleSheet.create({
   tile: {
     width: '23%',
     aspectRatio: 0.92,
+  },
+  glass: {
+    flex: 1,
     borderRadius: radius.lg,
-    backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 4,
-    overflow: 'hidden',
   },
   pressed: {
-    backgroundColor: colors.surfaceElevated,
+    transform: [{ scale: 0.96 }],
   },
   label: {
     color: colors.textMuted,

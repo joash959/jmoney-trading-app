@@ -10,6 +10,7 @@ import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
@@ -73,13 +74,7 @@ export default function MoreScreen({ navigation }: Props) {
         }
       />
 
-      <View style={styles.profileCard}>
-        <LinearGradient
-          colors={gradients.heroCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+      <LiquidGlass style={styles.profileCard}>
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
@@ -105,7 +100,7 @@ export default function MoreScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-      </View>
+      </LiquidGlass>
 
       <SectionLabel>Shortcuts</SectionLabel>
       <View style={styles.grid}>
@@ -147,10 +142,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 20,
     borderRadius: radius['2xl'],
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   avatar: {
     width: 56,

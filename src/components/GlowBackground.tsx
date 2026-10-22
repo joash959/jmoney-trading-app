@@ -1,42 +1,41 @@
-import { useMemo } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useMemo, useRef } from 'react';
+import { Animated, Easing, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { colors } from '../theme/colors';
 
-/** Neutral near-black backdrop after the Syfter reference: a soft, cool
- * glow falling from the top centre, faint star specks, and a barely-there
- * chart line across the lower half. No hard lines and no colour cast -
- * built from gradients and plain views (no SVG or blur), so it renders the
- * same on iOS and Android. */
+type OrbSpec = {
+  /** Centre, as a fraction of screen width/height. */
+  x: number;
+  y: number;
+  size: number;
+  rgb: string;
+  alpha: number;
+  /** Drift distance (px) and loop duration (ms). */
+  drift: number;
+  duration: number;
+};
+
+// Mixed hues at low strength so the glass has colour to refract without
+// any single tint taking over.
+const ORBS: OrbSpec[] = [
+  { x: 0.12, y: 0.06, size: 380, rgb: '123,97,255', alpha: 0.32, drift: 26, duration: 16000 },
+  { x: 0.92, y: 0.2, size: 340, rgb: '64,132,255', alpha: 0.28, drift: 32, duration: 19000 },
+  { x: 0.2, y: 0.62, size: 320, rgb: '46,200,170', alpha: 0.14, drift: 24, duration: 22000 },
+  { x: 0.85, y: 0.82, size: 300, rgb: '170,90,255', alpha: 0.14, drift: 22, duration: 18000 },
+];
+
+/** Near-black backdrop with soft, slowly drifting colour glows and faint
+ * star specks - the "living" layer the liquid-glass surfaces refract.
+ * Glows are stacks of translucent circles (a radial gradient without SVG
+ * or blur), animated on the native driver, so they're cheap everywhere. */
 export default function GlowBackground() {
   const { width, height } = useWindowDimensions();
   const stars = useMemo(() => makeStars(width, height), [width, height]);
-  const chart = useMemo(() => makeChartSegments(width, height), [width, height]);
 
   return (
     <View style={styles.base} pointerEvents="none">
-      {/* Glow: feathered on both sides, fading out downwards. */}
-      <View style={styles.glowArea}>
-        <LinearGradient
-          colors={[
-            'rgba(190,195,225,0)',
-            'rgba(190,195,225,0.035)',
-            'rgba(190,195,225,0.07)',
-            'rgba(190,195,225,0.035)',
-            'rgba(190,195,225,0)',
-          ]}
-          locations={[0.08, 0.3, 0.5, 0.7, 0.92]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <LinearGradient
-          colors={['rgba(10,10,13,0)', colors.background]}
-          locations={[0, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-      </View>
-
+      {ORBS.map((orb, i) => (
+        <Orb key={i} spec={orb} screenWidth={width} screenHeight={height} />
+      ))}
       {stars.map((star, i) => (
         <View
           key={i}
@@ -53,22 +52,81 @@ export default function GlowBackground() {
           ]}
         />
       ))}
-
-      {chart.map((seg, i) => (
-        <View
-          key={`c${i}`}
-          style={[
-            styles.chartSegment,
-            {
-              left: seg.cx - seg.length / 2,
-              top: seg.cy - 0.75,
-              width: seg.length,
-              transform: [{ rotate: `${seg.angle}rad` }],
-            },
-          ]}
-        />
-      ))}
     </View>
+  );
+}
+
+const RINGS = 28;
+
+function Orb({
+  spec,
+  screenWidth,
+  screenHeight,
+}: {
+  spec: OrbSpec;
+  screenWidth: number;
+  screenHeight: number;
+}) {
+  const t = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(t, {
+          toValue: 1,
+          duration: spec.duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(t, {
+          toValue: 0,
+          duration: spec.duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [t, spec.duration]);
+
+  const translateX = t.interpolate({ inputRange: [0, 1], outputRange: [-spec.drift, spec.drift] });
+  const translateY = t.interpolate({ inputRange: [0, 1], outputRange: [spec.drift * 0.6, -spec.drift * 0.6] });
+  const scale = t.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.06] });
+
+  const ringAlpha = spec.alpha / RINGS;
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        left: spec.x * screenWidth - spec.size / 2,
+        top: spec.y * screenHeight - spec.size / 2,
+        width: spec.size,
+        height: spec.size,
+        transform: [{ translateX }, { translateY }, { scale }],
+      }}
+    >
+      {Array.from({ length: RINGS }, (_, i) => {
+        // Rings shrink towards the centre; overlapping alpha builds a soft
+        // falloff that's densest in the middle.
+        const d = spec.size * (1 - i / RINGS);
+        return (
+          <View
+            key={i}
+            style={{
+              position: 'absolute',
+              left: (spec.size - d) / 2,
+              top: (spec.size - d) / 2,
+              width: d,
+              height: d,
+              borderRadius: d / 2,
+              backgroundColor: `rgba(${spec.rgb},${ringAlpha})`,
+            }}
+          />
+        );
+      })}
+    </Animated.View>
   );
 }
 
@@ -83,38 +141,12 @@ function seeded(seed: number) {
 
 function makeStars(width: number, height: number) {
   const rand = seeded(42);
-  return Array.from({ length: 40 }, () => ({
+  return Array.from({ length: 36 }, () => ({
     x: rand() * width,
-    y: rand() * height * 0.85,
+    y: rand() * height * 0.9,
     size: rand() < 0.85 ? 1.5 : 2,
-    opacity: 0.08 + rand() * 0.22,
+    opacity: 0.1 + rand() * 0.25,
   }));
-}
-
-/** A jagged price line across the lower part of the screen, drawn as short
- * rotated segments. */
-function makeChartSegments(width: number, height: number) {
-  const rand = seeded(7);
-  const baseY = height * 0.72;
-  const points: { x: number; y: number }[] = [];
-  const steps = 34;
-  for (let i = 0; i <= steps; i++) {
-    const x = (i / steps) * (width + 40) - 20;
-    const swell = Math.sin((i / steps) * Math.PI * 2.2) * height * 0.05;
-    const y = baseY - swell + (rand() - 0.5) * height * 0.06;
-    points.push({ x, y });
-  }
-  return points.slice(1).map((p, i) => {
-    const prev = points[i];
-    const dx = p.x - prev.x;
-    const dy = p.y - prev.y;
-    return {
-      cx: (p.x + prev.x) / 2,
-      cy: (p.y + prev.y) / 2,
-      length: Math.sqrt(dx * dx + dy * dy) + 1,
-      angle: Math.atan2(dy, dx),
-    };
-  });
 }
 
 const styles = StyleSheet.create({
@@ -123,21 +155,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     overflow: 'hidden',
   },
-  glowArea: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '55%',
-  },
   star: {
     position: 'absolute',
     backgroundColor: '#FFFFFF',
-  },
-  chartSegment: {
-    position: 'absolute',
-    height: 1.5,
-    borderRadius: 1,
-    backgroundColor: 'rgba(255,255,255,0.05)',
   },
 });

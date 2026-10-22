@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Keyboard, Platform, Pressable, StyleSheet, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -9,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Text from '../components/AppText';
 import { colors, gradients } from '../theme/colors';
 import type { IoniconName } from '../components/IconBadge';
+import LiquidGlass from '../components/LiquidGlass';
 
 export type TabIcons = Record<string, { outline: IoniconName; filled: IoniconName }>;
 
@@ -36,9 +36,8 @@ export default function GlassTabBar({
   if (keyboardOpen && Platform.OS === 'android') return null;
 
   return (
-    <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 10) }]}>
-      <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-      <View style={[StyleSheet.absoluteFill, styles.tint]} />
+    <View style={[styles.wrap, { bottom: Math.max(insets.bottom - 6, 12) }]}>
+      <LiquidGlass style={styles.capsule} blurOnAndroid intensity={40} />
       <View style={styles.row}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
@@ -111,7 +110,7 @@ export default function GlassTabBar({
                 <Ionicons
                   name={focused ? icon.filled : icon.outline}
                   size={23}
-                  color={focused ? colors.text : colors.textFaint}
+                  color={focused ? colors.text : colors.textMuted}
                 />
                 {badge != null && <TabBadge value={badge} style={styles.iconBadge} />}
               </View>
@@ -148,38 +147,39 @@ function useKeyboardOpen() {
 }
 
 const styles = StyleSheet.create({
+  // Floating capsule, inset from the screen edges (iOS 26 style).
   wrap: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderTopWidth: StyleSheet.hairlineWidth * 2,
-    borderTopColor: colors.cardBorder,
+    left: 14,
+    right: 14,
+    height: 66,
   },
-  tint: {
-    backgroundColor: 'rgba(10,10,13,0.8)',
+  capsule: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 33,
   },
   row: {
+    flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingTop: 8,
+    alignItems: 'center',
+    paddingHorizontal: 4,
   },
   item: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 4,
+    justifyContent: 'center',
+    gap: 3,
   },
   label: {
-    color: colors.textFaint,
-    fontSize: 11,
+    color: colors.textMuted,
+    fontSize: 10.5,
     fontWeight: '500',
   },
   labelActive: {
     color: colors.text,
   },
   centerLift: {
-    marginTop: -30,
+    marginTop: -34,
     borderRadius: 31,
     shadowColor: '#6C63FF',
     shadowOffset: { width: 0, height: 6 },

@@ -12,7 +12,7 @@ export const colors = {
   buttonSecondaryPressed: 'rgba(255,255,255,0.12)',
 
   // Translucent glass - every card in the app.
-  card: 'rgba(24,24,29,0.74)',
+  card: 'rgba(26,26,32,0.62)',
   cardBorder: 'rgba(255,255,255,0.07)',
   cardBorderTop: 'rgba(255,255,255,0.12)',
   // Tiles and chips sitting on top of a card.
@@ -44,7 +44,7 @@ export const gradients = {
   // Hero / featured cards: a slightly brighter neutral glass, no tint.
   heroCard: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.025)', 'rgba(255,255,255,0.01)'] as const,
   // Top-left sheen on every glass card.
-  glassSheen: ['rgba(255,255,255,0.06)', 'rgba(255,255,255,0)'] as const,
+  glassSheen: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0)'] as const,
   whatsapp: ['#34D399', '#128C7E'] as const,
   telegram: ['#7B61FF', '#4F6BFF'] as const,
 };

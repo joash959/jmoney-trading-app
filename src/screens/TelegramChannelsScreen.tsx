@@ -2,9 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import { MoreStackParamList } from '../navigation/types';
@@ -15,6 +14,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { Community } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -135,12 +135,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               disabled={openingId === featured.id}
               style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
             >
-              <LinearGradient
-                colors={gradients.heroCard}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.featuredCard}
-              >
+              <LiquidGlass style={styles.featuredCard}>
                 <View style={styles.featuredTopRow}>
                   <View style={styles.featuredIconCircle}>
                     <Ionicons
@@ -190,7 +185,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                     </>
                   )}
                 </View>
-              </LinearGradient>
+              </LiquidGlass>
             </Pressable>
           )}
 
@@ -264,10 +259,6 @@ const styles = StyleSheet.create({
   featuredCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   featuredTopRow: {
     flexDirection: 'row',

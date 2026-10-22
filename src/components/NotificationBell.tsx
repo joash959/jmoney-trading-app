@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import LiquidGlass from './LiquidGlass';
 
 type Props = {
   count?: number;
@@ -15,7 +16,9 @@ export default function NotificationBell({ count = 0, onPress }: Props) {
       style={({ pressed }) => [styles.bellButton, pressed && styles.pressed]}
       onPress={onPress}
     >
-      <Ionicons name="notifications-outline" size={20} color={colors.text} />
+      <LiquidGlass style={styles.glass} interactive>
+        <Ionicons name="notifications-outline" size={20} color={colors.text} />
+      </LiquidGlass>
       {count > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
@@ -29,15 +32,15 @@ const styles = StyleSheet.create({
   bellButton: {
     width: 44,
     height: 44,
+  },
+  glass: {
+    flex: 1,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
   },
   pressed: {
-    backgroundColor: colors.surfaceElevated,
+    transform: [{ scale: 0.94 }],
   },
   badge: {
     position: 'absolute',

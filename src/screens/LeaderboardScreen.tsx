@@ -2,9 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { MoreStackParamList } from '../navigation/types';
 import { supabase } from '../lib/supabase';
@@ -14,6 +13,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -250,12 +250,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
       />
 
       {settings?.show_podium !== false && (
-        <LinearGradient
-          colors={gradients.heroCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.heroCard, styles.cardSpaced]}
-        >
+        <LiquidGlass style={[styles.heroCard, styles.cardSpaced]}>
           <View style={styles.heroIconCircle}>
             <Ionicons name="trophy-outline" size={20} color={colors.text} />
           </View>
@@ -295,7 +290,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
               </View>
             </View>
           </View>
-        </LinearGradient>
+        </LiquidGlass>
       )}
 
       <GlassCard style={styles.cardSpaced}>
@@ -476,10 +471,6 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: radius['2xl'],
     padding: 20,
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   heroIconCircle: {
     width: 44,

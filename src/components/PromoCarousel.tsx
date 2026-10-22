@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from './AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import IconBadge from './IconBadge';
+import LiquidGlass from './LiquidGlass';
 
 export type PromoItem = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -49,20 +49,14 @@ export default function PromoCarousel({ items }: Props) {
               pressed && styles.pressed,
             ]}
           >
-            <View style={styles.card}>
-              <LinearGradient
-                colors={gradients.heroCard}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
+            <LiquidGlass style={styles.card} interactive>
               <View style={styles.topRow}>
                 <IconBadge icon={item.icon} size={42} />
                 <Ionicons name="arrow-forward" size={20} color={colors.text} />
               </View>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.subtitle}>{item.subtitle}</Text>
-            </View>
+            </LiquidGlass>
           </Pressable>
         ))}
       </ScrollView>
@@ -88,10 +82,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.lg,
     minHeight: 150,
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   topRow: {
     flexDirection: 'row',

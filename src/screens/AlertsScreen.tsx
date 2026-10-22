@@ -3,8 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, gradients } from '../theme/colors';
+import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,6 +12,7 @@ import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -234,13 +234,7 @@ export default function AlertsScreen({ navigation }: Props) {
 
   const directedTotal = Math.max(longCount + shortCount, 1);
   const statsRow = (
-    <View style={styles.summaryCard}>
-      <LinearGradient
-        colors={gradients.heroCard}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
+    <LiquidGlass style={styles.summaryCard}>
       <View style={styles.summaryTopRow}>
         <Text style={styles.summaryLabel}>Alerts today</Text>
         <Text style={styles.summaryMeta}>
@@ -263,7 +257,7 @@ export default function AlertsScreen({ navigation }: Props) {
           {shortCount} sell · {Math.round((shortCount / directedTotal) * 100)}%
         </Text>
       </View>
-    </View>
+    </LiquidGlass>
   );
 
   const statsSkeleton = <Skeleton height={150} radius={22} style={styles.summarySkeleton} />;
@@ -433,10 +427,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 20,
     borderRadius: radius['2xl'],
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   summarySkeleton: {
     marginTop: 16,

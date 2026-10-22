@@ -6,6 +6,7 @@ import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import IconBadge, { IoniconName } from './IconBadge';
+import LiquidGlass from './LiquidGlass';
 
 type Props = {
   title: string;
@@ -33,13 +34,15 @@ export default function GradientLinkCard({
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, style, pressed && styles.pressed]}
+      style={({ pressed }) => [style, pressed && styles.pressed]}
     >
+      <LiquidGlass style={styles.card} interactive>
       <LinearGradient
         colors={gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
       />
       <IconBadge icon={icon} size={46} />
       <View style={styles.textCol}>
@@ -51,6 +54,7 @@ export default function GradientLinkCard({
         </Text>
       </View>
       <Ionicons name={glyph} size={20} color={colors.text} />
+      </LiquidGlass>
     </Pressable>
   );
 }
@@ -63,13 +67,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.md,
     paddingRight: spacing.lg,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    backgroundColor: colors.card,
-    overflow: 'hidden',
   },
   pressed: {
-    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   textCol: {
     flex: 1,

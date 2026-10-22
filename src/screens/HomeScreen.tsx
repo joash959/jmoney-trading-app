@@ -15,9 +15,9 @@ import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
+import LiquidGlass from '../components/LiquidGlass';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
-import GlassSheen from '../components/GlassSheen';
 import PromoCarousel from '../components/PromoCarousel';
 import SentimentPoll from '../components/SentimentPoll';
 import IconTile from '../components/IconTile';
@@ -264,14 +264,7 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
 
       {/* Hero balance card */}
-      <View style={styles.heroCard}>
-        <LinearGradient
-          colors={gradients.heroCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <GlassSheen />
+      <LiquidGlass style={styles.heroCard}>
         <View style={styles.heroTopRow}>
           <Text style={styles.heroLabel}>This month's P&L</Text>
           <View style={[styles.tierChip, isPremium && styles.tierChipPremium]}>
@@ -340,7 +333,7 @@ export default function HomeScreen({ navigation }: Props) {
             />
           ))}
         </View>
-      </View>
+      </LiquidGlass>
 
       {/* Trade alerts - latest signal */}
       <GradientLinkCard
@@ -546,10 +539,6 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: radius['2xl'],
     padding: 20,
-    backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorderTop,
-    overflow: 'hidden',
   },
   heroTopRow: {
     flexDirection: 'row',

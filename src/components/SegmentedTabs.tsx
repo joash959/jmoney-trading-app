@@ -1,8 +1,9 @@
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Text from './AppText';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../theme/colors';
 import { radius } from '../theme/radius';
+import LiquidGlass from './LiquidGlass';
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -21,7 +22,7 @@ export default function SegmentedTabs<T extends string>({
   style,
 }: Props<T>) {
   return (
-    <View style={[styles.track, style]}>
+    <LiquidGlass style={[styles.track, style]}>
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -43,7 +44,7 @@ export default function SegmentedTabs<T extends string>({
           </Pressable>
         );
       })}
-    </View>
+    </LiquidGlass>
   );
 }
 
@@ -52,9 +53,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 4,
     borderRadius: radius.lg,
-    backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
   },
   segment: {
     flex: 1,
