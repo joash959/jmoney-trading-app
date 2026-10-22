@@ -115,8 +115,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderRadius: radius.xl,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     padding: 16,
     overflow: 'hidden',
   },
@@ -165,8 +163,6 @@ const styles = StyleSheet.create({
   fieldTile: {
     width: '48.5%',
     backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     borderRadius: radius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,

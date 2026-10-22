@@ -443,8 +443,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: radius.lg,
     backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },

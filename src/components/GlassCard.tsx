@@ -28,8 +28,6 @@ export default function GlassCard({ children, style, contentStyle }: Props) {
 export const glassCardStyle: ViewStyle = {
   backgroundColor: colors.card,
   borderRadius: radius.xl,
-  borderWidth: StyleSheet.hairlineWidth * 2,
-  borderColor: colors.cardBorder,
   padding: spacing.lg,
   overflow: 'hidden',
 };

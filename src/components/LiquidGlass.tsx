@@ -24,8 +24,8 @@ type Props = {
 };
 
 /** Liquid-glass surface: Apple's native Liquid Glass on iOS 26, otherwise a
- * frosted blur with a specular rim (bright top edge + soft sheen) so it
- * still reads as glass. Pass borderRadius/padding etc. through `style`. */
+ * frosted blur with a soft sheen so it still reads as glass. Edgeless:
+ * no border or rim line. Pass borderRadius/padding etc. through `style`. */
 export default function LiquidGlass({
   children,
   style,
@@ -77,7 +77,7 @@ export default function LiquidGlass({
   );
 }
 
-/** Specular rim + sheen that sells the glass. Also used on plain cards. */
+/** Soft sheen that sells the glass - edgeless, no outline or rim line. */
 export function GlassHighlights({ clear = false }: { clear?: boolean }) {
   return (
     <>
@@ -86,14 +86,6 @@ export function GlassHighlights({ clear = false }: { clear?: boolean }) {
         start={{ x: 0, y: 0 }}
         end={{ x: 0.75, y: 0.75 }}
         style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-      {/* Light catching the top edge. */}
-      <LinearGradient
-        colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.45)', 'rgba(255,255,255,0)']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.topRim}
         pointerEvents="none"
       />
     </>
@@ -106,15 +98,6 @@ const styles = StyleSheet.create({
   },
   fallback: {
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: 'rgba(255,255,255,0.12)',
     backgroundColor: 'transparent',
-  },
-  topRim: {
-    position: 'absolute',
-    top: 0,
-    left: '8%',
-    right: '8%',
-    height: 1,
   },
 });

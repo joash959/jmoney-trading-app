@@ -63,9 +63,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   segmentActive: {
-    backgroundColor: colors.surfaceElevated,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.borderStrong,
+    backgroundColor: 'rgba(255,255,255,0.12)',
   },
   label: {
     color: colors.textFaint,

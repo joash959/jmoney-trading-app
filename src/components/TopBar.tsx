@@ -56,14 +56,13 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   pill: {
-    borderWidth: 1,
-    borderColor: colors.accentBlue,
+    backgroundColor: colors.accentBlueDim,
     paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 999,
   },
   pillPressed: {
-    backgroundColor: colors.accentBlueDim,
+    backgroundColor: 'rgba(108,99,255,0.28)',
   },
   pillText: {
     color: colors.text,

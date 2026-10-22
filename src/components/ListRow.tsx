@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth * 2,
-    borderBottomColor: colors.cardBorder,
+    borderBottomColor: colors.divider,
   },
   pressed: {
     opacity: 0.7,

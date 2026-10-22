@@ -244,8 +244,6 @@ const styles = StyleSheet.create({
   skeletonCard: {
     width: '48%',
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
     borderRadius: 14,
     overflow: 'hidden',
   },

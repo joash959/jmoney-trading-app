@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
+    borderTopColor: colors.divider,
   },
   instructorAvatar: {
     width: 40,
@@ -435,8 +435,7 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
   },
   lessonRowActive: {
-    borderWidth: 1,
-    borderColor: colors.accentBlue,
+    backgroundColor: 'rgba(108,99,255,0.16)',
   },
   lessonIcon: {
     width: 34,

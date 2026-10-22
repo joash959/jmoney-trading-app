@@ -44,7 +44,5 @@ const styles = StyleSheet.create({
   badge: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
   },
 });

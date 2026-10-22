@@ -37,8 +37,6 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: radius.lg,
     backgroundColor: colors.buttonSecondary,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.borderStrong,
     paddingHorizontal: 18,
   },
   buttonPressed: {

@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
+    borderBottomColor: colors.divider,
   },
   optionSelected: {
     borderBottomColor: colors.cardBorder,

@@ -32,11 +32,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 56,
     paddingHorizontal: 24,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: 'rgba(108,99,255,0.45)',
-    backgroundColor: 'rgba(108,99,255,0.08)',
+    borderRadius: 22,
+    backgroundColor: 'rgba(108,99,255,0.1)',
   },
   pressed: {
     opacity: 0.75,

@@ -53,8 +53,6 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: colors.card,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     borderRadius: radius.xl,
     padding: spacing.md,
     overflow: 'hidden',

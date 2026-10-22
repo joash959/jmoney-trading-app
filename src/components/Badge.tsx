@@ -23,8 +23,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: 'rgba(157,151,255,0.35)',
     backgroundColor: colors.accentBlueDim,
     paddingHorizontal: 14,
     paddingVertical: 6,

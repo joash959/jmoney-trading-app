@@ -286,8 +286,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     backgroundColor: colors.glassTile,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     borderRadius: 999,
     paddingHorizontal: 16,
   },

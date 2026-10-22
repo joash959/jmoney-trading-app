@@ -123,9 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentBlue,
   },
   tonalButton: {
-    backgroundColor: colors.buttonSecondary,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.borderStrong,
+    backgroundColor: 'rgba(255,255,255,0.09)',
   },
   buttonText: {
     color: colors.text,

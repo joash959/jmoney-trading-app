@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
+    borderTopColor: colors.divider,
   },
   reasoningText: {
     color: colors.textMuted,

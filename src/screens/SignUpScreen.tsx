@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.cardBorder,
+    backgroundColor: colors.divider,
     marginTop: 18,
     marginBottom: 16,
   },

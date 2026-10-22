@@ -9,7 +9,7 @@ type Props = {
 
 export default function Pill({ label, color, backgroundColor }: Props) {
   return (
-    <View style={[styles.pill, { borderColor: color, backgroundColor }]}>
+    <View style={[styles.pill, { backgroundColor: backgroundColor ?? `${color}22` }]}>
       <Text style={[styles.text, { color }]} numberOfLines={1}>
         {label}
       </Text>
@@ -19,7 +19,6 @@ export default function Pill({ label, color, backgroundColor }: Props) {
 
 const styles = StyleSheet.create({
   pill: {
-    borderWidth: StyleSheet.hairlineWidth * 2,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,

@@ -508,8 +508,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.5)',
   },
   podiumMedalGold: {
     backgroundColor: GOLD,

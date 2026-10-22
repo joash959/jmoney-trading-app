@@ -128,8 +128,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderRadius: 20,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     overflow: 'hidden',
   },
   thumb: {
@@ -230,7 +228,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.cardBorder,
+    backgroundColor: colors.divider,
     marginTop: 10,
     marginBottom: 8,
   },

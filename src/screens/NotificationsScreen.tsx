@@ -205,13 +205,10 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: colors.card,
     borderRadius: 18,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: colors.cardBorder,
     padding: 14,
   },
   rowUnread: {
-    borderColor: colors.borderStrong,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.07)',
   },
   rowIcon: {
     width: 36,
