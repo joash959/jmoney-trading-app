@@ -1,8 +1,8 @@
-// Poppins for headings/display/buttons, Inter for body/labels/inputs.
+// Manrope for headings/display/buttons, Inter for body/labels/inputs.
 export const fonts = {
-  poppinsBold: 'Poppins_700Bold',
-  poppinsSemiBold: 'Poppins_600SemiBold',
-  poppinsMedium: 'Poppins_500Medium',
+  manropeExtraBold: 'Manrope_800ExtraBold',
+  manropeBold: 'Manrope_700Bold',
+  manropeSemiBold: 'Manrope_600SemiBold',
   interBold: 'Inter_700Bold',
   interSemiBold: 'Inter_600SemiBold',
   interMedium: 'Inter_500Medium',
@@ -18,11 +18,11 @@ export function fontFamilyForWeight(weight?: string | number | null): string {
         ? 700
         : parseInt(weight ?? '', 10) || 400;
 
-  // Two steps lighter than the CSS weight asks for: the glass look wants
-  // calm, geometric headings (Poppins Medium/SemiBold), not heavy ones.
-  if (numeric >= 900) return fonts.poppinsBold;
-  if (numeric >= 800) return fonts.poppinsSemiBold;
-  if (numeric >= 700) return fonts.poppinsMedium;
+  // Headings: Manrope one step lighter than the CSS weight asks for, so
+  // they read crisp and premium rather than heavy.
+  if (numeric >= 900) return fonts.manropeExtraBold;
+  if (numeric >= 800) return fonts.manropeBold;
+  if (numeric >= 700) return fonts.manropeBold;
   if (numeric >= 600) return fonts.interSemiBold;
   if (numeric >= 500) return fonts.interMedium;
   return fonts.interRegular;

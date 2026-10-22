@@ -7,7 +7,7 @@ type Props = TextProps & {
 };
 
 /**
- * Drop-in replacement for RN's Text. Picks Poppins or Inter automatically
+ * Drop-in replacement for RN's Text. Picks Manrope or Inter automatically
  * from whatever fontWeight the style already sets, and clears fontWeight
  * itself so the OS doesn't try to synthetically re-bold an already-bold
  * font file. Existing styles don't need to change.
