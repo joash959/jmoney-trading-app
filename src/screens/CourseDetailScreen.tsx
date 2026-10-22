@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -44,7 +44,8 @@ function getInitials(name: string) {
 
 export default function CourseDetailScreen({ route, navigation }: Props) {
   const { courseId, lessonId: requestedLessonId } = route.params;
-  const { isPremium: hasPremiumAccess } = useAuth();
+  const { isPremium: hasPremiumAccess, session } = useAuth();
+  const userId = session?.user.id;
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
@@ -58,6 +59,10 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
+  // Lesson ids this member has finished - shared with the website via
+  // user_lesson_progress, so progress carries across both.
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [marking, setMarking] = useState(false);
 
   const player = useVideoPlayer(null);
 
@@ -111,6 +116,24 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
 
       const loadedCourse = courseData as Course | null;
       const loadedLessons = (lessonData as Lesson[]) ?? [];
+      if (userId && loadedLessons.length) {
+        const { data: progressData } = await supabase
+          .from('user_lesson_progress')
+          .select('lesson_id, completed')
+          .eq('user_id', userId)
+          .in(
+            'lesson_id',
+            loadedLessons.map((l) => l.id)
+          );
+        if (cancelled) return;
+        setCompletedIds(
+          new Set(
+            ((progressData ?? []) as { lesson_id: string; completed: boolean | null }[])
+              .filter((p) => p.completed)
+              .map((p) => p.lesson_id)
+          )
+        );
+      }
       setCourse(loadedCourse);
       setLessons(loadedLessons);
 
@@ -147,10 +170,62 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
     ? getYoutubeVideoId(activeLesson.video_url)
     : null;
 
+  // Watching a lesson enrols the member in the course (same row the
+  // website's "Enroll" button creates); an existing row is left as is.
+  useEffect(() => {
+    if (!userId || !activeLessonId) return;
+    supabase
+      .from('user_course_progress')
+      .upsert(
+        { user_id: userId, course_id: courseId, progress_percentage: 0 },
+        { onConflict: 'user_id,course_id', ignoreDuplicates: true }
+      )
+      .then(({ error: enrolError }) => {
+        if (enrolError) console.warn('[progress] enrol failed', enrolError.message);
+      });
+  }, [userId, courseId, activeLessonId]);
+
+  const handleMarkComplete = async () => {
+    if (!userId || !activeLesson || marking) return;
+    setMarking(true);
+    const { error: lessonError } = await supabase.from('user_lesson_progress').upsert(
+      {
+        user_id: userId,
+        lesson_id: activeLesson.id,
+        completed: true,
+        completed_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,lesson_id' }
+    );
+    if (lessonError) {
+      setMarking(false);
+      Alert.alert("Couldn't save progress", lessonError.message);
+      return;
+    }
+    const next = new Set(completedIds).add(activeLesson.id);
+    setCompletedIds(next);
+    const pct = Math.round((next.size / Math.max(lessons.length, 1)) * 100);
+    await supabase
+      .from('user_course_progress')
+      .update({
+        progress_percentage: pct,
+        completed_at: pct >= 100 ? new Date().toISOString() : null,
+      })
+      .eq('user_id', userId)
+      .eq('course_id', courseId);
+    setMarking(false);
+    // Move straight on to the next unfinished lesson the member can play.
+    const nextLesson = lessons.find((l) => !next.has(l.id) && canPlay(l));
+    if (nextLesson) setActiveLessonId(nextLesson.id);
+  };
+
   const handleSelectLesson = (lesson: Lesson) => {
     if (!canPlay(lesson)) return;
     setActiveLessonId(lesson.id);
   };
+
+  const completedCount = lessons.filter((l) => completedIds.has(l.id)).length;
+  const activeDone = !!activeLesson && completedIds.has(activeLesson.id);
 
   return (
     <ScreenShell>
@@ -213,6 +288,27 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             </Text>
           )}
 
+          {activeLesson && (
+            <Pressable
+              onPress={handleMarkComplete}
+              disabled={activeDone || marking}
+              style={({ pressed }) => [
+                styles.completeButton,
+                activeDone && styles.completeButtonDone,
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <Ionicons
+                name={activeDone ? 'checkmark-circle' : 'checkmark-circle-outline'}
+                size={20}
+                color={activeDone ? colors.accentGreen : colors.text}
+              />
+              <Text style={[styles.completeText, activeDone && { color: colors.accentGreen }]}>
+                {activeDone ? 'Lesson completed' : marking ? 'Saving…' : 'Mark lesson complete'}
+              </Text>
+            </Pressable>
+          )}
+
           <GlassCard style={styles.cardSpaced}>
             <View style={styles.metaRow}>
               {course.level && <Pill label={course.level} color={colors.accentGreen} backgroundColor="rgba(46,230,166,0.12)" />}
@@ -243,13 +339,16 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
               <Text style={styles.sectionTitle}>Lessons</Text>
             </View>
             <View style={styles.lessonCountPill}>
-              <Text style={styles.lessonCountText}>{lessons.length}</Text>
+              <Text numeric style={styles.lessonCountText}>
+                {completedCount}/{lessons.length} done
+              </Text>
             </View>
           </View>
           <View style={styles.lessonsList}>
             {lessons.map((lesson, index) => {
               const isActive = lesson.id === activeLessonId;
               const locked = !canPlay(lesson);
+              const done = completedIds.has(lesson.id);
               return (
                 <Pressable
                   key={lesson.id}
@@ -261,17 +360,28 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                       styles.lessonIcon,
                       isActive && styles.lessonIconActive,
                       locked && styles.lessonIconLocked,
+                      done && !isActive && styles.lessonIconDone,
                     ]}
                   >
                     <Ionicons
-                      name={locked ? 'lock-closed-outline' : isActive ? 'play-outline' : 'play-circle-outline'}
+                      name={
+                        locked
+                          ? 'lock-closed-outline'
+                          : isActive
+                            ? 'play-outline'
+                            : done
+                              ? 'checkmark'
+                              : 'play-circle-outline'
+                      }
                       size={16}
                       color={
                         locked
                           ? colors.textFaint
                           : isActive
                             ? colors.text
-                            : colors.link
+                            : done
+                              ? colors.accentGreen
+                              : colors.link
                       }
                     />
                   </View>
@@ -450,6 +560,27 @@ const styles = StyleSheet.create({
   },
   lessonIconLocked: {
     backgroundColor: colors.surfaceAlt,
+  },
+  lessonIconDone: {
+    backgroundColor: 'rgba(46,230,166,0.14)',
+  },
+  completeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: radius.xl,
+    backgroundColor: colors.primary,
+  },
+  completeButtonDone: {
+    backgroundColor: 'rgba(46,230,166,0.12)',
+  },
+  completeText: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
   },
   lessonBody: {
     flex: 1,
