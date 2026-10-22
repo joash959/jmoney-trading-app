@@ -19,6 +19,10 @@ import SectionLabel from '../components/SectionLabel';
 import ListRow from '../components/ListRow';
 import DisclaimerCard from '../components/DisclaimerCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
+import BadgeGrid from '../components/BadgeGrid';
+import { useGameStats } from '../hooks/useGameStats';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
@@ -34,6 +38,12 @@ function getInitials(name: string) {
 export default function MoreScreen({ navigation }: Props) {
   const { session, profile, isPremium, signOut } = useAuth();
   const connect = usePrimeXBTConnect();
+  const { stats: gameStats, refresh: refreshGame } = useGameStats();
+  useFocusEffect(
+    useCallback(() => {
+      refreshGame();
+    }, [refreshGame])
+  );
   const { count: unreadCount } = useUnreadNotificationsCount();
 
   const email = session?.user.email ?? '';
@@ -100,10 +110,23 @@ export default function MoreScreen({ navigation }: Props) {
               style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
             >
               {isPremium ? 'Premium member' : 'Free plan'}
+              {gameStats ? ` · Lvl ${gameStats.level} ${gameStats.levelName}` : ''}
             </Text>
           </View>
         </View>
       </View>
+
+      {gameStats && (
+        <>
+          <View style={styles.achievementsHeader}>
+            <SectionLabel style={styles.noTopMargin}>Achievements</SectionLabel>
+            <Text numeric style={styles.achievementsCount}>
+              {gameStats.badges.filter((b) => b.unlocked).length}/{gameStats.badges.length}
+            </Text>
+          </View>
+          <BadgeGrid badges={gameStats.badges} />
+        </>
+      )}
 
       <SectionLabel>Shortcuts</SectionLabel>
       <View style={styles.grid}>
@@ -156,6 +179,21 @@ export default function MoreScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  achievementsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 28,
+    marginBottom: 10,
+  },
+  noTopMargin: {
+    marginTop: 0,
+  },
+  achievementsCount: {
+    color: colors.link,
+    fontSize: 15,
+    fontWeight: '600',
+  },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',

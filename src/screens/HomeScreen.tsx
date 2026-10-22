@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { getNextNFP, getNextCPI } from '../lib/economicCalendar';
@@ -24,6 +25,10 @@ import AnimatedNumber from '../components/AnimatedNumber';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import GradientLinkCard from '../components/GradientLinkCard';
 import type { IoniconName } from '../components/IconBadge';
+import LevelCard from '../components/LevelCard';
+import XpToast, { XpToastHandle } from '../components/XpToast';
+import { useGameStats } from '../hooks/useGameStats';
+import { XP } from '../lib/gamification';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
@@ -133,6 +138,8 @@ export default function HomeScreen({ navigation }: Props) {
   const { count: unreadCount } = useUnreadNotificationsCount();
   const connect = usePrimeXBTConnect();
   const [refreshing, setRefreshing] = useState(false);
+  const { stats: gameStats, refresh: refreshGame } = useGameStats();
+  const xpToast = useRef<XpToastHandle>(null);
   const [hideBalance, setHideBalance] = useState(false);
   const [range, setRange] = useState<RangeKey>('1M');
   const [scrubPoint, setScrubPoint] = useState<ChartPoint | null>(null);
@@ -208,9 +215,16 @@ export default function HomeScreen({ navigation }: Props) {
     fetchData();
   }, [fetchData]);
 
+  // XP can change elsewhere (journal, courses) - refresh on return.
+  useFocusEffect(
+    useCallback(() => {
+      refreshGame();
+    }, [refreshGame])
+  );
+
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchData(), refreshProfile()]);
+    await Promise.all([fetchData(), refreshProfile(), refreshGame()]);
     setRefreshing(false);
   };
 
@@ -254,7 +268,11 @@ export default function HomeScreen({ navigation }: Props) {
   const pnlColor = shownValue < 0 ? colors.accentRed : colors.text;
 
   return (
-    <ScreenShell refreshing={refreshing} onRefresh={handleRefresh}>
+    <ScreenShell
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      overlay={<XpToast ref={xpToast} />}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Pressable style={styles.profileRow} onPress={() => goMore('MoreHome')}>
@@ -270,6 +288,12 @@ export default function HomeScreen({ navigation }: Props) {
         </Pressable>
         <NotificationBell count={unreadCount} onPress={() => goMore('Notifications')} />
       </View>
+
+      <LevelCard
+        stats={gameStats}
+        onPress={() => goMore('MoreHome')}
+        style={styles.levelCard}
+      />
 
       {/* Hero: number + chart straight on the background, Robinhood-style */}
       <View style={styles.heroTopRow}>
@@ -437,7 +461,12 @@ export default function HomeScreen({ navigation }: Props) {
       </SurfaceCard>
 
       <View style={styles.cardSpaced}>
-        <SentimentPoll />
+        <SentimentPoll
+          onVoted={() => {
+            xpToast.current?.show(XP.pollVote, 'Vote cast');
+            refreshGame();
+          }}
+        />
       </View>
 
       {/* Upcoming - next session, learning, macro events */}
@@ -543,6 +572,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginTop: 1,
+  },
+  levelCard: {
+    marginBottom: 24,
   },
   heroTopRow: {
     flexDirection: 'row',

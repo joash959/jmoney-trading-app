@@ -24,7 +24,7 @@ function percentage(counts: Counts, key: Sentiment) {
   return Math.round((counts[key] / total) * 100);
 }
 
-export default function SentimentPoll() {
+export default function SentimentPoll({ onVoted }: { onVoted?: () => void } = {}) {
   const { session } = useAuth();
   const userId = session?.user.id;
   const [dismissed, setDismissed] = useState(false);
@@ -70,6 +70,7 @@ export default function SentimentPoll() {
   const handlePick = async (sentiment: Sentiment) => {
     if (!userId || submitting) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const firstVoteToday = picked === null;
     setSubmitting(true);
     setPicked(sentiment);
     await supabase
@@ -80,6 +81,7 @@ export default function SentimentPoll() {
       );
     await fetchCounts();
     setSubmitting(false);
+    if (firstVoteToday) onVoted?.();
   };
 
   return (

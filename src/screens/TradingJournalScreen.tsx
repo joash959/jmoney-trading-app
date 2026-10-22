@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,8 @@ import SecondaryButton from '../components/SecondaryButton';
 import GlassCard from '../components/GlassCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
+import XpToast, { XpToastHandle } from '../components/XpToast';
+import { XP } from '../lib/gamification';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'TradingJournal'>;
 
@@ -149,6 +151,8 @@ export default function TradingJournalScreen({ navigation }: Props) {
 
   const refetch = () => setViewDate(new Date(viewDate));
 
+  const xpToast = useRef<XpToastHandle>(null);
+
   const handleSave = async () => {
     if (!session) return;
     const pnl = parseFloat(pnlInput);
@@ -179,6 +183,13 @@ export default function TradingJournalScreen({ navigation }: Props) {
     if (error) {
       setEntryError(error.message);
       return;
+    }
+    // Reward a new day logged (not edits) - mirrors lib/gamification XP.
+    if (!selectedEntry) {
+      xpToast.current?.show(
+        XP.journalEntry + (pnl > 0 ? XP.greenDay : 0),
+        pnl > 0 ? 'Green day!' : 'Day logged'
+      );
     }
     refetch();
   };
@@ -284,7 +295,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
   }
 
   return (
-    <ScreenShell>
+    <ScreenShell overlay={<XpToast ref={xpToast} />}>
       <TopBar
         rightElement={
           <NotificationBell
