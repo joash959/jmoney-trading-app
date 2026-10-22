@@ -4,13 +4,13 @@ export type AlertField = {
 };
 
 const FIELD_PATTERNS: { label: string; regex: RegExp }[] = [
-  { label: 'Entry', regex: /entry(?:\s*price)?\s*[:\-]?\s*([\d.,]+)/i },
-  { label: 'TP1', regex: /(?:take\s*profit\s*1|tp\s*1|tp1)\s*[:\-]?\s*([\d.,]+)/i },
-  { label: 'TP2', regex: /(?:take\s*profit\s*2|tp\s*2|tp2)\s*[:\-]?\s*([\d.,]+)/i },
-  { label: 'SL', regex: /(?:stop\s*loss|sl)\s*[:\-]?\s*([\d.,]+)/i },
+  { label: 'Entry', regex: /entry(?:\s*price)?\s*[:\-]?\s*(\d[\d.,]*)/i },
+  { label: 'TP1', regex: /(?:take\s*profit\s*1|tp\s*1|tp1)\s*[:\-]?\s*(\d[\d.,]*)/i },
+  { label: 'TP2', regex: /(?:take\s*profit\s*2|tp\s*2|tp2)\s*[:\-]?\s*(\d[\d.,]*)/i },
+  { label: 'SL', regex: /(?:stop\s*loss|sl)\s*[:\-]?\s*(\d[\d.,]*)/i },
   {
     label: 'Current Price',
-    regex: /current\s*price\s*[:\-]?\s*([\d.,]+)/i,
+    regex: /current\s*price\s*[:\-]?\s*(\d[\d.,]*)/i,
   },
 ];
 

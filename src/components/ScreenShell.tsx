@@ -18,6 +18,7 @@ type Props = {
 };
 
 const PULL_RANGE = 100;
+const noop = () => {};
 
 export default function ScreenShell({
   children,
@@ -75,16 +76,19 @@ export default function ScreenShell({
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false }
           )}
+          // Always mounted (just disabled when unused): on Android and web
+          // the RefreshControl wraps the ScrollView, so adding it later -
+          // e.g. a screen's loading state has none, its loaded state does -
+          // remounts the content mid-fade and left pages stuck near-invisible.
           refreshControl={
-            onRefresh ? (
-              <RefreshControl
-                refreshing={!!refreshing}
-                onRefresh={onRefresh}
-                tintColor="transparent"
-                colors={['transparent']}
-                progressBackgroundColor="transparent"
-              />
-            ) : undefined
+            <RefreshControl
+              enabled={!!onRefresh}
+              refreshing={!!refreshing}
+              onRefresh={onRefresh ?? noop}
+              tintColor="transparent"
+              colors={['transparent']}
+              progressBackgroundColor="transparent"
+            />
           }
         >
           <Animated.View
@@ -124,7 +128,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 24,
+    // Clears the floating glass tab bar (and its raised centre button).
+    paddingBottom: 130,
   },
   pullLogoWrap: {
     alignItems: 'center',
