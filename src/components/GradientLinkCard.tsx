@@ -12,7 +12,7 @@ type Props = {
   subtitle: string;
   icon: IoniconName;
   onPress: () => void;
-  /** Wash behind the glass - defaults to the violet hero tint. */
+  /** Wash behind the card - defaults to the neutral hero tint. */
   gradient?: readonly [string, string, ...string[]];
   /** Right-hand glyph - defaults to a link arrow. */
   glyph?: IoniconName;
@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   subtitle: {
-    color: colors.textMuted,
+    // Soft white rather than grey so it stays readable on a brand-blue wash.
+    color: 'rgba(255,255,255,0.78)',
     fontSize: 13,
     marginTop: 2,
   },

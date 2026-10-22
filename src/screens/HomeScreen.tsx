@@ -492,6 +492,7 @@ export default function HomeScreen({ navigation }: Props) {
           icon="link-outline"
           title="Connect your PrimeXBT account"
           subtitle="Unlock live trade alerts and premium features"
+          gradient={gradients.brand}
           onPress={connect.open}
           style={styles.cardSpaced}
         />
