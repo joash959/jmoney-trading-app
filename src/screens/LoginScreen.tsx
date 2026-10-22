@@ -111,7 +111,7 @@ export default function LoginScreen({ navigation }: Props) {
       <Text style={styles.signUpRow}>
         Don't have an account?{' '}
         <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
-          Sign up free
+          Sign up
         </Text>
       </Text>
 
