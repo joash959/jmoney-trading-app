@@ -85,6 +85,7 @@ export default function AlertsScreen({ navigation }: Props) {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [locked, setLocked] = useState(false);
   const [filter, setFilter] = useState<'all' | 'long' | 'short'>('all');
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -382,6 +383,21 @@ export default function AlertsScreen({ navigation }: Props) {
                       message={alert.message}
                       time={formatShortTime(alert.created_at)}
                       isNew={Date.now() - new Date(alert.created_at).getTime() < 30 * 60000}
+                      // Newest alert open, older ones collapse to one row.
+                      collapsed={
+                        expandedIds[alert.id] === undefined
+                          ? alert.id !== alerts[0]?.id
+                          : !expandedIds[alert.id]
+                      }
+                      onToggle={() =>
+                        setExpandedIds((prev) => ({
+                          ...prev,
+                          [alert.id]:
+                            prev[alert.id] === undefined
+                              ? alert.id !== alerts[0]?.id
+                              : !prev[alert.id],
+                        }))
+                      }
                     />
                   ))}
                 </View>

@@ -79,6 +79,17 @@ function formatPnl(value: number) {
   return `${value < 0 ? '-' : '+'}$${amount}`;
 }
 
+/** Short label for a follow-up alert ("NAS100 TP1 HIT ✅ ..."). */
+function describeUpdate(message: string) {
+  if (/\b(tp\s*\d?|take\s*profit|target)\b[^\n]*\bhit\b/i.test(message)) {
+    return { label: 'TP hit', color: colors.accentGreen };
+  }
+  if (/\b(sl|stop(\s*loss)?)\b[^\n]*\bhit\b|\bstopped\s*out\b/i.test(message)) {
+    return { label: 'SL hit', color: colors.accentRed };
+  }
+  return { label: 'Update', color: colors.primary };
+}
+
 function minutesAgo(iso: string) {
   return Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -230,19 +241,16 @@ export default function HomeScreen({ navigation }: Props) {
   const nextCPI = getNextCPI();
 
   const goMore = (
-    screen: 'TradingJournal' | 'AIScanner' | 'Leaderboard' | 'Notifications' | 'MoreHome'
+    screen: 'TradingJournal' | 'AIScanner' | 'MarketAnalysis' | 'TelegramChannels' | 'Notifications' | 'MoreHome'
   ) => navigation.navigate('More', { screen });
 
   const quickActions: { icon: IoniconName; label: string; onPress: () => void }[] = [
     { icon: 'add', label: 'Log trade', onPress: () => goMore('TradingJournal') },
     { icon: 'scan-outline', label: 'Scanner', onPress: () => goMore('AIScanner') },
-    { icon: 'trophy-outline', label: 'Ranks', onPress: () => goMore('Leaderboard') },
-    { icon: 'grid-outline', label: 'More', onPress: () => goMore('MoreHome') },
+    { icon: 'stats-chart-outline', label: 'Analysis', onPress: () => goMore('MarketAnalysis') },
+    { icon: 'paper-plane-outline', label: 'Telegram', onPress: () => goMore('TelegramChannels') },
   ];
 
-  const progressTotal = Math.max(progress?.total ?? 0, 1);
-  const completedPct = ((progress?.completed ?? 0) / progressTotal) * 100;
-  const inProgressPct = ((progress?.inProgress ?? 0) / progressTotal) * 100;
   const pnlColor = shownValue < 0 ? colors.accentRed : colors.text;
 
   return (
@@ -403,19 +411,20 @@ export default function HomeScreen({ navigation }: Props) {
             const direction = detectAlertDirection(alert.message);
             const entry = parseAlertFields(alert.message).find((f) => f.label === 'Entry');
             const isNew = minutesAgo(alert.created_at) <= NEW_ALERT_MINUTES;
+            const update = direction ? null : describeUpdate(alert.message);
             const tint =
               direction === 'long'
                 ? colors.accentGreen
                 : direction === 'short'
                   ? colors.accentRed
-                  : colors.textMuted;
+                  : update!.color;
             return (
               <ListRow
                 key={alert.id}
                 icon={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
                 title={alert.message.split('\n')[0].trim()}
                 subtitle={entry ? `Entry ${entry.value}` : 'Trade update'}
-                value={direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : 'INFO'}
+                value={direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : update!.label}
                 valueColor={tint}
                 subvalue={isNew ? '● New' : timeAgo(alert.created_at)}
                 subvalueColor={isNew ? colors.primary : colors.textFaint}
@@ -427,7 +436,11 @@ export default function HomeScreen({ navigation }: Props) {
         )}
       </SurfaceCard>
 
-      {/* Upcoming */}
+      <View style={styles.cardSpaced}>
+        <SentimentPoll />
+      </View>
+
+      {/* Upcoming - next session, learning, macro events */}
       <View style={styles.sectionHeaderRow}>
         <Text style={styles.sectionTitle}>Upcoming</Text>
         <Pressable hitSlop={8} onPress={() => navigation.navigate('Live')}>
@@ -443,6 +456,21 @@ export default function HomeScreen({ navigation }: Props) {
           subvalue={nextSession ? daysUntil(nextSession.date) : 'Check back soon'}
           subvalueColor={colors.primary}
           onPress={() => navigation.navigate('Live')}
+        />
+        <ListRow
+          icon="school-outline"
+          title={progress?.continueCourse ? progress.continueCourse.title : 'Start learning'}
+          subtitle={progress?.continueCourse ? 'Continue your course' : 'Browse trading courses'}
+          value={`${(progress?.completed ?? 0) + (progress?.inProgress ?? 0)}/${progress?.total || '—'}`}
+          subvalue="courses"
+          onPress={() =>
+            progress?.continueCourse
+              ? navigation.navigate('Courses', {
+                  screen: 'CourseDetail',
+                  params: { courseId: progress.continueCourse.id },
+                })
+              : navigation.navigate('Courses', { screen: 'CoursesHome' })
+          }
         />
         <ListRow
           icon="briefcase-outline"
@@ -462,52 +490,6 @@ export default function HomeScreen({ navigation }: Props) {
           divider={false}
         />
       </SurfaceCard>
-
-      {/* Learning - compact */}
-      <SurfaceCard
-        style={styles.cardSpaced}
-        onPress={() =>
-          progress?.continueCourse
-            ? navigation.navigate('Courses', {
-                screen: 'CourseDetail',
-                params: { courseId: progress.continueCourse.id },
-              })
-            : navigation.navigate('Courses', { screen: 'CoursesHome' })
-        }
-      >
-        <View style={styles.cardHeaderRow}>
-          <Text style={styles.cardTitle}>Learning</Text>
-          <Text numeric style={styles.progressCount}>
-            {(progress?.completed ?? 0) + (progress?.inProgress ?? 0)}/{progress?.total || '—'} courses
-          </Text>
-        </View>
-        <View style={styles.allocationBar}>
-          {completedPct > 0 && (
-            <View style={[styles.allocationSegment, { flex: completedPct, backgroundColor: colors.primary }]} />
-          )}
-          {inProgressPct > 0 && (
-            <View style={[styles.allocationSegment, { flex: inProgressPct, backgroundColor: 'rgba(139,124,255,0.45)' }]} />
-          )}
-          <View
-            style={[
-              styles.allocationSegment,
-              { flex: Math.max(100 - completedPct - inProgressPct, 0.01), backgroundColor: colors.surfaceTrack },
-            ]}
-          />
-        </View>
-        <View style={styles.learningFooter}>
-          <Text style={styles.learningCourse} numberOfLines={1}>
-            {progress?.continueCourse ? progress.continueCourse.title : 'Start your first course'}
-          </Text>
-          <Text style={styles.linkText}>
-            {progress?.continueCourse ? 'Continue' : 'Browse'}
-          </Text>
-        </View>
-      </SurfaceCard>
-
-      <View style={styles.cardSpaced}>
-        <SentimentPoll />
-      </View>
 
       <PrimeXBTConnectModal
         visible={connect.visible}
@@ -695,42 +677,5 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 14,
     paddingVertical: 14,
-  },
-  cardHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  cardTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  progressCount: {
-    color: colors.textMuted,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  allocationBar: {
-    flexDirection: 'row',
-    gap: 3,
-    height: 8,
-    marginTop: 14,
-  },
-  allocationSegment: {
-    height: 8,
-    borderRadius: 3,
-  },
-  learningFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 12,
-  },
-  learningCourse: {
-    flex: 1,
-    color: colors.textMuted,
-    fontSize: 13,
   },
 });

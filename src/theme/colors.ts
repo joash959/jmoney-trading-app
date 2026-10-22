@@ -12,7 +12,7 @@ export const colors = {
   buttonSecondaryPressed: 'rgba(255,255,255,0.12)',
 
   // Translucent glass - every card in the app.
-  card: 'rgba(255,255,255,0.045)',
+  card: 'rgba(255,255,255,0.075)',
   // Edgeless glass: cards and tiles have no outline. Kept as tokens so
   // every surface stays in sync if that ever changes.
   cardBorder: 'transparent',
@@ -20,7 +20,7 @@ export const colors = {
   // Thin separators between rows inside a card (not card edges).
   divider: 'rgba(255,255,255,0.07)',
   // Tiles and chips sitting on top of a card.
-  glassTile: 'rgba(255,255,255,0.05)',
+  glassTile: 'rgba(255,255,255,0.07)',
   surfaceElevated: 'rgba(255,255,255,0.09)',
   borderStrong: 'rgba(255,255,255,0.14)',
   inputBackground: 'rgba(255,255,255,0.04)',

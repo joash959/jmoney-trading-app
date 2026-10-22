@@ -2,11 +2,10 @@ import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MainTabParamList, MoreStackParamList } from '../navigation/types';
+import { MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
@@ -36,8 +35,6 @@ export default function MoreScreen({ navigation }: Props) {
   const { session, profile, isPremium, signOut } = useAuth();
   const connect = usePrimeXBTConnect();
   const { count: unreadCount } = useUnreadNotificationsCount();
-  const tabNavigation =
-    navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
 
   const email = session?.user.email ?? '';
   const displayName = profile?.display_name || email || 'Trader';
@@ -48,18 +45,16 @@ export default function MoreScreen({ navigation }: Props) {
     // the session clears - no manual navigation needed here.
   };
 
+  // Only what the tab bar doesn't already reach.
   const shortcuts = [
-    { icon: 'school-outline' as const, label: 'Courses', onPress: () => tabNavigation?.navigate('Courses', { screen: 'CoursesHome' }) },
-    { icon: 'flash-outline' as const, label: 'Alerts', onPress: () => tabNavigation?.navigate('Alerts') },
-    { icon: 'scan-outline' as const, label: 'Scanner', onPress: () => navigation.navigate('AIScanner') },
-    { icon: 'videocam-outline' as const, label: 'Live', onPress: () => tabNavigation?.navigate('Live') },
     { icon: 'create-outline' as const, label: 'Journal', onPress: () => navigation.navigate('TradingJournal') },
+    { icon: 'scan-outline' as const, label: 'Scanner', onPress: () => navigation.navigate('AIScanner') },
     { icon: 'stats-chart-outline' as const, label: 'Analysis', onPress: () => navigation.navigate('MarketAnalysis') },
-    { icon: 'paper-plane-outline' as const, label: 'Telegram', onPress: () => navigation.navigate('TelegramChannels') },
     { icon: 'trophy-outline' as const, label: 'Ranks', onPress: () => navigation.navigate('Leaderboard') },
   ];
 
   const accountRows = [
+    { icon: 'paper-plane-outline' as const, title: 'Telegram channels', subtitle: 'Trade alerts and community', onPress: () => navigation.navigate('TelegramChannels') },
     {
       icon: (isPremium ? 'checkmark-circle-outline' : 'link-outline') as 'checkmark-circle-outline' | 'link-outline',
       title: 'PrimeXBT account',

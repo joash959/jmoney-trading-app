@@ -3,9 +3,10 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Text from './AppText';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
-import IconBadge, { IoniconName } from './IconBadge';
+import type { IoniconName } from './IconBadge';
 
 type Props = {
+  /** Kept for call-site compatibility; headers are text-only now. */
   icon?: IoniconName;
   title: string;
   subtitle?: string;
@@ -13,9 +14,8 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-/** Large page title with an optional line-icon badge, e.g. "Live Sessions". */
+/** Large page title, e.g. "Live sessions" - text only, like the Alerts screen. */
 export default function ScreenHeader({
-  icon,
   title,
   subtitle,
   rightElement,
@@ -24,7 +24,6 @@ export default function ScreenHeader({
   return (
     <View style={[styles.wrap, style]}>
       <View style={styles.row}>
-        {icon && <IconBadge icon={icon} size={42} />}
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
@@ -47,8 +46,8 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: colors.text,
-    fontSize: 28,
-    lineHeight: 36,
+    fontSize: 30,
+    lineHeight: 38,
     fontWeight: '700',
     letterSpacing: -0.3,
   },

@@ -14,6 +14,9 @@ type Props = {
   time: string;
   /** Posted in the last few minutes - gets a "NEW" marker. */
   isNew?: boolean;
+  /** Collapsed: header row only, tap to show the price levels. */
+  collapsed?: boolean;
+  onToggle?: () => void;
 };
 
 const GREEN_DIM = 'rgba(46,230,166,0.12)';
@@ -21,7 +24,7 @@ const RED_DIM = 'rgba(255,77,106,0.12)';
 
 /** One trade alert: instrument + direction header, the alert's price levels
  * as tap-to-copy tiles, and any extra lines of the message below. */
-export default function AlertCard({ message, time, isNew = false }: Props) {
+export default function AlertCard({ message, time, isNew = false, collapsed = false, onToggle }: Props) {
   const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
   const fields = parseAlertFields(message);
   const direction = detectAlertDirection(message);
@@ -44,10 +47,17 @@ export default function AlertCard({ message, time, isNew = false }: Props) {
   const tint =
     direction === 'long' ? colors.accentGreen : direction === 'short' ? colors.accentRed : colors.link;
 
+  const canCollapse = !!onToggle && (fields.length > 0 || extraLines.length > 0);
+
   return (
     <View style={styles.card}>
       <GlassSheen />
-      <View style={styles.headerRow}>
+      <Pressable
+        style={styles.headerRow}
+        onPress={onToggle}
+        disabled={!canCollapse}
+        hitSlop={4}
+      >
         <View
           style={[
             styles.directionIcon,
@@ -80,9 +90,16 @@ export default function AlertCard({ message, time, isNew = false }: Props) {
             </Text>
           </View>
         )}
-      </View>
+        {canCollapse && (
+          <Ionicons
+            name={collapsed ? 'chevron-down' : 'chevron-up'}
+            size={16}
+            color={colors.textFaint}
+          />
+        )}
+      </Pressable>
 
-      {fields.length > 0 && (
+      {!collapsed && fields.length > 0 && (
         <View style={styles.fieldsGrid}>
           {fields.map((field) => {
             const copied = copiedLabel === field.label;
@@ -113,7 +130,7 @@ export default function AlertCard({ message, time, isNew = false }: Props) {
         </View>
       )}
 
-      {extraLines.length > 0 && (
+      {!collapsed && extraLines.length > 0 && (
         <Text style={styles.body}>{extraLines.join('\n')}</Text>
       )}
     </View>
