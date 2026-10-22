@@ -368,8 +368,8 @@ export default function HomeScreen({ navigation }: Props) {
               action.onPress();
             }}
           >
-            <LiquidGlass style={styles.actionGlass} interactive>
-              <Ionicons name={action.icon} size={24} color={colors.text} />
+            <LiquidGlass style={styles.actionGlass} tint={colors.primaryDim} interactive>
+              <Ionicons name={action.icon} size={24} color={colors.primary} />
             </LiquidGlass>
             <Text style={styles.actionLabel}>{action.label}</Text>
           </Pressable>
@@ -413,20 +413,12 @@ export default function HomeScreen({ navigation }: Props) {
               <ListRow
                 key={alert.id}
                 icon={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
-                iconColor={tint}
-                iconBackground={
-                  direction === 'long'
-                    ? 'rgba(46,230,166,0.12)'
-                    : direction === 'short'
-                      ? 'rgba(255,77,106,0.12)'
-                      : colors.glassTile
-                }
                 title={alert.message.split('\n')[0].trim()}
                 subtitle={entry ? `Entry ${entry.value}` : 'Trade update'}
                 value={direction === 'long' ? 'BUY' : direction === 'short' ? 'SELL' : 'INFO'}
                 valueColor={tint}
                 subvalue={isNew ? '● New' : timeAgo(alert.created_at)}
-                subvalueColor={isNew ? colors.link : colors.textFaint}
+                subvalueColor={isNew ? colors.primary : colors.textFaint}
                 onPress={() => navigation.navigate('Alerts')}
                 divider={i < alerts.length - 1}
               />
@@ -449,7 +441,7 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Next live session"
           value={nextSession ? shortDate(nextSession.date) : 'None yet'}
           subvalue={nextSession ? daysUntil(nextSession.date) : 'Check back soon'}
-          subvalueColor={colors.link}
+          subvalueColor={colors.primary}
           onPress={() => navigation.navigate('Live')}
         />
         <ListRow
@@ -458,7 +450,7 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="US · NFP release"
           value={shortDate(nextNFP.date)}
           subvalue={daysUntil(nextNFP.date)}
-          subvalueColor={colors.link}
+          subvalueColor={colors.primary}
         />
         <ListRow
           icon="pricetags-outline"
@@ -466,7 +458,7 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="US · CPI release"
           value={shortDate(nextCPI.date)}
           subvalue={daysUntil(nextCPI.date)}
-          subvalueColor={colors.link}
+          subvalueColor={colors.primary}
           divider={false}
         />
       </SurfaceCard>
@@ -491,10 +483,10 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
         <View style={styles.allocationBar}>
           {completedPct > 0 && (
-            <View style={[styles.allocationSegment, { flex: completedPct, backgroundColor: colors.accentGreen }]} />
+            <View style={[styles.allocationSegment, { flex: completedPct, backgroundColor: colors.primary }]} />
           )}
           {inProgressPct > 0 && (
-            <View style={[styles.allocationSegment, { flex: inProgressPct, backgroundColor: colors.accentBlue }]} />
+            <View style={[styles.allocationSegment, { flex: inProgressPct, backgroundColor: 'rgba(139,124,255,0.45)' }]} />
           )}
           <View
             style={[
@@ -640,7 +632,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rangePillActive: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: colors.primaryDim,
   },
   rangeText: {
     color: colors.textFaint,
@@ -648,7 +640,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   rangeTextActive: {
-    color: colors.text,
+    color: colors.primary,
   },
   actionsRow: {
     flexDirection: 'row',

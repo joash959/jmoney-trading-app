@@ -51,13 +51,13 @@ export default function AlertCard({ message, time, isNew = false }: Props) {
         <View
           style={[
             styles.directionIcon,
-            { backgroundColor: direction === 'long' ? GREEN_DIM : direction === 'short' ? RED_DIM : colors.accentBlueDim },
+            { backgroundColor: colors.primaryDim },
           ]}
         >
           <Ionicons
             name={direction === 'long' ? 'trending-up' : direction === 'short' ? 'trending-down' : 'flash-outline'}
             size={18}
-            color={tint}
+            color={colors.primary}
           />
         </View>
         <View style={styles.titleCol}>
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   newPill: {
-    backgroundColor: colors.accentBlue,
+    backgroundColor: colors.primary,
     borderRadius: 999,
     paddingHorizontal: 7,
     paddingVertical: 1,

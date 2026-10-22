@@ -9,7 +9,7 @@ export type ChartPoint = { label: string; value: number };
 type Props = {
   data: ChartPoint[];
   height?: number;
-  /** Defaults to green when the series ends at/above where it started, red otherwise. */
+  /** Line colour - defaults to the brand purple. */
   color?: string;
   /** Called with the point under the finger while scrubbing, null on release. */
   onScrub?: (point: ChartPoint | null) => void;
@@ -37,8 +37,7 @@ export default function LineChart({
     () => (data.length >= 2 ? data : [{ label: '', value: 0 }, { label: '', value: 0 }]),
     [data]
   );
-  const rising = series[series.length - 1].value >= series[0].value;
-  const stroke = color ?? (rising ? colors.accentGreen : colors.accentRed);
+  const stroke = color ?? colors.primary;
 
   const geometry = useMemo(() => {
     if (width === 0) return null;

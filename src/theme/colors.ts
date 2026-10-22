@@ -32,6 +32,9 @@ export const colors = {
   // Secondary text: ~6:1 contrast on the background, readable at small sizes.
   textFaint: '#9696A3',
 
+  // Brand purple - the app's primary colour (buttons, charts, highlights).
+  primary: '#8B7CFF',
+  primaryDim: 'rgba(139,124,255,0.16)',
   accentBlue: '#6C63FF',
   accentBlueDim: 'rgba(108,99,255,0.16)',
   accentPurple: '#A78BFA',

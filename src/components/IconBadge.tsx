@@ -18,8 +18,8 @@ type Props = {
 export default function IconBadge({
   icon,
   size = 44,
-  color = colors.text,
-  backgroundColor = colors.glassTile,
+  color = colors.primary,
+  backgroundColor = colors.primaryDim,
   style,
 }: Props) {
   return (

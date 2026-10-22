@@ -110,7 +110,7 @@ export default function GlassTabBar({
                 <Ionicons
                   name={focused ? icon.filled : icon.outline}
                   size={23}
-                  color={focused ? colors.text : colors.textMuted}
+                  color={focused ? colors.primary : colors.textMuted}
                 />
                 {badge != null && <TabBadge value={badge} style={styles.iconBadge} />}
               </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   labelActive: {
-    color: colors.text,
+    color: colors.primary,
   },
   centerLift: {
     marginTop: -34,
