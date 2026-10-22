@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     height: 66,
   },
   capsule: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 33,
   },
   row: {

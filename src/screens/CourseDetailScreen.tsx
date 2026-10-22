@@ -266,7 +266,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
               <VideoView
                 player={player}
                 style={styles.video}
-                allowsFullscreen
+                fullscreenOptions={{ enable: true }}
                 nativeControls
               />
             ) : (

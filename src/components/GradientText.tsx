@@ -1,8 +1,13 @@
+import type { ComponentType } from 'react';
 import { TextStyle } from 'react-native';
 import Text from './AppText';
 import { LinearGradient } from 'expo-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
+import RNMaskedView, { MaskedViewProps } from '@react-native-masked-view/masked-view';
 import { gradients } from '../theme/colors';
+
+// masked-view's class typings predate React 19.3's JSX types; the
+// component itself works unchanged.
+const MaskedView = RNMaskedView as unknown as ComponentType<MaskedViewProps>;
 
 type Props = {
   children: string;

@@ -62,7 +62,7 @@ export default function GlowBackground() {
 
 const styles = StyleSheet.create({
   base: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors.background,
     overflow: 'hidden',
   },

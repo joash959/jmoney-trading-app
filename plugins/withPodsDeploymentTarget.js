@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { withDangerousMod } = require('expo/config-plugins');
 
-const MIN_IOS = '15.1';
+const MIN_IOS = '16.4'; // Expo SDK 58's minimum
 const MARKER = '# withPodsDeploymentTarget';
 
 module.exports = function withPodsDeploymentTarget(config) {

@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   thumbIconWrap: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },
