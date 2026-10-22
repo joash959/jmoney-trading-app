@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
   premiumPillText: {
     color: colors.warning,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
   },
   sessionHost: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   passwordLabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
   },
   passwordValue: {

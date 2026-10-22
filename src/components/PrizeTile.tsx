@@ -49,6 +49,7 @@ export default function PrizeTile({
         {label}
       </Text>
       <Text
+        numeric
         style={[styles.amount, { color: featured ? colors.text : amountColor }]}
         numberOfLines={1}
       >
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
     marginTop: 10,

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: colors.warning,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   },
   durationText: {
     color: colors.text,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
   },
   title: {

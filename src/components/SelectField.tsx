@@ -62,7 +62,7 @@ export default function SelectField({
 const styles = StyleSheet.create({
   label: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1.2,
     marginBottom: 8,

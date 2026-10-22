@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   text: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

@@ -70,7 +70,7 @@ export default function LeaderboardRow({
       </View>
 
       <View style={styles.lotsColumn}>
-        <Text style={styles.lotsValue}>{lots}</Text>
+        <Text numeric style={styles.lotsValue}>{lots}</Text>
         <Text style={styles.lotsLabel}>LOTS</Text>
       </View>
     </View>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   newBadgeText: {
     color: colors.link,
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: '800',
   },
   changeBadge: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   changeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
   },
   body: {
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   lotsLabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 1,
   },
 });

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     lineHeight: 16,
   },
   bold: {

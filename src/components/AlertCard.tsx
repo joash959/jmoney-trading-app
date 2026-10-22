@@ -12,6 +12,8 @@ import GlassSheen from './GlassSheen';
 type Props = {
   message: string;
   time: string;
+  /** Posted in the last few minutes - gets a "NEW" marker. */
+  isNew?: boolean;
 };
 
 const GREEN_DIM = 'rgba(46,230,166,0.12)';
@@ -19,7 +21,7 @@ const RED_DIM = 'rgba(255,77,106,0.12)';
 
 /** One trade alert: instrument + direction header, the alert's price levels
  * as tap-to-copy tiles, and any extra lines of the message below. */
-export default function AlertCard({ message, time }: Props) {
+export default function AlertCard({ message, time, isNew = false }: Props) {
   const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
   const fields = parseAlertFields(message);
   const direction = detectAlertDirection(message);
@@ -62,7 +64,14 @@ export default function AlertCard({ message, time }: Props) {
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
-          <Text style={styles.meta}>JMONEY alert · {time}</Text>
+          <View style={styles.metaRow}>
+            {isNew && (
+              <View style={styles.newPill}>
+                <Text style={styles.newText}>NEW</Text>
+              </View>
+            )}
+            <Text style={styles.meta}>JMONEY alert · {time}</Text>
+          </View>
         </View>
         {direction && (
           <View style={[styles.directionPill, { backgroundColor: direction === 'long' ? GREEN_DIM : RED_DIM }]}>
@@ -97,7 +106,7 @@ export default function AlertCard({ message, time }: Props) {
                     color={copied ? colors.accentGreen : colors.textFaint}
                   />
                 </View>
-                <Text style={[styles.fieldValue, { color: fieldTint }]}>{field.value}</Text>
+                <Text numeric style={[styles.fieldValue, { color: fieldTint }]}>{field.value}</Text>
               </Pressable>
             );
           })}
@@ -138,10 +147,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 3,
+  },
+  newPill: {
+    backgroundColor: colors.accentBlue,
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 1,
+  },
+  newText: {
+    color: colors.text,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+  },
   meta: {
     color: colors.textFaint,
     fontSize: 12,
-    marginTop: 2,
   },
   directionPill: {
     paddingHorizontal: 10,
@@ -149,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   directionText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.5,
   },
@@ -181,7 +207,7 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
   },
   fieldValue: {

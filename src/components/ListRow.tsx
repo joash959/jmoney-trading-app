@@ -76,12 +76,12 @@ export default function ListRow({
       {(!!value || !!subvalue) && (
         <View style={styles.right}>
           {!!value && (
-            <Text style={[styles.value, { color: valueColor }]} numberOfLines={1}>
+            <Text numeric style={[styles.value, { color: valueColor }]} numberOfLines={1}>
               {value}
             </Text>
           )}
           {!!subvalue && (
-            <Text style={[styles.subvalue, { color: subvalueColor }]} numberOfLines={1}>
+            <Text numeric style={[styles.subvalue, { color: subvalueColor }]} numberOfLines={1}>
               {subvalue}
             </Text>
           )}

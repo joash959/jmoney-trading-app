@@ -14,7 +14,6 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { Community } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -135,7 +134,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
               disabled={openingId === featured.id}
               style={({ pressed }) => [styles.cardSpaced, pressed && styles.pressed]}
             >
-              <LiquidGlass style={styles.featuredCard}>
+              <View style={styles.featuredCard}>
                 <View style={styles.featuredTopRow}>
                   <View style={styles.featuredIconCircle}>
                     <Ionicons
@@ -185,7 +184,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
                     </>
                   )}
                 </View>
-              </LiquidGlass>
+              </View>
             </Pressable>
           )}
 
@@ -259,6 +258,8 @@ const styles = StyleSheet.create({
   featuredCard: {
     borderRadius: radius.xl,
     padding: spacing.lg,
+    backgroundColor: colors.card,
+    overflow: 'hidden',
   },
   featuredTopRow: {
     flexDirection: 'row',
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   },
   featuredBadgeText: {
     color: colors.text,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
   },
   featuredTitle: {

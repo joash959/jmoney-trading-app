@@ -6,7 +6,6 @@ import { colors, gradients } from '../theme/colors';
 import { radius } from '../theme/radius';
 import { spacing } from '../theme/spacing';
 import IconBadge, { IoniconName } from './IconBadge';
-import LiquidGlass from './LiquidGlass';
 
 type Props = {
   title: string;
@@ -21,7 +20,7 @@ type Props = {
 };
 
 /** Tappable featured row: line-icon tile, title + subtitle, arrow - on a
- * violet-tinted glass card (the "Monthly Statement" row in the references). */
+ * flat card (the "Monthly Statement" row in the references). */
 export default function GradientLinkCard({
   title,
   subtitle,
@@ -36,7 +35,7 @@ export default function GradientLinkCard({
       onPress={onPress}
       style={({ pressed }) => [style, pressed && styles.pressed]}
     >
-      <LiquidGlass style={styles.card} interactive>
+      <View style={styles.card}>
       <LinearGradient
         colors={gradient}
         start={{ x: 0, y: 0 }}
@@ -54,7 +53,7 @@ export default function GradientLinkCard({
         </Text>
       </View>
       <Ionicons name={glyph} size={20} color={colors.text} />
-      </LiquidGlass>
+      </View>
     </Pressable>
   );
 }
@@ -67,6 +66,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.md,
     paddingRight: spacing.lg,
+    backgroundColor: colors.card,
+    overflow: 'hidden',
   },
   pressed: {
     transform: [{ scale: 0.98 }],

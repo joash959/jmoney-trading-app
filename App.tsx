@@ -7,6 +7,7 @@ import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
+  Inter_700Bold,
 } from '@expo-google-fonts/inter';
 import {
   Poppins_500Medium,
@@ -26,6 +27,7 @@ export default function App() {
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
+    Inter_700Bold,
     Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold,

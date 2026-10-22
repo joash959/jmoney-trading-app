@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     color: colors.text,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   progressTrack: {

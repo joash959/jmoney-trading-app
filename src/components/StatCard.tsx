@@ -36,7 +36,7 @@ export default function StatCard({
           </View>
         )}
       </View>
-      <Text style={styles.value} numberOfLines={1}>
+      <Text numeric style={styles.value} numberOfLines={1}>
         {value}
       </Text>
       <Text style={styles.label} numberOfLines={2}>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   trendText: {
     flexShrink: 1,
     color: colors.accentGreen,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '600',
   },
   value: {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   sublabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 2,
   },
 });

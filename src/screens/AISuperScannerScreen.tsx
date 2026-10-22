@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
   },
   levelsLabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
   },

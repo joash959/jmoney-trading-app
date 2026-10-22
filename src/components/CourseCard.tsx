@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   levelText: {
     color: colors.accentGreen,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '600',
     textTransform: 'capitalize',
   },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   category: {
     color: colors.link,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   title: {
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     color: colors.textFaint,
-    fontSize: 10,
+    fontSize: 12,
   },
   divider: {
     height: 1,

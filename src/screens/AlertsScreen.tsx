@@ -12,12 +12,12 @@ import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
 import SegmentedTabs from '../components/SegmentedTabs';
 import AlertCard from '../components/AlertCard';
+import AnimatedNumber from '../components/AnimatedNumber';
 import Skeleton from '../components/Skeleton';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
@@ -234,14 +234,18 @@ export default function AlertsScreen({ navigation }: Props) {
 
   const directedTotal = Math.max(longCount + shortCount, 1);
   const statsRow = (
-    <LiquidGlass style={styles.summaryCard}>
+    <View style={styles.summaryCard}>
       <View style={styles.summaryTopRow}>
         <Text style={styles.summaryLabel}>Alerts today</Text>
         <Text style={styles.summaryMeta}>
           Last {alerts[0] ? formatRelativeTime(alerts[0].created_at) : '—'}
         </Text>
       </View>
-      <Text style={styles.summaryValue}>{todayCount}</Text>
+      <AnimatedNumber
+        value={todayCount}
+        format={(v) => String(Math.round(v))}
+        style={styles.summaryValue}
+      />
       <View style={styles.splitBar}>
         <View style={[styles.splitSegment, { flex: longCount || 0.0001, backgroundColor: colors.accentGreen }]} />
         <View style={[styles.splitSegment, { flex: shortCount || 0.0001, backgroundColor: colors.accentRed }]} />
@@ -250,14 +254,14 @@ export default function AlertsScreen({ navigation }: Props) {
         )}
       </View>
       <View style={styles.splitLegend}>
-        <Text style={[styles.splitText, { color: colors.accentGreen }]}>
+        <Text numeric style={[styles.splitText, { color: colors.accentGreen }]}>
           {longCount} buy · {Math.round((longCount / directedTotal) * 100)}%
         </Text>
-        <Text style={[styles.splitText, { color: colors.accentRed }]}>
+        <Text numeric style={[styles.splitText, { color: colors.accentRed }]}>
           {shortCount} sell · {Math.round((shortCount / directedTotal) * 100)}%
         </Text>
       </View>
-    </LiquidGlass>
+    </View>
   );
 
   const statsSkeleton = <Skeleton height={150} radius={22} style={styles.summarySkeleton} />;
@@ -377,6 +381,7 @@ export default function AlertsScreen({ navigation }: Props) {
                       key={alert.id}
                       message={alert.message}
                       time={formatShortTime(alert.created_at)}
+                      isNew={Date.now() - new Date(alert.created_at).getTime() < 30 * 60000}
                     />
                   ))}
                 </View>
@@ -412,7 +417,7 @@ const styles = StyleSheet.create({
   },
   liveText: {
     color: colors.accentGreen,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.5,
   },
@@ -425,6 +430,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 20,
     borderRadius: radius['2xl'],
+    backgroundColor: colors.card,
+    overflow: 'hidden',
   },
   summarySkeleton: {
     marginTop: 16,

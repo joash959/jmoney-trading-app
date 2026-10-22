@@ -51,6 +51,7 @@ export default function InsightCard({
         </Text>
       </View>
       <Text
+        numeric
         style={[
           styles.value,
           compact && styles.valueCompact,
@@ -96,11 +97,11 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   labelCompact: {
-    fontSize: 9,
+    fontSize: 12,
   },
   labelFeatured: {
     color: colors.textMuted,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   sublabel: {
     color: colors.textFaint,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 1,
   },
 });

@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   },
   disclaimer: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',
     marginTop: 24,
@@ -474,13 +474,13 @@ const styles = StyleSheet.create({
   },
   copyright: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     textAlign: 'center',
     marginTop: 12,
   },
   credentialLabel: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1.2,
     marginBottom: 8,

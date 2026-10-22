@@ -12,7 +12,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { TradeJournalEntry } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import LiquidGlass from '../components/LiquidGlass';
+import LineChart from '../components/LineChart';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -206,6 +206,16 @@ export default function TradingJournalScreen({ navigation }: Props) {
     );
   });
   const monthlyPnl = monthlyEntries.reduce((sum, e) => sum + e.profit_loss, 0);
+  // Running total through the month, oldest day first, for the chart.
+  const monthSeries = [...monthlyEntries]
+    .sort((a, b) => a.trade_date.localeCompare(b.trade_date))
+    .reduce<{ label: string; value: number }[]>(
+      (points, e) => [
+        ...points,
+        { label: e.trade_date, value: points[points.length - 1].value + e.profit_loss },
+      ],
+      [{ label: 'start', value: 0 }]
+    );
 
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - 6);
@@ -289,20 +299,18 @@ export default function TradingJournalScreen({ navigation }: Props) {
         title="Trading journal"
       />
 
-      <LiquidGlass style={[styles.summaryCard, styles.cardSpaced]}>
+      <View style={[styles.summaryCard, styles.cardSpaced]}>
         <View style={styles.summaryTopRow}>
-          <View style={styles.summaryIconCircle}>
-            <Ionicons name="trending-up-outline" size={20} color={colors.text} />
-          </View>
+          <Text style={styles.summaryLabel}>Monthly P&L</Text>
           <View style={styles.daysPill}>
-            <Text style={styles.daysText}>
+            <Text numeric style={styles.daysText}>
               {monthlyEntries.length} day
               {monthlyEntries.length === 1 ? '' : 's'} logged
             </Text>
           </View>
         </View>
-        <Text style={styles.summaryLabel}>Monthly P&L</Text>
         <Text
+          numeric
           style={[
             styles.summaryValue,
             monthlyPnl < 0 && styles.summaryValueNegative,
@@ -310,7 +318,8 @@ export default function TradingJournalScreen({ navigation }: Props) {
         >
           {formatPnl(monthlyPnl)}
         </Text>
-      </LiquidGlass>
+        <LineChart data={monthSeries} height={110} style={styles.summaryChart} />
+      </View>
 
       <View style={styles.cardSpaced}>
         <Calendar
@@ -410,6 +419,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
                 </Text>
               </View>
               <Text
+                numeric
                 style={[
                   styles.weekPnl,
                   entry.profit_loss < 0 && styles.weekPnlNegative,
@@ -432,24 +442,22 @@ const styles = StyleSheet.create({
   summaryCard: {
     borderRadius: radius['2xl'],
     padding: 20,
+    paddingBottom: 8,
+    backgroundColor: colors.card,
+    overflow: 'hidden',
+  },
+  summaryChart: {
+    marginTop: 8,
+    marginHorizontal: -20,
   },
   summaryTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  summaryIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.glassTile,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   summaryLabel: {
     color: colors.textMuted,
     fontSize: 14,
-    marginTop: 16,
   },
   summaryValue: {
     color: colors.text,

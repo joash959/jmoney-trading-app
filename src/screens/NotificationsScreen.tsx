@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   rowTime: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 6,
   },
   unreadDot: {

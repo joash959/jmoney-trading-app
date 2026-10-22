@@ -9,8 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MainTabParamList, MoreStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
+import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
-import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
@@ -19,6 +19,7 @@ import MenuRow from '../components/MenuRow';
 import SectionLabel from '../components/SectionLabel';
 import ListRow from '../components/ListRow';
 import DisclaimerCard from '../components/DisclaimerCard';
+import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
@@ -33,6 +34,7 @@ function getInitials(name: string) {
 
 export default function MoreScreen({ navigation }: Props) {
   const { session, profile, isPremium, signOut } = useAuth();
+  const connect = usePrimeXBTConnect();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const tabNavigation =
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
@@ -58,6 +60,12 @@ export default function MoreScreen({ navigation }: Props) {
   ];
 
   const accountRows = [
+    {
+      icon: (isPremium ? 'checkmark-circle-outline' : 'link-outline') as 'checkmark-circle-outline' | 'link-outline',
+      title: 'PrimeXBT account',
+      subtitle: isPremium ? 'Connected · verified and funded' : 'Not connected - tap to connect',
+      onPress: connect.open,
+    },
     { icon: 'notifications-outline' as const, title: 'Notifications', subtitle: unreadCount > 0 ? `${unreadCount} unread` : 'All caught up', onPress: () => navigation.navigate('Notifications') },
     { icon: 'briefcase-outline' as const, title: 'Recommended broker', subtitle: 'PrimeXBT account and benefits', onPress: () => navigation.navigate('RecommendedBroker') },
     { icon: 'chatbubbles-outline' as const, title: 'Contact us', subtitle: 'WhatsApp, Telegram or email', onPress: () => navigation.navigate('ContactUs') },
@@ -74,7 +82,7 @@ export default function MoreScreen({ navigation }: Props) {
         }
       />
 
-      <LiquidGlass style={styles.profileCard}>
+      <View style={styles.profileCard}>
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
         </LinearGradient>
@@ -100,7 +108,7 @@ export default function MoreScreen({ navigation }: Props) {
             </Text>
           </View>
         </View>
-      </LiquidGlass>
+      </View>
 
       <SectionLabel>Shortcuts</SectionLabel>
       <View style={styles.grid}>
@@ -130,6 +138,24 @@ export default function MoreScreen({ navigation }: Props) {
       </SurfaceCard>
 
       <DisclaimerCard style={styles.disclaimerSpaced} />
+
+      <PrimeXBTConnectModal
+        visible={connect.visible}
+        onClose={connect.close}
+        clientId={connect.clientId}
+        onChangeClientId={connect.setClientId}
+        onConnect={connect.handleConnect}
+        loading={connect.loading}
+        successMessage={connect.successMessage}
+        errorMessage={connect.errorMessage}
+        title={isPremium ? 'Connect a different PrimeXBT account' : undefined}
+        description={
+          isPremium
+            ? "You're already connected and funded. Enter a different PrimeXBT client ID to switch accounts."
+            : undefined
+        }
+        confirmLabel={isPremium ? 'Connect different account' : undefined}
+      />
     </ScreenShell>
   );
 }
@@ -142,6 +168,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 20,
     borderRadius: radius['2xl'],
+    backgroundColor: colors.card,
+    overflow: 'hidden',
   },
   avatar: {
     width: 56,
@@ -184,7 +212,7 @@ const styles = StyleSheet.create({
   },
   tierPillText: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   tierPillTextPremium: {

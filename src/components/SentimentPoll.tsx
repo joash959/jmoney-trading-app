@@ -120,10 +120,10 @@ export default function SentimentPoll() {
                 />
               </View>
               <View style={styles.splitLegend}>
-                <Text style={[styles.splitText, { color: colors.accentGreen }]}>
+                <Text numeric style={[styles.splitText, { color: colors.accentGreen }]}>
                   {percentage(counts, 'bullish')}% bullish
                 </Text>
-                <Text style={[styles.splitText, { color: colors.accentRed }]}>
+                <Text numeric style={[styles.splitText, { color: colors.accentRed }]}>
                   {percentage(counts, 'bearish')}% bearish
                 </Text>
               </View>

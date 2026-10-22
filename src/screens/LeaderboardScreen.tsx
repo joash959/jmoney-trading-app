@@ -13,7 +13,6 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import LiquidGlass from '../components/LiquidGlass';
 import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
 import ScreenHeader from '../components/ScreenHeader';
@@ -250,7 +249,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
       />
 
       {settings?.show_podium !== false && (
-        <LiquidGlass style={[styles.heroCard, styles.cardSpaced]}>
+        <View style={[styles.heroCard, styles.cardSpaced]}>
           <View style={styles.heroIconCircle}>
             <Ionicons name="trophy-outline" size={20} color={colors.text} />
           </View>
@@ -290,7 +289,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
               </View>
             </View>
           </View>
-        </LiquidGlass>
+        </View>
       )}
 
       <GlassCard style={styles.cardSpaced}>
@@ -471,6 +470,8 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: radius['2xl'],
     padding: 20,
+    backgroundColor: colors.card,
+    overflow: 'hidden',
   },
   heroIconCircle: {
     width: 44,

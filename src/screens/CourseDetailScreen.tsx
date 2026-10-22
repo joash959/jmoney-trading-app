@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
   debugText: {
     color: colors.accentRed,
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 8,
   },
   metaRow: {
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   instructorLabel: {
     color: colors.textFaint,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   instructorName: {
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   },
   premiumPillText: {
     color: colors.warning,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
   },
   emptyText: {
