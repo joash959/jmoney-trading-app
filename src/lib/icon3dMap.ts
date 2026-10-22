@@ -16,7 +16,7 @@ export const ICON_3D: Record<string, Icon3DName> = {
   'trending-down': 'chart-down',
   'trending-down-outline': 'chart-down',
   'paper-plane-outline': 'telegram',
-  'trophy-outline': 'trophy',
+  'trophy-outline': 'podium',
   'school-outline': 'courses',
   'book-outline': 'books',
   'videocam-outline': 'live',
@@ -38,5 +38,7 @@ export const ICON_3D: Record<string, Icon3DName> = {
   'star-outline': 'star',
   'diamond-outline': 'gem',
   'card-outline': 'money-bag',
-  'globe-outline': 'bank',
+  'globe-outline': 'broker',
+  'grid-outline': 'dashboard',
+  'podium-outline': 'podium',
 };
