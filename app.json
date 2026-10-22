@@ -27,6 +27,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withPodsDeploymentTarget",
       [
         "expo-splash-screen",
         {
