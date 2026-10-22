@@ -13,7 +13,7 @@ type Props = {
   onPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
-  /** 'tonal' is a tinted glass button for repeated, lower-emphasis actions. */
+  /** 'tonal' is a neutral glass button for repeated, lower-emphasis actions. */
   variant?: 'gradient' | 'flat' | 'tonal';
   style?: StyleProp<ViewStyle>;
 };
@@ -115,17 +115,17 @@ const styles = StyleSheet.create({
   gradientShadow: {
     shadowColor: '#6C63FF',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
     elevation: 8,
   },
   flatButton: {
     backgroundColor: colors.accentBlue,
   },
   tonalButton: {
-    backgroundColor: colors.accentBlueDim,
+    backgroundColor: colors.buttonSecondary,
     borderWidth: StyleSheet.hairlineWidth * 2,
-    borderColor: 'rgba(157,151,255,0.35)',
+    borderColor: colors.borderStrong,
   },
   buttonText: {
     color: colors.text,

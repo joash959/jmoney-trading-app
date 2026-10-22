@@ -3,10 +3,11 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 
-/** Indigo-black backdrop after the Syfter reference: a soft vertical light
- * beam falling from the top centre, faint star specks, and a dim chart
- * line across the lower half. Built from gradients and plain views (no SVG
- * or blur), so it renders the same on iOS and Android. */
+/** Neutral near-black backdrop after the Syfter reference: a soft, cool
+ * glow falling from the top centre, faint star specks, and a barely-there
+ * chart line across the lower half. No hard lines and no colour cast -
+ * built from gradients and plain views (no SVG or blur), so it renders the
+ * same on iOS and Android. */
 export default function GlowBackground() {
   const { width, height } = useWindowDimensions();
   const stars = useMemo(() => makeStars(width, height), [width, height]);
@@ -14,44 +15,27 @@ export default function GlowBackground() {
 
   return (
     <View style={styles.base} pointerEvents="none">
-      {/* Beam: wide soft glow + narrower core, both fading out downwards. */}
-      <View style={styles.beamArea}>
-        <LinearGradient
-          colors={['rgba(108,99,255,0)', 'rgba(108,99,255,0.16)', 'rgba(108,99,255,0)']}
-          locations={[0.1, 0.5, 0.9]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={StyleSheet.absoluteFill}
-        />
+      {/* Glow: feathered on both sides, fading out downwards. */}
+      <View style={styles.glowArea}>
         <LinearGradient
           colors={[
-            'rgba(160,150,255,0)',
-            'rgba(160,150,255,0.07)',
-            'rgba(160,150,255,0.2)',
-            'rgba(160,150,255,0.07)',
-            'rgba(160,150,255,0)',
+            'rgba(190,195,225,0)',
+            'rgba(190,195,225,0.035)',
+            'rgba(190,195,225,0.07)',
+            'rgba(190,195,225,0.035)',
+            'rgba(190,195,225,0)',
           ]}
-          locations={[0.28, 0.41, 0.5, 0.59, 0.72]}
+          locations={[0.08, 0.3, 0.5, 0.7, 0.92]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}
         />
         <LinearGradient
-          colors={['rgba(9,8,15,0)', colors.background]}
-          locations={[0.05, 1]}
+          colors={['rgba(10,10,13,0)', colors.background]}
+          locations={[0, 1]}
           style={StyleSheet.absoluteFill}
         />
       </View>
-      {/* Thin bright core of the beam, with a slightly wider halo. */}
-      <LinearGradient
-        colors={['rgba(150,140,255,0.25)', 'rgba(150,140,255,0)']}
-        style={[styles.beamHalo, { left: width / 2 - 4 }]}
-      />
-      <LinearGradient
-        colors={['rgba(215,210,255,0.5)', 'rgba(150,140,255,0.15)', 'rgba(150,140,255,0)']}
-        locations={[0, 0.4, 1]}
-        style={[styles.beamLine, { left: width / 2 - 0.5 }]}
-      />
 
       {stars.map((star, i) => (
         <View
@@ -99,11 +83,11 @@ function seeded(seed: number) {
 
 function makeStars(width: number, height: number) {
   const rand = seeded(42);
-  return Array.from({ length: 46 }, () => ({
+  return Array.from({ length: 40 }, () => ({
     x: rand() * width,
     y: rand() * height * 0.85,
-    size: rand() < 0.85 ? 1.5 : 2.5,
-    opacity: 0.12 + rand() * 0.35,
+    size: rand() < 0.85 ? 1.5 : 2,
+    opacity: 0.08 + rand() * 0.22,
   }));
 }
 
@@ -114,12 +98,10 @@ function makeChartSegments(width: number, height: number) {
   const baseY = height * 0.72;
   const points: { x: number; y: number }[] = [];
   const steps = 34;
-  let y = baseY;
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * (width + 40) - 20;
-    // Gentle swell plus noise, like the Syfter silhouette.
     const swell = Math.sin((i / steps) * Math.PI * 2.2) * height * 0.05;
-    y = baseY - swell + (rand() - 0.5) * height * 0.06;
+    const y = baseY - swell + (rand() - 0.5) * height * 0.06;
     points.push({ x, y });
   }
   return points.slice(1).map((p, i) => {
@@ -141,24 +123,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     overflow: 'hidden',
   },
-  beamArea: {
+  glowArea: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '62%',
-  },
-  beamHalo: {
-    position: 'absolute',
-    top: 0,
-    width: 8,
-    height: '30%',
-  },
-  beamLine: {
-    position: 'absolute',
-    top: 0,
-    width: 1,
-    height: '36%',
+    height: '55%',
   },
   star: {
     position: 'absolute',
@@ -168,6 +138,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 1.5,
     borderRadius: 1,
-    backgroundColor: 'rgba(108,99,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
 });

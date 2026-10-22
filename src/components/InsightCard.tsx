@@ -37,7 +37,7 @@ export default function InsightCard({
         <Ionicons
           name={icon}
           size={compact ? 11 : 13}
-          color={isFeatured ? colors.link : iconColor}
+          color={isFeatured ? colors.textMuted : iconColor}
         />
         <Text
           style={[
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
   labelFeatured: {
-    color: colors.link,
+    color: colors.textMuted,
   },
   value: {
     fontSize: 17,

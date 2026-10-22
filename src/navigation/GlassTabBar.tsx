@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.cardBorder,
   },
   tint: {
-    backgroundColor: 'rgba(9,8,15,0.78)',
+    backgroundColor: 'rgba(10,10,13,0.8)',
   },
   row: {
     flexDirection: 'row',
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     borderRadius: 31,
     shadowColor: '#6C63FF',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.55,
-    shadowRadius: 16,
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
     elevation: 10,
   },
   centerRing: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerInnerActive: {
-    backgroundColor: '#1D1A3A',
+    backgroundColor: '#1B1A26',
   },
   centerBadge: {
     top: 0,

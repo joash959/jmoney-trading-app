@@ -29,7 +29,7 @@ const TYPE_ACCENT: Record<string, { fg: string; bg: string }> = {
   telegram_access: { fg: '#22D3EE', bg: 'rgba(34,211,238,0.15)' },
 };
 
-const DEFAULT_ACCENT = { fg: colors.link, bg: 'rgba(108,99,255,0.12)' };
+const DEFAULT_ACCENT = { fg: colors.text, bg: colors.glassTile };
 
 function iconForType(type: string) {
   return TYPE_ICON[type] ?? 'notifications-outline';
@@ -204,19 +204,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     backgroundColor: colors.card,
-    borderRadius: 14,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: colors.cardBorder,
     padding: 14,
   },
   rowUnread: {
-    borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.35)',
-    backgroundColor: 'rgba(108,99,255,0.08)',
+    borderColor: colors.borderStrong,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   rowIcon: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: 'rgba(108,99,255,0.12)',
+    backgroundColor: colors.glassTile,
     alignItems: 'center',
     justifyContent: 'center',
   },

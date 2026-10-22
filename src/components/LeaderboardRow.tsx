@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   lotsValue: {
-    color: colors.link,
+    color: colors.text,
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   lotsLabel: {
     color: colors.textFaint,
