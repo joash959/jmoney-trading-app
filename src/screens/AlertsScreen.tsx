@@ -15,6 +15,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import NotificationBell from '../components/NotificationBell';
 import PageHeader from '../components/PageHeader';
+import SectionHeader from '../components/SectionHeader';
 import AlertCard from '../components/AlertCard';
 import AnimatedNumber from '../components/AnimatedNumber';
 import Skeleton from '../components/Skeleton';
@@ -71,6 +72,12 @@ function formatDateLabel(iso: string) {
   });
 }
 
+/** "2:25 PM" for today, otherwise "Yesterday, 2:25 PM" / "October 21, 2:25 PM". */
+function whenLabel(iso: string) {
+  const day = formatDateLabel(iso);
+  return day === 'Today' ? formatShortTime(iso) : `${day}, ${formatShortTime(iso)}`;
+}
+
 const CORE_MARKETS = ['Gold', 'US30', 'NAS100'];
 
 export default function AlertsScreen({ navigation }: Props) {
@@ -89,6 +96,8 @@ export default function AlertsScreen({ navigation }: Props) {
   // Market tab: 'All' or an instrument such as 'Gold' / 'US30'.
   const [market, setMarket] = useState('All');
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+  // Finished trades are tucked away until asked for.
+  const [showClosed, setShowClosed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,7 +125,7 @@ export default function AlertsScreen({ navigation }: Props) {
       .from('trade_alerts')
       .select('id, message, created_at')
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(200);
 
     if (alertError) {
       setError(alertError.message);
@@ -152,7 +161,7 @@ export default function AlertsScreen({ navigation }: Props) {
           const row = payload.new as TradeAlert;
           setAlerts((prev) => {
             if (prev.some((a) => a.id === row.id)) return prev;
-            return [row, ...prev].slice(0, 100);
+            return [row, ...prev].slice(0, 200);
           });
           const direction = detectAlertDirection(row.message);
           if (direction === 'long') setLongCount((count) => count + 1);
@@ -201,35 +210,34 @@ export default function AlertsScreen({ navigation }: Props) {
   // Signals with their TP / SL / close updates attached, newest first.
   const threads = useMemo(() => buildTradeThreads(alerts), [alerts]);
 
+  // A trade is active until a trigger word (closed, SL hit, cancelled...)
+  // is posted for it. Updates whose signal we never saw count as past.
+  const isActive = (t: TradeThread) => !!t.signal && !t.status.closed;
+
   // Core markets always get a tab; any other pair appears once it's traded.
+  // Counts are active trades only, so "US30 1" means one live US30 trade.
   const marketTabs = useMemo(() => {
-    const counts = new Map<string, number>();
+    const active = new Map<string, number>();
+    const seen = new Set<string>();
     threads.forEach((t) => {
-      if (t.instrument) counts.set(t.instrument, (counts.get(t.instrument) ?? 0) + 1);
+      if (!t.instrument) return;
+      seen.add(t.instrument);
+      if (isActive(t)) active.set(t.instrument, (active.get(t.instrument) ?? 0) + 1);
     });
-    const extra = [...counts.keys()].filter((m) => !CORE_MARKETS.includes(m)).sort();
+    const extra = [...seen].filter((m) => !CORE_MARKETS.includes(m)).sort();
     return [
-      { name: 'All', count: threads.length },
-      ...[...CORE_MARKETS, ...extra].map((name) => ({ name, count: counts.get(name) ?? 0 })),
+      { name: 'All', count: threads.filter(isActive).length },
+      ...[...CORE_MARKETS, ...extra].map((name) => ({ name, count: active.get(name) ?? 0 })),
     ];
   }, [threads]);
 
-  const openCount = threads.filter((t) => t.signal && !t.status.closed).length;
-
-  const groupedThreads = useMemo(() => {
-    const groups: { label: string; items: TradeThread[] }[] = [];
-    const visible = market === 'All' ? threads : threads.filter((t) => t.instrument === market);
-    visible.forEach((thread) => {
-      const label = formatDateLabel(thread.lastAt);
-      const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.label === label) {
-        lastGroup.items.push(thread);
-      } else {
-        groups.push({ label, items: [thread] });
-      }
-    });
-    return groups;
-  }, [threads, market]);
+  const inMarket = useMemo(
+    () => (market === 'All' ? threads : threads.filter((t) => t.instrument === market)),
+    [threads, market]
+  );
+  const activeThreads = inMarket.filter(isActive);
+  const closedThreads = inMarket.filter((t) => !isActive(t));
+  const activeCount = threads.filter(isActive).length;
 
   const directedTotal = Math.max(longCount + shortCount, 1);
   const statsRow = (
@@ -314,6 +322,30 @@ export default function AlertsScreen({ navigation }: Props) {
     );
   }
 
+  const renderThread = (thread: TradeThread, openByDefault: boolean) => {
+    const head = thread.signal ?? thread.updates[0];
+    const followUps = thread.signal ? thread.updates : thread.updates.slice(1);
+    // The newest active trade starts open; closed ones start collapsed.
+    const defaultOpen = openByDefault && thread.id === activeThreads[0]?.id;
+    const open = expandedIds[thread.id] ?? defaultOpen;
+    return (
+      <AlertCard
+        key={thread.id}
+        message={head.message}
+        time={whenLabel(head.created_at)}
+        isNew={isActive(thread) && Date.now() - new Date(thread.lastAt).getTime() < 30 * 60000}
+        status={thread.signal ? thread.status : { label: 'Past update', color: colors.textMuted, closed: true }}
+        updates={followUps.map((u) => ({
+          id: u.id,
+          message: u.message,
+          time: whenLabel(u.created_at),
+        }))}
+        collapsed={!open}
+        onToggle={() => setExpandedIds((prev) => ({ ...prev, [thread.id]: !open }))}
+      />
+    );
+  };
+
   return (
     <ScreenShell
       refreshing={refreshing}
@@ -325,7 +357,7 @@ export default function AlertsScreen({ navigation }: Props) {
         context={
           loading
             ? null
-            : `${openCount} open · ${todayCount} alerts today`
+            : `${activeCount} active · ${todayCount} alerts today`
         }
         right={
           <NotificationBell
@@ -384,47 +416,40 @@ export default function AlertsScreen({ navigation }: Props) {
           {/* Today's buy/sell split is about all markets - only on "All". */}
           {market === 'All' && statsRow}
 
-          <View style={styles.list}>
-            {groupedThreads.map((group) => (
-              <View key={group.label} style={styles.group}>
-                <View style={styles.dateRow}>
-                  <Text style={styles.dateLabel}>{group.label}</Text>
-                </View>
-                <View style={styles.groupList}>
-                  {group.items.map((thread) => {
-                    const head = thread.signal ?? thread.updates[0];
-                    const followUps = thread.signal ? thread.updates : thread.updates.slice(1);
-                    // Newest trade open, older ones collapse to one row.
-                    const defaultOpen = thread.id === threads[0]?.id;
-                    const open = expandedIds[thread.id] ?? defaultOpen;
-                    return (
-                      <AlertCard
-                        key={thread.id}
-                        message={head.message}
-                        time={formatShortTime(head.created_at)}
-                        isNew={Date.now() - new Date(thread.lastAt).getTime() < 30 * 60000}
-                        status={thread.signal ? thread.status : undefined}
-                        updates={followUps.map((u) => ({
-                          id: u.id,
-                          message: u.message,
-                          time: formatShortTime(u.created_at),
-                        }))}
-                        collapsed={!open}
-                        onToggle={() =>
-                          setExpandedIds((prev) => ({ ...prev, [thread.id]: !open }))
-                        }
-                      />
-                    );
-                  })}
-                </View>
-              </View>
-            ))}
-            {groupedThreads.length === 0 && (
-              <Text style={styles.emptyText}>
-                {alerts.length === 0 ? 'No alerts yet.' : `No ${market} trades in recent alerts.`}
+          <SectionHeader
+            title="Active trades"
+            meta={String(activeThreads.length)}
+          />
+          {activeThreads.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyTitle}>
+                No active {market === 'All' ? '' : `${market} `}trades
               </Text>
-            )}
-          </View>
+              <Text style={styles.emptyText}>
+                New signals appear here the moment they're posted.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.groupList}>
+              {activeThreads.map((thread) => renderThread(thread, true))}
+            </View>
+          )}
+
+          {closedThreads.length > 0 && (
+            <>
+              <SectionHeader
+                title="Closed"
+                meta={String(closedThreads.length)}
+                actionLabel={showClosed ? 'Hide' : 'Show'}
+                onAction={() => setShowClosed((v) => !v)}
+              />
+              {showClosed && (
+                <View style={styles.groupList}>
+                  {closedThreads.map((thread) => renderThread(thread, false))}
+                </View>
+              )}
+            </>
+          )}
         </>
       )}
     </ScreenShell>
@@ -432,6 +457,18 @@ export default function AlertsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  emptyCard: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    borderRadius: radius.xl,
+    backgroundColor: colors.card,
+  },
+  emptyTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
   marketScroll: {
     marginHorizontal: -20,
     marginTop: 12,
@@ -532,22 +569,6 @@ const styles = StyleSheet.create({
     gap: 20,
     marginTop: 16,
   },
-  group: {
-    gap: 10,
-  },
-  dateRow: {
-    alignItems: 'center',
-  },
-  dateLabel: {
-    color: colors.textFaint,
-    fontSize: 12,
-    fontWeight: '500',
-    backgroundColor: colors.glassTile,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    overflow: 'hidden',
-  },
   groupList: {
     gap: 10,
   },
@@ -555,6 +576,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 14,
     textAlign: 'center',
-    paddingVertical: 16,
+    marginTop: 4,
   },
 });

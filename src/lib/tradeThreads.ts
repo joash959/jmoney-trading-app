@@ -52,7 +52,7 @@ export function detectInstrument(message: string): string | null {
 
 // Words that mark a follow-up on an open trade rather than a new signal.
 const UPDATE_PATTERN =
-  /\b(tp\s*\d?\s*(hit|reached|smashed)|take\s*profit\s*\d?\s*(hit|reached)|sl\s*(hit|moved|to)|stop(\s*loss)?\s*(hit|moved)|stopped\s*out|move\s*(sl|stop)|break\s*-?\s*even|closed?|exit(ed)?|secure|partials?|running|pips?)\b/i;
+  /\b(tp\s*\d?\s*(hit|reached|smashed)|take\s*profit\s*\d?\s*(hit|reached)|sl\s*(hit|moved|to|triggered|taken)|stop(\s*loss)?\s*(hit|moved|triggered)|stopped\s*out|move\s*(sl|stop)|break\s*-?\s*even|closed?|exit(ed)?|secure|partials?|running|pips?|cancel(l?ed)?|invalidated?)\b/i;
 
 function isUpdate(message: string) {
   return UPDATE_PATTERN.test(message);
@@ -67,14 +67,33 @@ function isSignal(message: string) {
   return !!detectAlertDirection(message);
 }
 
+// Trigger words that end a trade. Nothing else does: a signal stays active
+// until one of these is posted for it (there is no time-based expiry).
+const STOPPED_OUT = /\b(sl|stop(\s*loss)?)\s*(hit|triggered|taken)\b|\bstopped\s*out\b/i;
+const CANCELLED = /\b(cancel(l?ed)?|invalidated?|void)\b/i;
+const CLOSED = /\b(closed?|exit(ed)?)\b/i;
+// "Close 50%", "close half", "close partials", "SL close to entry" don't end it.
+const NOT_A_FULL_CLOSE = /\bclose\s*(\d+\s*%|(half|some|partials?|part)\b)|\bclose\s*to\b|\bpartials?\s*closed\b/i;
+
+const CLOSE_ALL = /\bclose\s*all\b/i;
+
+function isFullClose(message: string) {
+  // "Close all" always counts, even next to a partial-close phrase.
+  if (CLOSE_ALL.test(message)) return true;
+  return CLOSED.test(message) && !NOT_A_FULL_CLOSE.test(message);
+}
+
 /** Status of a trade from its latest meaningful update. */
 function statusFor(updates: AlertRow[]): TradeStatus {
   for (let i = updates.length - 1; i >= 0; i -= 1) {
     const m = updates[i].message;
-    if (/\b(sl|stop(\s*loss)?)\s*(hit|triggered)\b|\bstopped\s*out\b/i.test(m)) {
+    if (STOPPED_OUT.test(m)) {
       return { label: 'Stopped out', color: colors.accentRed, closed: true };
     }
-    if (/\b(closed?|exit(ed)?|fully\s*closed)\b/i.test(m)) {
+    if (CANCELLED.test(m)) {
+      return { label: 'Cancelled', color: colors.textMuted, closed: true };
+    }
+    if (isFullClose(m)) {
       return { label: 'Closed', color: colors.textMuted, closed: true };
     }
     const tp = m.match(/\btp\s*(\d)?\s*(hit|reached|smashed)\b|\btake\s*profit\s*(\d)?\s*(hit|reached)\b/i);
@@ -86,7 +105,7 @@ function statusFor(updates: AlertRow[]): TradeStatus {
       return { label: 'Risk-free', color: colors.link, closed: false };
     }
   }
-  return { label: 'Running', color: colors.link, closed: false };
+  return { label: 'Active', color: colors.accentGreen, closed: false };
 }
 
 // An update with no market named is linked to the latest trade only if it

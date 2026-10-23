@@ -19,7 +19,7 @@ type Props = {
   collapsed?: boolean;
   onToggle?: () => void;
   /** Where the trade stands now, from its updates (e.g. "TP1 hit"). */
-  status?: { label: string; color: string };
+  status?: { label: string; color: string; closed?: boolean };
   /** Follow-up messages for this trade, oldest first. */
   updates?: { id: string; message: string; time: string }[];
 };
@@ -62,10 +62,26 @@ export default function AlertCard({
 
   const canCollapse = !!onToggle && (fields.length > 0 || extraLines.length > 0 || updates.length > 0);
   const latestUpdate = updates[updates.length - 1];
+  // A finished trade must never look actionable: dimmed, no copy buttons.
+  const isClosed = !!status?.closed;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isClosed && styles.cardClosed]}>
       <GlassSheen />
+      {/* Live trades carry a BUY/SELL coloured edge. */}
+      {!isClosed && direction && <View style={[styles.edge, { backgroundColor: tint }]} />}
+      {isClosed && (
+        <View style={styles.closedBanner}>
+          <Ionicons
+            name={status?.label === 'Stopped out' ? 'close-circle' : 'checkmark-circle'}
+            size={15}
+            color={status?.color}
+          />
+          <Text style={[styles.closedBannerText, { color: status?.color }]}>
+            {status?.label} · trade closed, do not enter
+          </Text>
+        </View>
+      )}
       <Pressable
         style={styles.headerRow}
         onPress={onToggle}
@@ -143,16 +159,24 @@ export default function AlertCard({
                   pressed && styles.fieldTilePressed,
                 ]}
                 onPress={() => handleCopy(field.label, field.value)}
+                disabled={isClosed}
               >
                 <View style={styles.fieldLabelRow}>
                   <Text style={styles.fieldLabel}>{field.label}</Text>
-                  <Ionicons
-                    name={copied ? 'checkmark' : 'copy-outline'}
-                    size={11}
-                    color={copied ? colors.accentGreen : colors.textFaint}
-                  />
+                  {!isClosed && (
+                    <Ionicons
+                      name={copied ? 'checkmark' : 'copy-outline'}
+                      size={11}
+                      color={copied ? colors.accentGreen : colors.textFaint}
+                    />
+                  )}
                 </View>
-                <Text numeric style={[styles.fieldValue, { color: fieldTint }]}>{field.value}</Text>
+                <Text
+                  numeric
+                  style={[styles.fieldValue, { color: isClosed ? colors.textFaint : fieldTint }]}
+                >
+                  {field.value}
+                </Text>
               </Pressable>
             );
           })}
@@ -193,6 +217,31 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: 16,
     overflow: 'hidden',
+  },
+  cardClosed: {
+    opacity: 0.6,
+  },
+  edge: {
+    position: 'absolute',
+    left: 0,
+    top: 16,
+    bottom: 16,
+    width: 3,
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
+  },
+  closedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.divider,
+  },
+  closedBannerText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   headerRow: {
     flexDirection: 'row',

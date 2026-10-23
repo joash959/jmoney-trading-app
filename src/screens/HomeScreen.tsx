@@ -321,6 +321,8 @@ export default function HomeScreen({ navigation }: Props) {
   ];
 
   const pnlColor = shownValue < 0 ? colors.accentRed : colors.text;
+  // Only trades still open - closed and stopped-out ones live on the Alerts tab.
+  const activeTrades = buildTradeThreads(alerts).filter((t) => t.signal && !t.status.closed);
 
   return (
     <ScreenShell
@@ -470,14 +472,16 @@ export default function HomeScreen({ navigation }: Props) {
 
       {/* Latest alerts */}
       <SectionHeader
-        title="Latest alerts"
+        title="Active trades"
         actionLabel="See all"
         onAction={() => navigation.navigate('Alerts')}
       />
-      {alerts.length === 0 ? (
+      {activeTrades.length === 0 ? (
         <SurfaceCard>
           <Text style={styles.emptyText}>
-            {isPremium ? 'No alerts yet today.' : 'Connect PrimeXBT to see live trade alerts.'}
+            {isPremium
+              ? 'No active trades right now. New signals show here the moment they post.'
+              : 'Connect PrimeXBT to see live trade alerts.'}
           </Text>
         </SurfaceCard>
       ) : (
@@ -489,7 +493,7 @@ export default function HomeScreen({ navigation }: Props) {
           style={styles.carousel}
           contentContainerStyle={styles.carouselContent}
         >
-          {buildTradeThreads(alerts).slice(0, 5).map((thread) => {
+          {activeTrades.slice(0, 5).map((thread) => {
             const alert = thread.signal ?? thread.updates[0];
             const direction = thread.signal ? thread.direction : null;
             const fields = parseAlertFields(alert.message);
