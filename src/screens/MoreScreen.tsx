@@ -10,7 +10,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
-import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
 import IconTile from '../components/IconTile';
@@ -84,24 +83,6 @@ export default function MoreScreen({ navigation }: Props) {
 
   return (
     <ScreenShell>
-      <PageHeader
-        title="More"
-        context={
-          gameStats
-            ? `Level ${gameStats.level} · ${gameStats.streak}-day streak · ${
-                gameStats.badges.filter((b) => b.unlocked).length
-              }/${gameStats.badges.length} badges`
-            : null
-        }
-        right={
-          <NotificationBell
-            plain
-            count={unreadCount}
-            onPress={() => navigation.navigate('Notifications')}
-          />
-        }
-      />
-
       <View style={styles.profileCard}>
         <LinearGradient colors={gradients.brand} style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(displayName)}</Text>
@@ -124,11 +105,16 @@ export default function MoreScreen({ navigation }: Props) {
             <Text
               style={[styles.tierPillText, isPremium && styles.tierPillTextPremium]}
             >
-              {isPremium ? 'Premium member' : 'Free plan'}
-              {gameStats ? ` · Lvl ${gameStats.level} ${gameStats.levelName}` : ''}
+              {isPremium ? 'Premium' : 'Free plan'}
+              {gameStats ? ` · Lvl ${gameStats.level}` : ''}
             </Text>
           </View>
         </View>
+        <NotificationBell
+          plain
+          count={unreadCount}
+          onPress={() => navigation.navigate('Notifications')}
+        />
       </View>
 
       <SectionHeader title="Tools" />
@@ -265,7 +251,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    marginTop: 8,
+    marginTop: 16,
     padding: 20,
     borderRadius: radius['2xl'],
     backgroundColor: colors.card,
