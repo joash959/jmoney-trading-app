@@ -52,7 +52,7 @@ export function detectInstrument(message: string): string | null {
 
 // Words that mark a follow-up on an open trade rather than a new signal.
 const UPDATE_PATTERN =
-  /\b(tp\s*\d?\s*(hit|reached|smashed)|take\s*profit\s*\d?\s*(hit|reached)|sl\s*(hit|moved|to|triggered|taken)|stop(\s*loss)?\s*(hit|moved|triggered)|stopped\s*out|move\s*(sl|stop)|break\s*-?\s*even|closed?|exit(ed)?|secure|partials?|running|pips?|cancel(l?ed)?|invalidated?)\b/i;
+  /\b(tp\s*\d?\s*(hit|reached|smashed)|take\s*profit\s*\d?\s*(hit|reached)|sl\s*(hit|moved|to|triggered|taken)|stop(\s*loss)?\s*(hit|moved|triggered)|stopped\s*out|move\s*(sl|stop)|break\s*-?\s*even|close[ds]?|closing|exit(ed|ing)?|secure|partials?|running|pips?|cancel(l?ed)?|invalidated?)\b/i;
 
 function isUpdate(message: string) {
   return UPDATE_PATTERN.test(message);
@@ -71,11 +71,12 @@ function isSignal(message: string) {
 // until one of these is posted for it (there is no time-based expiry).
 const STOPPED_OUT = /\b(sl|stop(\s*loss)?)\s*(hit|triggered|taken)\b|\bstopped\s*out\b/i;
 const CANCELLED = /\b(cancel(l?ed)?|invalidated?|void)\b/i;
-const CLOSED = /\b(closed?|exit(ed)?)\b/i;
-// "Close 50%", "close half", "close partials", "SL close to entry" don't end it.
-const NOT_A_FULL_CLOSE = /\bclose\s*(\d+\s*%|(half|some|partials?|part)\b)|\bclose\s*to\b|\bpartials?\s*closed\b/i;
+const CLOSED = /\b(close[ds]?|closing|exit(ed|ing)?)\b/i;
+// "Close/closing 50%", "close half", "closing partials", "SL close to entry"
+// don't end it.
+const NOT_A_FULL_CLOSE = /\b(close|closing)\s*(\d+\s*%|(half|some|partials?|part)\b)|\b(close|closing)\s*to\b|\bpartials?\s*closed\b/i;
 
-const CLOSE_ALL = /\bclose\s*all\b/i;
+const CLOSE_ALL = /\b(close|closing)\s*all\b/i;
 
 function isFullClose(message: string) {
   // "Close all" always counts, even next to a partial-close phrase.
