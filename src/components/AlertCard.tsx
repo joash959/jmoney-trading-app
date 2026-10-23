@@ -18,6 +18,10 @@ type Props = {
   /** Collapsed: header row only, tap to show the price levels. */
   collapsed?: boolean;
   onToggle?: () => void;
+  /** Where the trade stands now, from its updates (e.g. "TP1 hit"). */
+  status?: { label: string; color: string };
+  /** Follow-up messages for this trade, oldest first. */
+  updates?: { id: string; message: string; time: string }[];
 };
 
 const GREEN_DIM = 'rgba(46,230,166,0.12)';
@@ -25,7 +29,15 @@ const RED_DIM = 'rgba(255,77,106,0.12)';
 
 /** One trade alert: instrument + direction header, the alert's price levels
  * as tap-to-copy tiles, and any extra lines of the message below. */
-export default function AlertCard({ message, time, isNew = false, collapsed = false, onToggle }: Props) {
+export default function AlertCard({
+  message,
+  time,
+  isNew = false,
+  collapsed = false,
+  onToggle,
+  status,
+  updates = [],
+}: Props) {
   const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
   const fields = parseAlertFields(message);
   const direction = detectAlertDirection(message);
@@ -48,7 +60,8 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
   const tint =
     direction === 'long' ? colors.accentGreen : direction === 'short' ? colors.accentRed : colors.link;
 
-  const canCollapse = !!onToggle && (fields.length > 0 || extraLines.length > 0);
+  const canCollapse = !!onToggle && (fields.length > 0 || extraLines.length > 0 || updates.length > 0);
+  const latestUpdate = updates[updates.length - 1];
 
   return (
     <View style={styles.card}>
@@ -79,7 +92,13 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
                 <Text style={styles.newText}>NEW</Text>
               </View>
             )}
-            <Text style={styles.meta}>JMONEY alert · {time}</Text>
+            <Text style={styles.meta}>{time}</Text>
+            {status && (
+              <View style={styles.statusChip}>
+                <View style={[styles.statusDot, { backgroundColor: status.color }]} />
+                <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+              </View>
+            )}
           </View>
         </View>
         {direction && (
@@ -97,6 +116,17 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
           />
         )}
       </Pressable>
+
+      {/* Collapsed: just the latest update, so the card stays one glance. */}
+      {collapsed && latestUpdate && (
+        <View style={styles.latestRow}>
+          <Ionicons name="return-down-forward" size={14} color={colors.textFaint} />
+          <Text style={styles.latestText} numberOfLines={1}>
+            {latestUpdate.message.replace(/\s*\n\s*/g, ' ')}
+          </Text>
+          <Text style={styles.latestTime}>{latestUpdate.time}</Text>
+        </View>
+      )}
 
       {!collapsed && fields.length > 0 && (
         <View style={styles.fieldsGrid}>
@@ -131,6 +161,27 @@ export default function AlertCard({ message, time, isNew = false, collapsed = fa
 
       {!collapsed && extraLines.length > 0 && (
         <Text style={styles.body}>{extraLines.join('\n')}</Text>
+      )}
+
+      {!collapsed && updates.length > 0 && (
+        <View style={styles.timeline}>
+          <Text style={styles.timelineLabel}>Updates</Text>
+          {updates.map((update, i) => {
+            const last = i === updates.length - 1;
+            return (
+              <View key={update.id} style={styles.timelineItem}>
+                <View style={styles.timelineRail}>
+                  <View style={[styles.timelineDot, last && status && { backgroundColor: status.color }]} />
+                  {!last && <View style={styles.timelineLine} />}
+                </View>
+                <View style={styles.timelineBody}>
+                  <Text style={styles.timelineText}>{update.message}</Text>
+                  <Text style={styles.timelineTime}>{update.time}</Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
       )}
     </View>
   );
@@ -230,6 +281,86 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 3,
+  },
+  statusChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 2,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  latestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  latestText: {
+    flex: 1,
+    color: colors.textMuted,
+    fontSize: 13,
+  },
+  latestTime: {
+    color: colors.textFaint,
+    fontSize: 12,
+  },
+  timeline: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  timelineLabel: {
+    color: colors.textFaint,
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  timelineRail: {
+    width: 10,
+    alignItems: 'center',
+  },
+  timelineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 5,
+    backgroundColor: colors.textFaint,
+  },
+  timelineLine: {
+    flex: 1,
+    width: 2,
+    marginVertical: 2,
+    backgroundColor: colors.divider,
+  },
+  timelineBody: {
+    flex: 1,
+    paddingBottom: 12,
+  },
+  timelineText: {
+    color: colors.text,
+    fontSize: 14,
+    lineHeight: 19,
+  },
+  timelineTime: {
+    color: colors.textFaint,
+    fontSize: 12,
+    marginTop: 2,
   },
   body: {
     color: colors.textMuted,

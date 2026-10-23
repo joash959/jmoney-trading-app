@@ -9,7 +9,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { colors, gradients } from '../theme/colors';
 import { supabase } from '../lib/supabase';
 import { getNextNFP, getNextCPI } from '../lib/economicCalendar';
-import { detectAlertDirection, parseAlertFields } from '../lib/tradeAlertParser';
+import { parseAlertFields } from '../lib/tradeAlertParser';
+import { buildTradeThreads } from '../lib/tradeThreads';
 import { useAuth } from '../contexts/AuthContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
@@ -219,7 +220,8 @@ export default function HomeScreen({ navigation }: Props) {
           .from('trade_alerts')
           .select('id, message, created_at')
           .order('created_at', { ascending: false })
-          .limit(3),
+          // Enough history to attach recent updates to their signals.
+          .limit(40),
         supabase.from('courses').select('id', { count: 'exact', head: true }),
         supabase
           .from('user_course_progress')
@@ -487,11 +489,12 @@ export default function HomeScreen({ navigation }: Props) {
           style={styles.carousel}
           contentContainerStyle={styles.carouselContent}
         >
-          {alerts.map((alert) => {
-            const direction = detectAlertDirection(alert.message);
+          {buildTradeThreads(alerts).slice(0, 5).map((thread) => {
+            const alert = thread.signal ?? thread.updates[0];
+            const direction = thread.signal ? thread.direction : null;
             const fields = parseAlertFields(alert.message);
             const field = (label: string) => fields.find((f) => f.label === label)?.value;
-            const isNew = minutesAgo(alert.created_at) <= NEW_ALERT_MINUTES;
+            const isNew = minutesAgo(thread.lastAt) <= NEW_ALERT_MINUTES;
             const update = direction ? null : describeUpdate(alert.message);
             const tint =
               direction === 'long'
@@ -506,7 +509,7 @@ export default function HomeScreen({ navigation }: Props) {
             ].filter((f) => f.value);
             return (
               <Pressable
-                key={alert.id}
+                key={thread.id}
                 onPress={() => navigation.navigate('Alerts')}
                 style={({ pressed }) => [styles.alertCard, pressed && styles.pressed]}
               >
@@ -540,9 +543,18 @@ export default function HomeScreen({ navigation }: Props) {
                     {alert.message.split('\n').slice(1).join(' ').trim() || 'Trade update'}
                   </Text>
                 )}
-                <Text style={[styles.alertTime, isNew && { color: colors.link }]}>
-                  {isNew ? '● New' : timeAgo(alert.created_at)}
-                </Text>
+                <View style={styles.alertFooter}>
+                  {thread.signal ? (
+                    <Text style={[styles.alertStatus, { color: thread.status.color }]}>
+                      ● {thread.status.label}
+                    </Text>
+                  ) : (
+                    <Text style={styles.alertStatus}>Update</Text>
+                  )}
+                  <Text style={[styles.alertTime, isNew && { color: colors.link }]}>
+                    {isNew ? 'New' : timeAgo(thread.lastAt)}
+                  </Text>
+                </View>
               </Pressable>
             );
           })}
@@ -897,10 +909,20 @@ const styles = StyleSheet.create({
     marginTop: 12,
     minHeight: 36,
   },
+  alertFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  alertStatus: {
+    color: colors.textFaint,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   alertTime: {
     color: colors.textFaint,
     fontSize: 12,
-    marginTop: 12,
   },
   timelineCard: {
     paddingVertical: 6,

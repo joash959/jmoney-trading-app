@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import Text from '../components/AppText';
 import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -14,13 +15,13 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import ScreenShell from '../components/ScreenShell';
 import NotificationBell from '../components/NotificationBell';
 import PageHeader from '../components/PageHeader';
-import SegmentedTabs from '../components/SegmentedTabs';
 import AlertCard from '../components/AlertCard';
 import AnimatedNumber from '../components/AnimatedNumber';
 import Skeleton from '../components/Skeleton';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import { detectAlertDirection } from '../lib/tradeAlertParser';
+import { buildTradeThreads, TradeThread } from '../lib/tradeThreads';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Alerts'>;
 
@@ -70,6 +71,8 @@ function formatDateLabel(iso: string) {
   });
 }
 
+const CORE_MARKETS = ['Gold', 'US30', 'NAS100'];
+
 export default function AlertsScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
@@ -83,7 +86,8 @@ export default function AlertsScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [locked, setLocked] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'long' | 'short'>('all');
+  // Market tab: 'All' or an instrument such as 'Gold' / 'US30'.
+  const [market, setMarket] = useState('All');
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -112,7 +116,7 @@ export default function AlertsScreen({ navigation }: Props) {
       .from('trade_alerts')
       .select('id, message, created_at')
       .order('created_at', { ascending: false })
-      .limit(30);
+      .limit(100);
 
     if (alertError) {
       setError(alertError.message);
@@ -148,7 +152,7 @@ export default function AlertsScreen({ navigation }: Props) {
           const row = payload.new as TradeAlert;
           setAlerts((prev) => {
             if (prev.some((a) => a.id === row.id)) return prev;
-            return [row, ...prev].slice(0, 30);
+            return [row, ...prev].slice(0, 100);
           });
           const direction = detectAlertDirection(row.message);
           if (direction === 'long') setLongCount((count) => count + 1);
@@ -194,23 +198,38 @@ export default function AlertsScreen({ navigation }: Props) {
     );
   }).length;
 
-  const groupedAlerts = useMemo(() => {
-    const groups: { label: string; items: TradeAlert[] }[] = [];
-    const visible =
-      filter === 'all'
-        ? alerts
-        : alerts.filter((alert) => detectAlertDirection(alert.message) === filter);
-    visible.forEach((alert) => {
-      const label = formatDateLabel(alert.created_at);
+  // Signals with their TP / SL / close updates attached, newest first.
+  const threads = useMemo(() => buildTradeThreads(alerts), [alerts]);
+
+  // Core markets always get a tab; any other pair appears once it's traded.
+  const marketTabs = useMemo(() => {
+    const counts = new Map<string, number>();
+    threads.forEach((t) => {
+      if (t.instrument) counts.set(t.instrument, (counts.get(t.instrument) ?? 0) + 1);
+    });
+    const extra = [...counts.keys()].filter((m) => !CORE_MARKETS.includes(m)).sort();
+    return [
+      { name: 'All', count: threads.length },
+      ...[...CORE_MARKETS, ...extra].map((name) => ({ name, count: counts.get(name) ?? 0 })),
+    ];
+  }, [threads]);
+
+  const openCount = threads.filter((t) => t.signal && !t.status.closed).length;
+
+  const groupedThreads = useMemo(() => {
+    const groups: { label: string; items: TradeThread[] }[] = [];
+    const visible = market === 'All' ? threads : threads.filter((t) => t.instrument === market);
+    visible.forEach((thread) => {
+      const label = formatDateLabel(thread.lastAt);
       const lastGroup = groups[groups.length - 1];
       if (lastGroup && lastGroup.label === label) {
-        lastGroup.items.push(alert);
+        lastGroup.items.push(thread);
       } else {
-        groups.push({ label, items: [alert] });
+        groups.push({ label, items: [thread] });
       }
     });
     return groups;
-  }, [alerts, filter]);
+  }, [threads, market]);
 
   const directedTotal = Math.max(longCount + shortCount, 1);
   const statsRow = (
@@ -306,7 +325,7 @@ export default function AlertsScreen({ navigation }: Props) {
         context={
           loading
             ? null
-            : `${todayCount} today · ${longCount} buy / ${shortCount} sell`
+            : `${openCount} open · ${todayCount} alerts today`
         }
         right={
           <NotificationBell
@@ -334,55 +353,75 @@ export default function AlertsScreen({ navigation }: Props) {
         </Text>
       ) : (
         <>
-          {statsRow}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.marketScroll}
+            contentContainerStyle={styles.marketTabs}
+          >
+            {marketTabs.map((tab) => {
+              const active = tab.name === market;
+              return (
+                <Pressable
+                  key={tab.name}
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    setMarket(tab.name);
+                  }}
+                  style={[styles.marketTab, active && styles.marketTabActive]}
+                >
+                  <Text style={[styles.marketTabText, active && styles.marketTabTextActive]}>
+                    {tab.name}
+                  </Text>
+                  <Text numeric style={[styles.marketTabCount, active && styles.marketTabTextActive]}>
+                    {tab.count}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
 
-          <SegmentedTabs
-            options={[
-              { value: 'all', label: 'All' },
-              { value: 'long', label: 'Buy' },
-              { value: 'short', label: 'Sell' },
-            ]}
-            value={filter}
-            onChange={setFilter}
-            style={styles.filterSpaced}
-          />
+          {/* Today's buy/sell split is about all markets - only on "All". */}
+          {market === 'All' && statsRow}
 
           <View style={styles.list}>
-            {groupedAlerts.map((group) => (
+            {groupedThreads.map((group) => (
               <View key={group.label} style={styles.group}>
                 <View style={styles.dateRow}>
                   <Text style={styles.dateLabel}>{group.label}</Text>
                 </View>
                 <View style={styles.groupList}>
-                  {group.items.map((alert) => (
-                    <AlertCard
-                      key={alert.id}
-                      message={alert.message}
-                      time={formatShortTime(alert.created_at)}
-                      isNew={Date.now() - new Date(alert.created_at).getTime() < 30 * 60000}
-                      // Newest alert open, older ones collapse to one row.
-                      collapsed={
-                        expandedIds[alert.id] === undefined
-                          ? alert.id !== alerts[0]?.id
-                          : !expandedIds[alert.id]
-                      }
-                      onToggle={() =>
-                        setExpandedIds((prev) => ({
-                          ...prev,
-                          [alert.id]:
-                            prev[alert.id] === undefined
-                              ? alert.id !== alerts[0]?.id
-                              : !prev[alert.id],
-                        }))
-                      }
-                    />
-                  ))}
+                  {group.items.map((thread) => {
+                    const head = thread.signal ?? thread.updates[0];
+                    const followUps = thread.signal ? thread.updates : thread.updates.slice(1);
+                    // Newest trade open, older ones collapse to one row.
+                    const defaultOpen = thread.id === threads[0]?.id;
+                    const open = expandedIds[thread.id] ?? defaultOpen;
+                    return (
+                      <AlertCard
+                        key={thread.id}
+                        message={head.message}
+                        time={formatShortTime(head.created_at)}
+                        isNew={Date.now() - new Date(thread.lastAt).getTime() < 30 * 60000}
+                        status={thread.signal ? thread.status : undefined}
+                        updates={followUps.map((u) => ({
+                          id: u.id,
+                          message: u.message,
+                          time: formatShortTime(u.created_at),
+                        }))}
+                        collapsed={!open}
+                        onToggle={() =>
+                          setExpandedIds((prev) => ({ ...prev, [thread.id]: !open }))
+                        }
+                      />
+                    );
+                  })}
                 </View>
               </View>
             ))}
-            {groupedAlerts.length === 0 && (
+            {groupedThreads.length === 0 && (
               <Text style={styles.emptyText}>
-                {alerts.length === 0 ? 'No alerts yet.' : `No ${filter === 'long' ? 'buy' : 'sell'} alerts right now.`}
+                {alerts.length === 0 ? 'No alerts yet.' : `No ${market} trades in recent alerts.`}
               </Text>
             )}
           </View>
@@ -393,6 +432,39 @@ export default function AlertsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  marketScroll: {
+    marginHorizontal: -20,
+    marginTop: 12,
+  },
+  marketTabs: {
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  marketTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: radius.pill,
+    backgroundColor: colors.glassTile,
+  },
+  marketTabActive: {
+    backgroundColor: colors.primary,
+  },
+  marketTabText: {
+    color: colors.textMuted,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  marketTabTextActive: {
+    color: colors.text,
+  },
+  marketTabCount: {
+    color: colors.textFaint,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   errorText: {
     color: colors.accentRed,
     fontSize: 14,
@@ -446,9 +518,6 @@ const styles = StyleSheet.create({
   splitText: {
     fontSize: 12,
     fontWeight: '500',
-  },
-  filterSpaced: {
-    marginTop: 16,
   },
   fieldSpaced: {
     marginTop: 8,
