@@ -7,6 +7,7 @@ import {
 } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { registerForPushNotifications, unregisterPushNotifications } from '../lib/pushNotifications';
 import { Profile } from '../types/database';
 
 type AuthContextValue = {
@@ -72,6 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // Remove this phone's push token first, while still signed in (RLS).
+    if (session) await unregisterPushNotifications(session.user.id);
     await supabase.auth.signOut();
   };
 
@@ -80,6 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await loadProfile(session.user.id);
     }
   };
+
+  // Register this phone for trade-alert pushes once per signed-in member.
+  const userId = session?.user.id;
+  useEffect(() => {
+    if (userId) registerForPushNotifications(userId);
+  }, [userId]);
 
   const isPremium = profile?.membership_tier === 'premium';
 

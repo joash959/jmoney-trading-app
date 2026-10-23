@@ -29,6 +29,13 @@
     "plugins": [
       "./plugins/withPodsDeploymentTarget",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#2F6BFF"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-logo.png",
