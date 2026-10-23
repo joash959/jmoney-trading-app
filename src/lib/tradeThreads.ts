@@ -102,7 +102,7 @@ function statusFor(updates: AlertRow[]): TradeStatus {
       return { label: n ? `TP${n} hit` : 'TP hit', color: colors.accentGreen, closed: false };
     }
     if (/\bbreak\s*-?\s*even\b|\b(move|moved)\s*(sl|stop)\s*to\s*(entry|be)\b/i.test(m)) {
-      return { label: 'Risk-free', color: colors.link, closed: false };
+      return { label: 'SL at entry', color: colors.link, closed: false };
     }
   }
   return { label: 'Active', color: colors.accentGreen, closed: false };

@@ -62,7 +62,7 @@ export default function AlertCard({
 
   const canCollapse = !!onToggle && (fields.length > 0 || extraLines.length > 0 || updates.length > 0);
   const latestUpdate = updates[updates.length - 1];
-  // A finished trade must never look actionable: dimmed, no copy buttons.
+  // A finished trade reads as finished: dimmed, with no copy buttons.
   const isClosed = !!status?.closed;
 
   return (
@@ -78,7 +78,7 @@ export default function AlertCard({
             color={status?.color}
           />
           <Text style={[styles.closedBannerText, { color: status?.color }]}>
-            {status?.label} · trade closed, do not enter
+            {status?.label} · this trade has ended
           </Text>
         </View>
       )}
