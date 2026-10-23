@@ -5,13 +5,13 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors } from '../theme/colors';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { Course } from '../types/database';
 import { CoursesStackParamList, MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
+import PageHeader from '../components/PageHeader';
 import SearchBar from '../components/SearchBar';
 import SelectField from '../components/SelectField';
 import FilterSheet from '../components/FilterSheet';
@@ -45,6 +45,10 @@ export default function CoursesScreen({ navigation }: Props) {
     navigation.getParent<BottomTabNavigationProp<MainTabParamList>>();
   const [search, setSearch] = useState('');
   const [courses, setCourses] = useState<Course[]>([]);
+  // Courses this member has finished, for the header's progress line.
+  const [completedCount, setCompletedCount] = useState(0);
+  const { session } = useAuth();
+  const userId = session?.user.id;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,17 +58,21 @@ export default function CoursesScreen({ navigation }: Props) {
   const [levelModalVisible, setLevelModalVisible] = useState(false);
 
   const fetchCourses = useCallback(async () => {
-    const { data, error: fetchError } = await supabase
-      .from('courses')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [{ data, error: fetchError }, progressRes] = await Promise.all([
+      supabase.from('courses').select('*').order('created_at', { ascending: false }),
+      userId
+        ? supabase.from('user_course_progress').select('completed_at').eq('user_id', userId)
+        : Promise.resolve({ data: [] as { completed_at: string | null }[] }),
+    ]);
     if (fetchError) {
       setError(fetchError.message);
     } else {
       setError(null);
       setCourses((data as Course[]) ?? []);
     }
-  }, []);
+    const progress = (progressRes.data ?? []) as { completed_at: string | null }[];
+    setCompletedCount(progress.filter((p) => p.completed_at).length);
+  }, [userId]);
 
   useEffect(() => {
     fetchCourses().then(() => setLoading(false));
@@ -111,8 +119,15 @@ export default function CoursesScreen({ navigation }: Props) {
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Courses"
+        icon="courses"
+        context={
+          loading
+            ? null
+            : `${completedCount} of ${courses.length} completed`
+        }
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() =>
@@ -120,11 +135,6 @@ export default function CoursesScreen({ navigation }: Props) {
             }
           />
         }
-      />
-
-      <ScreenHeader
-        icon="book-outline"
-        title="Courses"
       />
 
       <SearchBar

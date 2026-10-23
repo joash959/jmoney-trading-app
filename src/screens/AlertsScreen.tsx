@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -12,9 +12,8 @@ import { useAlertsBadge } from '../contexts/AlertsBadgeContext';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
+import PageHeader from '../components/PageHeader';
 import SegmentedTabs from '../components/SegmentedTabs';
 import AlertCard from '../components/AlertCard';
 import AnimatedNumber from '../components/AnimatedNumber';
@@ -178,26 +177,6 @@ export default function AlertsScreen({ navigation }: Props) {
     }, [markAlertsSeen])
   );
 
-  const livePulse = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(livePulse, {
-          toValue: 0.3,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-        Animated.timing(livePulse, {
-          toValue: 1,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [livePulse]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -270,7 +249,7 @@ export default function AlertsScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <TopBar />
+        <PageHeader title="Trade alerts" icon="alerts" />
       </ScreenShell>
     );
   }
@@ -278,8 +257,11 @@ export default function AlertsScreen({ navigation }: Props) {
   if (locked) {
     return (
       <ScreenShell>
-        <TopBar
-          rightElement={
+        <PageHeader
+          title="Trade alerts"
+          icon="alerts"
+          context="Premium members get every alert in real time"
+          right={
             <NotificationBell
               count={unreadCount}
               onPress={() =>
@@ -288,7 +270,6 @@ export default function AlertsScreen({ navigation }: Props) {
             />
           }
         />
-        <ScreenHeader title="Trade alerts" />
         <View style={styles.fieldSpaced}>
           {loading ? statsSkeleton : statsRow}
         </View>
@@ -319,26 +300,22 @@ export default function AlertsScreen({ navigation }: Props) {
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Trade alerts"
+        icon="alerts"
+        live
+        context={
+          loading
+            ? null
+            : `${todayCount} today · ${longCount} buy / ${shortCount} sell`
+        }
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() =>
               navigation.navigate('More', { screen: 'Notifications' })
             }
           />
-        }
-      />
-
-      <ScreenHeader
-        title="Trade alerts"
-        rightElement={
-          <View style={styles.livePill}>
-            <Animated.View
-              style={[styles.liveDot, { opacity: livePulse }]}
-            />
-            <Text style={styles.liveText}>LIVE</Text>
-          </View>
         }
       />
 
@@ -416,27 +393,6 @@ export default function AlertsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  livePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(46,230,166,0.12)',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  liveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.accentGreen,
-  },
-  liveText: {
-    color: colors.accentGreen,
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
   errorText: {
     color: colors.accentRed,
     fontSize: 14,

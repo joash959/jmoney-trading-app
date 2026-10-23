@@ -13,11 +13,9 @@ import { LiveSession } from '../types/database';
 import { MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
+import PageHeader from '../components/PageHeader';
 import IconBadge from '../components/IconBadge';
-import InsightCard from '../components/InsightCard';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimaryButton from '../components/PrimaryButton';
 import Skeleton from '../components/Skeleton';
@@ -38,15 +36,16 @@ function formatSessionDate(dateStr: string, timeStr: string | null) {
   return `${dateLabel} • ${timeLabel}`;
 }
 
-function formatDateOnly(dateStr: string) {
-  return new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 type Props = BottomTabScreenProps<MainTabParamList, 'Live'>;
+
+/** "Sat 25 Oct, 14:00" - compact date for the header context line. */
+function formatShortSession(session: LiveSession) {
+  const start = new Date(`${session.session_date}T${session.session_time ?? '00:00:00'}`);
+  const day = start.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  return session.session_time
+    ? `${day}, ${start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+    : day;
+}
 
 export default function LiveScreen({ navigation }: Props) {
   const { isPremium: hasPremiumAccess } = useAuth();
@@ -164,6 +163,11 @@ export default function LiveScreen({ navigation }: Props) {
   ).length;
 
   const nextSession = upcoming[0];
+  const liveContext = !nextSession
+    ? 'No sessions scheduled yet'
+    : isLiveNow(nextSession)
+      ? `${nextSession.title} is on now`
+      : `Next ${formatShortSession(nextSession)} · ${thisWeekCount} this week`;
 
   const handleJoin = async (session: LiveSession) => {
     const cached = accessBySessionId[session.id];
@@ -187,8 +191,12 @@ export default function LiveScreen({ navigation }: Props) {
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Live sessions"
+        icon="live"
+        live={upcoming.some(isLiveNow)}
+        context={loading ? null : liveContext}
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() =>
@@ -196,11 +204,6 @@ export default function LiveScreen({ navigation }: Props) {
             }
           />
         }
-      />
-
-      <ScreenHeader
-        icon="videocam-outline"
-        title="Live sessions"
       />
 
       {loading ? (
@@ -215,20 +218,6 @@ export default function LiveScreen({ navigation }: Props) {
         </Text>
       ) : (
         <>
-          <View style={styles.statsRow}>
-            <InsightCard
-              variant="gradient"
-              icon="calendar-outline"
-              label="This Week"
-              value={String(thisWeekCount)}
-            />
-            <InsightCard
-              variant="gradient"
-              icon="time-outline"
-              label="Next Session"
-              value={nextSession ? formatDateOnly(nextSession.session_date) : 'None'}
-            />
-          </View>
 
           {upcoming.length === 0 ? (
             <EmptyStateCard
@@ -349,11 +338,6 @@ const styles = StyleSheet.create({
     color: colors.accentRed,
     fontSize: 14,
     textAlign: 'center',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
   },
   cardSpaced: {
     marginTop: 20,
