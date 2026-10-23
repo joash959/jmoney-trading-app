@@ -10,6 +10,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { MoreStackParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import SectionHeader from '../components/SectionHeader';
 import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
@@ -181,8 +182,8 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         />
       </SurfaceCard>
 
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>Rated by traders</Text>
-      <SurfaceCard style={[styles.fieldSpaced, styles.ratingsCard]}>
+      <SectionHeader title="Rated by traders" />
+      <SurfaceCard style={styles.ratingsCard}>
         {RATINGS.map((r, i) => (
           <View key={r.name} style={[styles.rating, i > 0 && styles.statDivider]}>
             <View style={styles.ratingValueRow}>
@@ -196,8 +197,8 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         ))}
       </SurfaceCard>
 
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>What you can trade</Text>
-      <SurfaceCard style={styles.fieldSpaced}>
+      <SectionHeader title="What you can trade" />
+      <SurfaceCard>
         <View style={styles.marketGrid}>
           {MARKETS.map((m) => (
             <View key={m.title} style={styles.market}>
@@ -213,8 +214,8 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         </View>
       </SurfaceCard>
 
-      <Text style={[styles.sectionTitle, styles.sectionSpaced]}>Why PrimeXBT</Text>
-      <SurfaceCard style={styles.fieldSpaced}>
+      <SectionHeader title="Why PrimeXBT" />
+      <SurfaceCard>
         {REASONS.map((reason, i) => (
           <View key={reason} style={[styles.reason, i > 0 && styles.reasonDivider]}>
             <View style={styles.check}>
@@ -241,9 +242,6 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   cardSpaced: {
     marginTop: 20,
-  },
-  fieldSpaced: {
-    marginTop: 12,
   },
   sectionSpaced: {
     marginTop: 28,
@@ -307,11 +305,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 3,
     textAlign: 'center',
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
   },
   ratingsCard: {
     flexDirection: 'row',

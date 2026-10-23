@@ -12,11 +12,11 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { TradeJournalEntry } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import SectionHeader from '../components/SectionHeader';
 import LineChart from '../components/LineChart';
 import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import Calendar from '../components/Calendar';
-import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
@@ -386,13 +386,13 @@ export default function TradingJournalScreen({ navigation }: Props) {
         </View>
       </GlassCard>
 
-      <SectionLabel>WEEKLY SUMMARY</SectionLabel>
+      <SectionHeader title="This week" />
       {weeklyEntries.length === 0 ? (
-        <View style={[styles.emptyCard, styles.fieldSpaced]}>
+        <View style={styles.emptyCard}>
           <Text style={styles.emptyText}>No entries yet this week</Text>
         </View>
       ) : (
-        <View style={[styles.weekList, styles.fieldSpaced]}>
+        <View style={styles.weekList}>
           {weeklyEntries.map((entry) => (
             <Pressable
               key={entry.id}

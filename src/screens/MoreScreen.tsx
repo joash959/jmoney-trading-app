@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Text from '../components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,14 +15,15 @@ import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
 import IconTile from '../components/IconTile';
 import MenuRow from '../components/MenuRow';
-import SectionLabel from '../components/SectionLabel';
+import SectionHeader from '../components/SectionHeader';
+import Icon3D from '../components/Icon3D';
 import ListRow from '../components/ListRow';
 import DisclaimerCard from '../components/DisclaimerCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import BadgeGrid from '../components/BadgeGrid';
 import { useGameStats } from '../hooks/useGameStats';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MoreHome'>;
 
@@ -45,6 +46,8 @@ export default function MoreScreen({ navigation }: Props) {
     }, [refreshGame])
   );
   const { count: unreadCount } = useUnreadNotificationsCount();
+  // Achievements show as a compact strip until the member asks for all.
+  const [showAllBadges, setShowAllBadges] = useState(false);
 
   const email = session?.user.email ?? '';
   const displayName = profile?.display_name || email || 'Trader';
@@ -63,8 +66,12 @@ export default function MoreScreen({ navigation }: Props) {
     { icon: 'trophy-outline' as const, label: 'Ranks', onPress: () => navigation.navigate('Leaderboard') },
   ];
 
-  const accountRows = [
+  const communityRows = [
     { icon: 'paper-plane-outline' as const, title: 'Telegram channels', subtitle: 'Trade alerts and community', onPress: () => navigation.navigate('TelegramChannels') },
+    { icon: 'briefcase-outline' as const, title: 'Recommended broker', subtitle: 'PrimeXBT account and benefits', onPress: () => navigation.navigate('RecommendedBroker') },
+  ];
+
+  const accountRows = [
     {
       icon: (isPremium ? 'checkmark-circle-outline' : 'link-outline') as 'checkmark-circle-outline' | 'link-outline',
       title: 'PrimeXBT account',
@@ -72,7 +79,6 @@ export default function MoreScreen({ navigation }: Props) {
       onPress: connect.open,
     },
     { icon: 'notifications-outline' as const, title: 'Notifications', subtitle: unreadCount > 0 ? `${unreadCount} unread` : 'All caught up', onPress: () => navigation.navigate('Notifications') },
-    { icon: 'briefcase-outline' as const, title: 'Recommended broker', subtitle: 'PrimeXBT account and benefits', onPress: () => navigation.navigate('RecommendedBroker') },
     { icon: 'chatbubbles-outline' as const, title: 'Contact us', subtitle: 'WhatsApp, Telegram or email', onPress: () => navigation.navigate('ContactUs') },
   ];
 
@@ -125,19 +131,7 @@ export default function MoreScreen({ navigation }: Props) {
         </View>
       </View>
 
-      {gameStats && (
-        <>
-          <View style={styles.achievementsHeader}>
-            <SectionLabel style={styles.noTopMargin}>Achievements</SectionLabel>
-            <Text numeric style={styles.achievementsCount}>
-              {gameStats.badges.filter((b) => b.unlocked).length}/{gameStats.badges.length}
-            </Text>
-          </View>
-          <BadgeGrid badges={gameStats.badges} />
-        </>
-      )}
-
-      <SectionLabel>Shortcuts</SectionLabel>
+      <SectionHeader title="Tools" />
       <View style={styles.grid}>
         {shortcuts.map((item) => (
           <IconTile
@@ -149,7 +143,62 @@ export default function MoreScreen({ navigation }: Props) {
         ))}
       </View>
 
-      <SectionLabel>Account</SectionLabel>
+      {gameStats && (
+        <>
+          <SectionHeader
+            title="Achievements"
+            meta={`${gameStats.badges.filter((b) => b.unlocked).length}/${gameStats.badges.length}`}
+            actionLabel={showAllBadges ? 'Show less' : 'See all'}
+            onAction={() => setShowAllBadges((v) => !v)}
+          />
+          {showAllBadges ? (
+            <BadgeGrid badges={gameStats.badges} />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.badgeStrip}
+              contentContainerStyle={styles.badgeStripContent}
+            >
+              {/* Unlocked first, then the closest to unlocking. */}
+              {[...gameStats.badges]
+                .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.progress - a.progress)
+                .map((badge) => (
+                  <Pressable
+                    key={badge.key}
+                    onPress={() => setShowAllBadges(true)}
+                    style={styles.badgeChip}
+                  >
+                    <Icon3D name={badge.icon} size={40} muted={!badge.unlocked} />
+                    <Text
+                      style={[styles.badgeChipLabel, !badge.unlocked && styles.badgeChipLabelLocked]}
+                      numberOfLines={1}
+                    >
+                      {badge.title}
+                    </Text>
+                  </Pressable>
+                ))}
+            </ScrollView>
+          )}
+        </>
+      )}
+
+      <SectionHeader title="Community" />
+      <SurfaceCard style={styles.listCard}>
+        {communityRows.map((row, i) => (
+          <ListRow
+            key={row.title}
+            icon={row.icon}
+            title={row.title}
+            subtitle={row.subtitle}
+            onPress={row.onPress}
+            divider={i < communityRows.length - 1}
+            chevron
+          />
+        ))}
+      </SurfaceCard>
+
+      <SectionHeader title="Account" />
       <SurfaceCard style={styles.listCard}>
         {accountRows.map((row) => (
           <ListRow
@@ -188,20 +237,29 @@ export default function MoreScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  achievementsHeader: {
-    flexDirection: 'row',
+  badgeStrip: {
+    marginHorizontal: -20,
+  },
+  badgeStripContent: {
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  badgeChip: {
+    width: 84,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 28,
-    marginBottom: 10,
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 18,
+    backgroundColor: colors.card,
   },
-  noTopMargin: {
-    marginTop: 0,
-  },
-  achievementsCount: {
-    color: colors.link,
-    fontSize: 15,
+  badgeChipLabel: {
+    color: colors.textMuted,
+    fontSize: 12,
     fontWeight: '600',
+    paddingHorizontal: 6,
+  },
+  badgeChipLabelLocked: {
+    color: colors.textFaint,
   },
   profileCard: {
     flexDirection: 'row',
@@ -265,10 +323,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     rowGap: 10,
-    marginTop: 10,
   },
   listCard: {
-    marginTop: 10,
     paddingVertical: 4,
   },
   disclaimerSpaced: {

@@ -24,6 +24,7 @@ import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 import GradientLinkCard from '../components/GradientLinkCard';
 import type { IoniconName } from '../components/IconBadge';
 import LevelCard from '../components/LevelCard';
+import SectionHeader from '../components/SectionHeader';
 import DailyMissions from '../components/DailyMissions';
 import BadgeUnlockedModal from '../components/BadgeUnlockedModal';
 import { useBadgeUnlocks } from '../hooks/useBadgeUnlocks';
@@ -341,12 +342,6 @@ export default function HomeScreen({ navigation }: Props) {
         <NotificationBell count={unreadCount} onPress={() => goMore('Notifications')} />
       </View>
 
-      <LevelCard
-        stats={gameStats}
-        onPress={() => goMore('MoreHome')}
-        style={styles.levelCard}
-      />
-
       {/* Hero: number + chart straight on the background, Robinhood-style */}
       <View style={styles.heroTopRow}>
         <Text style={styles.heroLabel}>
@@ -460,35 +455,6 @@ export default function HomeScreen({ navigation }: Props) {
         ))}
       </View>
 
-      <DailyMissions
-        style={styles.cardSpaced}
-        missions={[
-          {
-            key: 'log',
-            icon: 'journal',
-            title: "Log today's trades",
-            xp: XP.journalEntry,
-            done: !!gameStats?.loggedToday,
-            onPress: () => goMore('TradingJournal'),
-          },
-          {
-            key: 'vote',
-            icon: 'ballot',
-            title: 'Vote in the market poll',
-            xp: XP.pollVote,
-            done: !!gameStats?.votedToday,
-          },
-          {
-            key: 'alerts',
-            icon: 'alerts',
-            title: 'Catch up on trade alerts',
-            xp: 0,
-            done: unseenAlerts === 0,
-            onPress: () => navigation.navigate('Alerts'),
-          },
-        ]}
-      />
-
       {!isPremium && (
         <GradientLinkCard
           icon="link-outline"
@@ -501,12 +467,11 @@ export default function HomeScreen({ navigation }: Props) {
       )}
 
       {/* Latest alerts */}
-      <View style={styles.sectionHeaderRow}>
-        <Text style={styles.sectionTitle}>Latest alerts</Text>
-        <Pressable hitSlop={8} onPress={() => navigation.navigate('Alerts')}>
-          <Text style={styles.linkText}>See all</Text>
-        </Pressable>
-      </View>
+      <SectionHeader
+        title="Latest alerts"
+        actionLabel="See all"
+        onAction={() => navigation.navigate('Alerts')}
+      />
       {alerts.length === 0 ? (
         <SurfaceCard>
           <Text style={styles.emptyText}>
@@ -594,12 +559,11 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
 
       {/* Upcoming - next session, learning, macro events */}
-      <View style={styles.sectionHeaderRow}>
-        <Text style={styles.sectionTitle}>Upcoming</Text>
-        <Pressable hitSlop={8} onPress={() => navigation.navigate('Live')}>
-          <Text style={styles.linkText}>Live sessions</Text>
-        </Pressable>
-      </View>
+      <SectionHeader
+        title="Upcoming"
+        actionLabel="Live sessions"
+        onAction={() => navigation.navigate('Live')}
+      />
       <SurfaceCard style={styles.timelineCard}>
         <TimelineRow
           date={nextSession?.date ?? null}
@@ -662,6 +626,46 @@ export default function HomeScreen({ navigation }: Props) {
         <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
       </Pressable>
 
+      {/* Your progress - level, streak and today's missions together */}
+      <SectionHeader
+        title="Your progress"
+        actionLabel="Badges"
+        onAction={() => goMore('MoreHome')}
+      />
+      <LevelCard
+        stats={gameStats}
+        onPress={() => goMore('MoreHome')}
+      />
+
+      <DailyMissions
+        style={styles.missions}
+        missions={[
+          {
+            key: 'log',
+            icon: 'journal',
+            title: "Log today's trades",
+            xp: XP.journalEntry,
+            done: !!gameStats?.loggedToday,
+            onPress: () => goMore('TradingJournal'),
+          },
+          {
+            key: 'vote',
+            icon: 'ballot',
+            title: 'Vote in the market poll',
+            xp: XP.pollVote,
+            done: !!gameStats?.votedToday,
+          },
+          {
+            key: 'alerts',
+            icon: 'alerts',
+            title: 'Catch up on trade alerts',
+            xp: 0,
+            done: unseenAlerts === 0,
+            onPress: () => navigation.navigate('Alerts'),
+          },
+        ]}
+      />
+
       <BadgeUnlockedModal badge={celebrate} onClose={dismissCelebration} />
 
       <PrimeXBTConnectModal
@@ -717,8 +721,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 1,
   },
-  levelCard: {
-    marginBottom: 24,
+  missions: {
+    marginTop: 12,
   },
   heroTopRow: {
     flexDirection: 'row',
@@ -827,23 +831,6 @@ const styles = StyleSheet.create({
   },
   cardSpaced: {
     marginTop: 16,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 30,
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  linkText: {
-    color: colors.link,
-    fontSize: 14,
-    fontWeight: '500',
   },
   carousel: {
     marginHorizontal: -20,

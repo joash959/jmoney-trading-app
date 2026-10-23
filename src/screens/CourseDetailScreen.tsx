@@ -17,6 +17,7 @@ import { Course, Lesson } from '../types/database';
 import { CoursesStackParamList, MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import SectionHeader from '../components/SectionHeader';
 import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
@@ -341,17 +342,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             )}
           </GlassCard>
 
-          <View style={[styles.sectionHeadingRow, styles.sectionSpaced]}>
-            <View style={styles.sectionHeadingLeft}>
-              <Ionicons name="list-outline" size={18} color={colors.link} />
-              <Text style={styles.sectionTitle}>Lessons</Text>
-            </View>
-            <View style={styles.lessonCountPill}>
-              <Text numeric style={styles.lessonCountText}>
-                {completedCount}/{lessons.length} done
-              </Text>
-            </View>
-          </View>
+          <SectionHeader title="Lessons" meta={`${completedCount}/${lessons.length} done`} />
           <View style={styles.lessonsList}>
             {lessons.map((lesson, index) => {
               const isActive = lesson.id === activeLessonId;
@@ -511,38 +502,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 2,
   },
-  sectionHeadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionHeadingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  sectionSpaced: {
-    marginTop: 28,
-  },
-  lessonCountPill: {
-    backgroundColor: colors.accentBlueDim,
-    borderRadius: radius.pill,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  lessonCountText: {
-    color: colors.accentBlue,
-    fontSize: 12,
-    fontWeight: '800',
-  },
   lessonsList: {
     gap: 10,
-    marginTop: 14,
   },
   lessonRow: {
     flexDirection: 'row',

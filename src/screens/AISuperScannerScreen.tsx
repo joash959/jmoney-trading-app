@@ -16,6 +16,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { parseFunctionError } from '../lib/functionError';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import SectionHeader from '../components/SectionHeader';
 import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import GlassCard from '../components/GlassCard';
@@ -184,7 +185,7 @@ export default function AISuperScannerScreen({ navigation }: Props) {
             onPress={handlePick}
             style={styles.dropzone}
           />
-          <Text style={styles.howTitle}>How it works</Text>
+          <SectionHeader title="How it works" />
           <GlassCard style={styles.howCard}>
             {HOW_IT_WORKS.map((step, i) => (
               <View key={step.title} style={[styles.howRow, i > 0 && styles.howDivider]}>
@@ -409,14 +410,7 @@ function CopyablePlanCell({ label, value, copied, onCopy }: CopyablePlanCellProp
 }
 
 const styles = StyleSheet.create({
-  howTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
-    marginTop: 28,
-  },
   howCard: {
-    marginTop: 12,
     paddingVertical: 6,
   },
   howRow: {

@@ -104,7 +104,7 @@ export default function ChannelCard({
 
 const styles = StyleSheet.create({
   card: {
-    marginTop: 20,
+    marginBottom: 12,
   },
   topRow: {
     flexDirection: 'row',

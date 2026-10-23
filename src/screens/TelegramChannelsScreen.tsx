@@ -15,6 +15,7 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { Community } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
+import SectionHeader from '../components/SectionHeader';
 import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import GlassCard from '../components/GlassCard';
@@ -197,10 +198,7 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
           )}
 
           {rest.length > 0 && (
-            <View style={[styles.sectionHeaderRow, styles.sectionSpaced]}>
-              <Text style={styles.sectionTitle}>All Channels</Text>
-              <Text style={styles.sectionCount}>{rest.length}</Text>
-            </View>
+            <SectionHeader title="All channels" meta={String(rest.length)} />
           )}
 
           {rest.map((community) => {
@@ -323,24 +321,6 @@ const styles = StyleSheet.create({
     color: colors.accentBlue,
     fontSize: 14,
     fontWeight: '800',
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionSpaced: {
-    marginTop: 28,
-  },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  sectionCount: {
-    color: colors.textFaint,
-    fontSize: 13,
-    fontWeight: '700',
   },
   tipRow: {
     flexDirection: 'row',
