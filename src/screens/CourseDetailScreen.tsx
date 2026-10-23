@@ -231,7 +231,6 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
     <ScreenShell>
       <PageHeader
         title="Course"
-        icon="courses"
         onBack={() => navigation.goBack()}
         context={
           loading || lessons.length === 0
@@ -240,6 +239,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
         }
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() =>
               tabNavigation?.navigate('More', { screen: 'Notifications' })

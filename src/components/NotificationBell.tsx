@@ -7,18 +7,28 @@ import LiquidGlass from './LiquidGlass';
 type Props = {
   count?: number;
   onPress?: () => void;
+  /** Bare icon for navigation-bar headers; the glass circle is for Home. */
+  plain?: boolean;
 };
 
-/** Round glass icon button with an unread dot/count. */
-export default function NotificationBell({ count = 0, onPress }: Props) {
+/** Bell icon button with an unread count - glass circle, or plain. */
+export default function NotificationBell({ count = 0, onPress, plain = false }: Props) {
   return (
     <Pressable
       style={({ pressed }) => [styles.bellButton, pressed && styles.pressed]}
       onPress={onPress}
+      hitSlop={8}
+      accessibilityLabel="Notifications"
     >
-      <LiquidGlass style={styles.glass} interactive>
-        <Ionicons name="notifications-outline" size={20} color={colors.text} />
-      </LiquidGlass>
+      {plain ? (
+        <View style={styles.plain}>
+          <Ionicons name="notifications-outline" size={25} color={colors.text} />
+        </View>
+      ) : (
+        <LiquidGlass style={styles.glass} interactive>
+          <Ionicons name="notifications-outline" size={20} color={colors.text} />
+        </LiquidGlass>
+      )}
       {count > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
@@ -37,6 +47,11 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 22,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  plain: {
+    flex: 1,
+    alignItems: 'flex-end',
     justifyContent: 'center',
   },
   pressed: {

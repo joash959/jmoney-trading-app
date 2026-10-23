@@ -163,9 +163,9 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
           <PageHeader
             title="Market analysis"
             onBack={() => navigation.goBack()}
-            icon="analysis"
             right={
               <NotificationBell
+                plain
                 count={unreadCount}
                 onPress={() => navigation.navigate('Notifications')}
               />
@@ -201,10 +201,10 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         <PageHeader
           title="Market analysis"
           onBack={() => navigation.goBack()}
-          icon="analysis"
           context="Live charts · Gold, US30 & NAS100"
           right={
             <NotificationBell
+              plain
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />

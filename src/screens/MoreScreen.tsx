@@ -89,6 +89,7 @@ export default function MoreScreen({ navigation }: Props) {
         }
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

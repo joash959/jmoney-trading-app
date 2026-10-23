@@ -171,7 +171,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
   if (checkingAccess || loading) {
     return (
       <ScreenShell>
-        <PageHeader title="Leaderboard" icon="trophy" onBack={() => navigation.goBack()} />
+        <PageHeader title="Leaderboard" onBack={() => navigation.goBack()} />
         <ActivityIndicator
           color={colors.accentBlue}
           style={styles.cardSpaced}
@@ -186,9 +186,9 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <PageHeader
           title="Leaderboard"
           onBack={() => navigation.goBack()}
-          icon="trophy"
           right={
             <NotificationBell
+              plain
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
@@ -222,7 +222,6 @@ export default function LeaderboardScreen({ navigation }: Props) {
         <PageHeader
           title="Leaderboard"
           onBack={() => navigation.goBack()}
-          icon="trophy"
         />
       </ScreenShell>
     );
@@ -236,10 +235,10 @@ export default function LeaderboardScreen({ navigation }: Props) {
       <PageHeader
         title="Leaderboard"
         onBack={() => navigation.goBack()}
-        icon="trophy"
         context={`${participants.length} traders · ${currency}${totalPool.toLocaleString()} prize pool`}
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

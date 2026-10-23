@@ -31,10 +31,10 @@ export default function ContactUsScreen({ navigation }: Props) {
       <PageHeader
         title="Contact us"
         onBack={() => navigation.goBack()}
-        icon="speech"
         context="WhatsApp, Telegram or email"
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

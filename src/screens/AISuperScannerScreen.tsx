@@ -157,10 +157,10 @@ export default function AISuperScannerScreen({ navigation }: Props) {
       <PageHeader
         title="AI Super Scanner"
         onBack={() => navigation.goBack()}
-        icon="scanner"
         context="Instant AI read of any chart"
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

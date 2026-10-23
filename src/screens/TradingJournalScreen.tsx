@@ -250,7 +250,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <PageHeader title="Trading journal" icon="journal" onBack={() => navigation.goBack()} />
+        <PageHeader title="Trading journal" onBack={() => navigation.goBack()} />
         <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
       </ScreenShell>
     );
@@ -262,9 +262,9 @@ export default function TradingJournalScreen({ navigation }: Props) {
         <PageHeader
           title="Trading journal"
           onBack={() => navigation.goBack()}
-          icon="journal"
           right={
             <NotificationBell
+              plain
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
@@ -297,10 +297,10 @@ export default function TradingJournalScreen({ navigation }: Props) {
       <PageHeader
         title="Trading journal"
         onBack={() => navigation.goBack()}
-        icon="journal"
         context={`${monthlyEntries.length} day${monthlyEntries.length === 1 ? '' : 's'} logged this month`}
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

@@ -83,7 +83,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <PageHeader title="Broker" icon="briefcase" onBack={() => navigation.goBack()} />
+        <PageHeader title="Broker" onBack={() => navigation.goBack()} />
         <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
       </ScreenShell>
     );
@@ -95,9 +95,9 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
         <PageHeader
           title="Broker"
           onBack={() => navigation.goBack()}
-          icon="briefcase"
           right={
             <NotificationBell
+              plain
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
@@ -130,10 +130,10 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
       <PageHeader
         title="Broker"
         onBack={() => navigation.goBack()}
-        icon="briefcase"
         context="PrimeXBT · crypto, forex, indices & commodities"
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

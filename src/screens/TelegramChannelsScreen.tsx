@@ -122,10 +122,10 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
       <PageHeader
         title="Telegram"
         onBack={() => navigation.goBack()}
-        icon="telegram"
         context={loading ? null : `${communities.length} communities · ${isPremium ? 'premium unlocked' : 'free & premium'}`}
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />

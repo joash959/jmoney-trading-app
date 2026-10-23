@@ -121,7 +121,6 @@ export default function CoursesScreen({ navigation }: Props) {
     >
       <PageHeader
         title="Courses"
-        icon="courses"
         context={
           loading
             ? null
@@ -129,6 +128,7 @@ export default function CoursesScreen({ navigation }: Props) {
         }
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() =>
               tabNavigation?.navigate('More', { screen: 'Notifications' })

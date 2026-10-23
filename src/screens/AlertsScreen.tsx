@@ -249,7 +249,7 @@ export default function AlertsScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <PageHeader title="Trade alerts" icon="alerts" />
+        <PageHeader title="Trade alerts" />
       </ScreenShell>
     );
   }
@@ -259,10 +259,10 @@ export default function AlertsScreen({ navigation }: Props) {
       <ScreenShell>
         <PageHeader
           title="Trade alerts"
-          icon="alerts"
           context="Premium members get every alert in real time"
           right={
             <NotificationBell
+              plain
               count={unreadCount}
               onPress={() =>
                 navigation.navigate('More', { screen: 'Notifications' })
@@ -302,7 +302,6 @@ export default function AlertsScreen({ navigation }: Props) {
     >
       <PageHeader
         title="Trade alerts"
-        icon="alerts"
         live
         context={
           loading
@@ -311,6 +310,7 @@ export default function AlertsScreen({ navigation }: Props) {
         }
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() =>
               navigation.navigate('More', { screen: 'Notifications' })

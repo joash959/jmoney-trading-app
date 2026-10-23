@@ -103,7 +103,6 @@ export default function NotificationsScreen({ navigation }: Props) {
       <PageHeader
         title="Notifications"
         onBack={() => navigation.goBack()}
-        icon="bell"
         context={loading ? null : unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
         right={
           unreadCount > 0 ? (
@@ -113,7 +112,7 @@ export default function NotificationsScreen({ navigation }: Props) {
               style={({ pressed }) => [styles.markAllPill, pressed && styles.markAllPillPressed]}
               onPress={handleMarkAllRead}
             >
-              <Ionicons name="checkmark-done" size={18} color={colors.link} />
+              <Ionicons name="checkmark-done" size={25} color={colors.link} />
             </Pressable>
           ) : undefined
         }
@@ -163,11 +162,9 @@ export default function NotificationsScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   markAllPill: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primaryDim,
-    alignItems: 'center',
+    width: 44,
+    height: 44,
+    alignItems: 'flex-end',
     justifyContent: 'center',
   },
   markAllPillPressed: {

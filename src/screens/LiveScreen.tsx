@@ -193,11 +193,11 @@ export default function LiveScreen({ navigation }: Props) {
     >
       <PageHeader
         title="Live sessions"
-        icon="live"
         live={upcoming.some(isLiveNow)}
         context={loading ? null : liveContext}
         right={
           <NotificationBell
+            plain
             count={unreadCount}
             onPress={() =>
               navigation.navigate('More', { screen: 'Notifications' })
