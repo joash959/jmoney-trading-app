@@ -17,7 +17,7 @@ import { Course, Lesson } from '../types/database';
 import { CoursesStackParamList, MainTabParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import Pill from '../components/Pill';
 import GlassCard from '../components/GlassCard';
@@ -229,8 +229,16 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
 
   return (
     <ScreenShell>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Course"
+        icon="courses"
+        onBack={() => navigation.goBack()}
+        context={
+          loading || lessons.length === 0
+            ? null
+            : `${completedCount} of ${lessons.length} lessons done`
+        }
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() =>

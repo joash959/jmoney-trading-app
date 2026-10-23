@@ -15,9 +15,8 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { Community } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
 import ChannelCard from '../components/ChannelCard';
 import Icon3D, { Icon3DName } from '../components/Icon3D';
@@ -120,18 +119,17 @@ export default function TelegramChannelsScreen({ navigation }: Props) {
 
   return (
     <ScreenShell refreshing={refreshing} onRefresh={handleRefresh}>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Telegram"
+        onBack={() => navigation.goBack()}
+        icon="telegram"
+        context={loading ? null : `${communities.length} communities · ${isPremium ? 'premium unlocked' : 'free & premium'}`}
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />
         }
-      />
-
-      <ScreenHeader
-        icon="options-outline"
-        title="Telegram channels"
       />
 
       {loading ? (

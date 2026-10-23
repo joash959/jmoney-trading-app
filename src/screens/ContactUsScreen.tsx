@@ -6,9 +6,8 @@ import { colors } from '../theme/colors';
 import { MoreStackParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
 import Icon3D, { Icon3DName } from '../components/Icon3D';
 
@@ -29,18 +28,17 @@ export default function ContactUsScreen({ navigation }: Props) {
 
   return (
     <ScreenShell>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Contact us"
+        onBack={() => navigation.goBack()}
+        icon="speech"
+        context="WhatsApp, Telegram or email"
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />
         }
-      />
-
-      <ScreenHeader
-        icon="call-outline"
-        title="Contact us"
       />
 
       <Text style={styles.intro}>

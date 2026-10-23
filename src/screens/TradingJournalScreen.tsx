@@ -13,9 +13,8 @@ import { TradeJournalEntry } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import LineChart from '../components/LineChart';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import Calendar from '../components/Calendar';
 import SectionLabel from '../components/SectionLabel';
 import FormInput from '../components/FormInput';
@@ -251,7 +250,7 @@ export default function TradingJournalScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <TopBar />
+        <PageHeader title="Trading journal" icon="journal" onBack={() => navigation.goBack()} />
         <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
       </ScreenShell>
     );
@@ -260,17 +259,16 @@ export default function TradingJournalScreen({ navigation }: Props) {
   if (locked) {
     return (
       <ScreenShell>
-        <TopBar
-          rightElement={
+        <PageHeader
+          title="Trading journal"
+          onBack={() => navigation.goBack()}
+          icon="journal"
+          right={
             <NotificationBell
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
           }
-        />
-        <ScreenHeader
-          icon="bookmark-outline"
-          title="Trading journal"
         />
         <EmptyStateCard
           icon="lock-closed-outline"
@@ -296,8 +294,12 @@ export default function TradingJournalScreen({ navigation }: Props) {
 
   return (
     <ScreenShell overlay={<XpToast ref={xpToast} />}>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Trading journal"
+        onBack={() => navigation.goBack()}
+        icon="journal"
+        context={`${monthlyEntries.length} day${monthlyEntries.length === 1 ? '' : 's'} logged this month`}
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
@@ -305,20 +307,9 @@ export default function TradingJournalScreen({ navigation }: Props) {
         }
       />
 
-      <ScreenHeader
-        icon="create-outline"
-        title="Trading journal"
-      />
-
       <View style={[styles.summaryCard, styles.cardSpaced]}>
         <View style={styles.summaryTopRow}>
           <Text style={styles.summaryLabel}>Monthly P&L</Text>
-          <View style={styles.daysPill}>
-            <Text numeric style={styles.daysText}>
-              {monthlyEntries.length} day
-              {monthlyEntries.length === 1 ? '' : 's'} logged
-            </Text>
-          </View>
         </View>
         <Text
           numeric
@@ -479,17 +470,6 @@ const styles = StyleSheet.create({
   },
   summaryValueNegative: {
     color: colors.accentRed,
-  },
-  daysPill: {
-    backgroundColor: colors.glassTile,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-  },
-  daysText: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '500',
   },
   fieldSpaced: {
     marginTop: 12,

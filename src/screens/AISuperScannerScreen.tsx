@@ -16,9 +16,8 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { parseFunctionError } from '../lib/functionError';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
 import Pill from '../components/Pill';
 import PrimaryButton from '../components/PrimaryButton';
@@ -155,18 +154,17 @@ export default function AISuperScannerScreen({ navigation }: Props) {
 
   return (
     <ScreenShell>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="AI Super Scanner"
+        onBack={() => navigation.goBack()}
+        icon="scanner"
+        context="Instant AI read of any chart"
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />
         }
-      />
-
-      <ScreenHeader
-        icon="locate-outline"
-        title="AI Super Scanner"
       />
 
       {!isPremium ? (

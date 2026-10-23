@@ -12,8 +12,7 @@ import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCoun
 import { NotificationRow } from '../types/database';
 import Icon3D, { Icon3DName } from '../components/Icon3D';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
-import ScreenHeader from '../components/ScreenHeader';
+import PageHeader from '../components/PageHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'Notifications'>;
@@ -46,7 +45,7 @@ function formatRelativeTime(iso: string) {
   return `${days}d ago`;
 }
 
-export default function NotificationsScreen({}: Props) {
+export default function NotificationsScreen({ navigation }: Props) {
   const { session } = useAuth();
   const { refetch: refetchCount } = useUnreadNotificationsCount();
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
@@ -101,24 +100,24 @@ export default function NotificationsScreen({}: Props) {
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >
-      <TopBar />
-
-      <ScreenHeader
-        icon="notifications-outline"
+      <PageHeader
         title="Notifications"
+        onBack={() => navigation.goBack()}
+        icon="bell"
+        context={loading ? null : unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
+        right={
+          unreadCount > 0 ? (
+            <Pressable
+              hitSlop={8}
+              accessibilityLabel="Mark all as read"
+              style={({ pressed }) => [styles.markAllPill, pressed && styles.markAllPillPressed]}
+              onPress={handleMarkAllRead}
+            >
+              <Ionicons name="checkmark-done" size={18} color={colors.link} />
+            </Pressable>
+          ) : undefined
+        }
       />
-
-      {unreadCount > 0 && (
-        <Pressable
-          style={({ pressed }) => [styles.markAllPill, pressed && styles.markAllPillPressed]}
-          onPress={handleMarkAllRead}
-        >
-          <Ionicons name="checkmark-outline" size={13} color={colors.text} />
-          <Text style={styles.markAllText}>
-            Mark all as read ({unreadCount})
-          </Text>
-        </Pressable>
-      )}
 
       {loading ? (
         <ActivityIndicator
@@ -164,23 +163,15 @@ export default function NotificationsScreen({}: Props) {
 
 const styles = StyleSheet.create({
   markAllPill: {
-    flexDirection: 'row',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primaryDim,
     alignItems: 'center',
-    gap: 6,
-    marginTop: 14,
-    alignSelf: 'flex-start',
-    backgroundColor: colors.accentBlue,
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    justifyContent: 'center',
   },
   markAllPillPressed: {
     opacity: 0.85,
-  },
-  markAllText: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: '700',
   },
   cardSpaced: {
     marginTop: 20,

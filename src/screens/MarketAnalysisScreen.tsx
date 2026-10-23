@@ -11,9 +11,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import GlowBackground from '../components/GlowBackground';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import EmptyStateCard from '../components/EmptyStateCard';
 import PrimeXBTConnectModal from '../components/PrimeXBTConnectModal';
 
@@ -161,17 +160,16 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <GlowBackground />
         <View style={styles.gatedContent}>
-          <TopBar
-            rightElement={
+          <PageHeader
+            title="Market analysis"
+            onBack={() => navigation.goBack()}
+            icon="analysis"
+            right={
               <NotificationBell
                 count={unreadCount}
                 onPress={() => navigation.navigate('Notifications')}
               />
             }
-          />
-          <ScreenHeader
-            icon="bar-chart-outline"
-            title="Market analysis"
           />
           <EmptyStateCard
             icon="lock-closed-outline"
@@ -200,17 +198,17 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <GlowBackground />
       <View style={styles.headerWrap}>
-        <TopBar
-          rightElement={
+        <PageHeader
+          title="Market analysis"
+          onBack={() => navigation.goBack()}
+          icon="analysis"
+          context="Live charts · Gold, US30 & NAS100"
+          right={
             <NotificationBell
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
           }
-        />
-        <ScreenHeader
-          icon="bar-chart-outline"
-          title="Market analysis"
         />
       </View>
 

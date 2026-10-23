@@ -10,9 +10,8 @@ import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import { MoreStackParamList } from '../navigation/types';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import SurfaceCard from '../components/SurfaceCard';
 import PrimaryButton from '../components/PrimaryButton';
 import EmptyStateCard from '../components/EmptyStateCard';
@@ -84,7 +83,7 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
   if (checkingAccess) {
     return (
       <ScreenShell>
-        <TopBar />
+        <PageHeader title="Broker" icon="briefcase" onBack={() => navigation.goBack()} />
         <ActivityIndicator color={colors.accentBlue} style={styles.cardSpaced} />
       </ScreenShell>
     );
@@ -93,17 +92,16 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
   if (locked) {
     return (
       <ScreenShell>
-        <TopBar
-          rightElement={
+        <PageHeader
+          title="Broker"
+          onBack={() => navigation.goBack()}
+          icon="briefcase"
+          right={
             <NotificationBell
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
           }
-        />
-        <ScreenHeader
-          icon="briefcase-outline"
-          title="Recommended broker"
         />
         <EmptyStateCard
           icon="lock-closed-outline"
@@ -129,18 +127,17 @@ export default function RecommendedBrokerScreen({ navigation }: Props) {
 
   return (
     <ScreenShell>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Broker"
+        onBack={() => navigation.goBack()}
+        icon="briefcase"
+        context="PrimeXBT · crypto, forex, indices & commodities"
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />
         }
-      />
-
-      <ScreenHeader
-        icon="briefcase-outline"
-        title="Recommended broker"
       />
 
       {/* The broker at a glance: who, key numbers, and the one action. */}

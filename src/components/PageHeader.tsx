@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react';
-import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Animated, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Text from './AppText';
 import Icon3D, { Icon3DName } from './Icon3D';
 import { colors } from '../theme/colors';
@@ -12,6 +13,8 @@ type Props = {
   context?: string | null;
   /** Prefix the context line with a pulsing green "Live" dot. */
   live?: boolean;
+  /** Shows a back chevron before the title (for pushed screens). */
+  onBack?: () => void;
   /** Action on the right, usually the notification bell. */
   right?: ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -22,7 +25,7 @@ type Props = {
  * context line - the page says something about its data instead of just
  * naming itself. The JMONEY logo bar is kept for Home only.
  */
-export default function PageHeader({ title, icon, context, live, right, style }: Props) {
+export default function PageHeader({ title, icon, context, live, onBack, right, style }: Props) {
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -40,6 +43,16 @@ export default function PageHeader({ title, icon, context, live, right, style }:
   return (
     <View style={[styles.wrap, style]}>
       <View style={styles.row}>
+        {onBack && (
+          <Pressable
+            onPress={onBack}
+            hitSlop={10}
+            accessibilityLabel="Back"
+            style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+          >
+            <Ionicons name="chevron-back" size={20} color={colors.text} />
+          </Pressable>
+        )}
         {icon && <Icon3D name={icon} size={30} />}
         <Text style={styles.title} numberOfLines={1}>
           {title}
@@ -47,7 +60,7 @@ export default function PageHeader({ title, icon, context, live, right, style }:
         {right}
       </View>
       {(!!context || live) && (
-        <View style={styles.contextRow}>
+        <View style={[styles.contextRow, onBack && styles.contextIndented]}>
           {live && (
             <>
               <Animated.View style={[styles.liveDot, { opacity: pulse }]} />
@@ -76,6 +89,17 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: 44,
   },
+  back: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.glassTile,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backPressed: {
+    opacity: 0.7,
+  },
   title: {
     flex: 1,
     color: colors.text,
@@ -89,6 +113,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginTop: 4,
+  },
+  // Line the context up under the title, past the back button.
+  contextIndented: {
+    marginLeft: 46,
   },
   liveDot: {
     width: 7,

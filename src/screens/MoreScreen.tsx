@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import { usePrimeXBTConnect } from '../hooks/usePrimeXBTConnect';
 import ScreenShell from '../components/ScreenShell';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
 import SurfaceCard from '../components/SurfaceCard';
 import IconTile from '../components/IconTile';
@@ -78,8 +78,16 @@ export default function MoreScreen({ navigation }: Props) {
 
   return (
     <ScreenShell>
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="More"
+        context={
+          gameStats
+            ? `Level ${gameStats.level} · ${gameStats.streak}-day streak · ${
+                gameStats.badges.filter((b) => b.unlocked).length
+              }/${gameStats.badges.length} badges`
+            : null
+        }
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}

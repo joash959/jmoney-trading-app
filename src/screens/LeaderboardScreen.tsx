@@ -14,9 +14,8 @@ import { LeaderboardParticipant, LeaderboardSettings } from '../types/database';
 import { useUnreadNotificationsCount } from '../hooks/useUnreadNotificationsCount';
 import ScreenShell from '../components/ScreenShell';
 import Icon3D from '../components/Icon3D';
-import TopBar from '../components/TopBar';
+import PageHeader from '../components/PageHeader';
 import NotificationBell from '../components/NotificationBell';
-import ScreenHeader from '../components/ScreenHeader';
 import GlassCard from '../components/GlassCard';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
@@ -172,7 +171,7 @@ export default function LeaderboardScreen({ navigation }: Props) {
   if (checkingAccess || loading) {
     return (
       <ScreenShell>
-        <TopBar />
+        <PageHeader title="Leaderboard" icon="trophy" onBack={() => navigation.goBack()} />
         <ActivityIndicator
           color={colors.accentBlue}
           style={styles.cardSpaced}
@@ -184,17 +183,16 @@ export default function LeaderboardScreen({ navigation }: Props) {
   if (locked) {
     return (
       <ScreenShell>
-        <TopBar
-          rightElement={
+        <PageHeader
+          title="Leaderboard"
+          onBack={() => navigation.goBack()}
+          icon="trophy"
+          right={
             <NotificationBell
               count={unreadCount}
               onPress={() => navigation.navigate('Notifications')}
             />
           }
-        />
-        <ScreenHeader
-          icon="trophy-outline"
-          title="Leaderboard"
         />
         <EmptyStateCard
           icon="lock-closed-outline"
@@ -221,10 +219,10 @@ export default function LeaderboardScreen({ navigation }: Props) {
   if (settings && settings.show_leaderboard === false) {
     return (
       <ScreenShell>
-        <TopBar />
-        <ScreenHeader
-          icon="trophy-outline"
+        <PageHeader
           title="Leaderboard"
+          onBack={() => navigation.goBack()}
+          icon="trophy"
         />
       </ScreenShell>
     );
@@ -235,18 +233,17 @@ export default function LeaderboardScreen({ navigation }: Props) {
       refreshing={refreshing}
       onRefresh={handleRefresh}
     >
-      <TopBar
-        rightElement={
+      <PageHeader
+        title="Leaderboard"
+        onBack={() => navigation.goBack()}
+        icon="trophy"
+        context={`${participants.length} traders · ${currency}${totalPool.toLocaleString()} prize pool`}
+        right={
           <NotificationBell
             count={unreadCount}
             onPress={() => navigation.navigate('Notifications')}
           />
         }
-      />
-
-      <ScreenHeader
-        icon="trophy-outline"
-        title="Leaderboard"
       />
 
       {settings?.show_podium !== false && (
