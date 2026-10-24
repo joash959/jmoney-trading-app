@@ -48,7 +48,7 @@ export async function registerForPushNotifications(userId: string): Promise<void
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(ALERTS_CHANNEL, {
-        name: 'Trade alerts',
+        name: 'Trade alerts & updates',
         importance: Notifications.AndroidImportance.HIGH,
         sound: 'default',
         vibrationPattern: [0, 250, 150, 250],

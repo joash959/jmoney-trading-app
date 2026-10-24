@@ -37,15 +37,22 @@ export default function RootNavigator() {
   const navigationRef = useNavigationContainerRef<RootStackParamList>();
   const [navReady, setNavReady] = useState(false);
 
-  // Tapping a trade-alert push opens the Alerts tab - including the tap that
-  // launched the app. Phones only: notifications don't exist on web.
+  // Tapping a push opens where it belongs - trade alerts on the Alerts tab,
+  // session reminders on Live, everything else in Notifications - including
+  // the tap that launched the app. Phones only: no notifications on web.
   useEffect(() => {
     if (Platform.OS === 'web' || !navReady || !session) return;
     const open = (response: Notifications.NotificationResponse | null) => {
-      if (response?.notification.request.content.data?.type === 'trade_alert') {
+      const type = response?.notification.request.content.data?.type;
+      if (!type) return;
+      if (type === 'trade_alert') {
         navigationRef.navigate('Main', { screen: 'Alerts' });
-        Notifications.clearLastNotificationResponseAsync();
+      } else if (type === 'live_session') {
+        navigationRef.navigate('Main', { screen: 'Live' });
+      } else {
+        navigationRef.navigate('Main', { screen: 'More', params: { screen: 'Notifications' } });
       }
+      Notifications.clearLastNotificationResponseAsync();
     };
     Notifications.getLastNotificationResponseAsync().then(open);
     const subscription = Notifications.addNotificationResponseReceivedListener(open);
