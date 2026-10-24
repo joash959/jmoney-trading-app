@@ -49,10 +49,11 @@ type Timeframe = (typeof TIMEFRAMES)[number]['value'];
 const CHART_BG = colors.surface;
 
 /**
- * Only TradingView's candles - no toolbars, legend or page chrome. Uses the
- * embed widget, whose backgroundColor and gridColor settings are officially
- * supported, so the chart is painted in exactly the card's colour and the
- * two read as one surface. Posts 'ready' once the chart frame has loaded.
+ * Only TradingView's candles - no toolbars, legend or page chrome - in the
+ * app's colours: green/red candles like BUY/SELL, and the card's exact
+ * background so chart and card read as one surface. Uses tv.js, which
+ * applies candle colour overrides; the background is set both as a widget
+ * option and as an override. Posts 'ready' once the chart frame has loaded.
  */
 function chartHtml(symbol: string, interval: string, full: boolean) {
   const up = colors.accentGreen;
@@ -67,18 +68,19 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     locale: 'en',
     backgroundColor: CHART_BG,
     gridColor: 'rgba(255,255,255,0.04)',
+    toolbar_bg: CHART_BG,
+    enable_publishing: false,
+    allow_symbol_change: false,
     hide_top_toolbar: !full,
     hide_side_toolbar: !full,
     hide_legend: !full,
     hide_volume: true,
-    allow_symbol_change: false,
-    save_image: false,
     withdateranges: false,
-    calendar: false,
+    save_image: false,
     details: false,
     hotlist: false,
-    support_host: 'https://www.tradingview.com',
-    // Brand candle colours, where the widget accepts them.
+    calendar: false,
+    container_id: 'chart',
     overrides: {
       'mainSeriesProperties.candleStyle.upColor': up,
       'mainSeriesProperties.candleStyle.downColor': down,
@@ -86,10 +88,18 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
       'mainSeriesProperties.candleStyle.borderDownColor': down,
       'mainSeriesProperties.candleStyle.wickUpColor': up,
       'mainSeriesProperties.candleStyle.wickDownColor': down,
+      'mainSeriesProperties.candleStyle.drawBorder': true,
+      'mainSeriesProperties.priceLineColor': colors.link,
       'paneProperties.backgroundType': 'solid',
       'paneProperties.background': CHART_BG,
+      'paneProperties.vertGridProperties.color': 'rgba(255,255,255,0.03)',
+      'paneProperties.horzGridProperties.color': 'rgba(255,255,255,0.04)',
       'scalesProperties.textColor': colors.textFaint,
       'scalesProperties.lineColor': CHART_BG,
+    },
+    studies_overrides: {
+      'volume.volume.color.0': down,
+      'volume.volume.color.1': up,
     },
   };
   return `<!DOCTYPE html>
@@ -98,15 +108,11 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
 <link rel="preconnect" href="https://s3.tradingview.com" />
 <link rel="preconnect" href="https://s.tradingview.com" />
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
-  .tradingview-widget-container, .tradingview-widget-container__widget { height: 100%; width: 100%; background: ${CHART_BG}; }
-  .tradingview-widget-copyright { display: none; }
+  html, body, #chart { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
   iframe { background: ${CHART_BG}; }
 </style>
 </head><body>
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-</div>
+<div id="chart"></div>
 <script>
   (function () {
     var sent = false;
@@ -121,9 +127,8 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     setTimeout(send, 8000);
   })();
 </script>
-<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-${JSON.stringify(config)}
-</script>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>new TradingView.widget(${JSON.stringify(config)});</script>
 </body></html>`;
 }
 
