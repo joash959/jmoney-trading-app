@@ -114,8 +114,12 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
 <link rel="preconnect" href="https://s3.tradingview.com" />
 <link rel="preconnect" href="https://s.tradingview.com" />
 <style>
-  html, body, #chart { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
-  iframe { background: ${CHART_BG}; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
+  /* The chart is drawn 3px bigger than the window on every side and the
+     excess cropped, so TradingView's own 1-2px frame line never shows. */
+  #chart { position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; background: ${CHART_BG}; }
+  #chart, #chart div, iframe { border: 0 !important; outline: 0 !important; box-shadow: none !important; }
+  iframe { background: ${CHART_BG}; display: block; }
 </style>
 </head><body>
 <div id="chart"></div>
