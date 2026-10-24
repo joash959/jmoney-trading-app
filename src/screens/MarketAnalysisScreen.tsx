@@ -50,6 +50,14 @@ type Timeframe = (typeof TIMEFRAMES)[number]['value'];
 // ignores hex for its background and grid options.
 const CHART_BG = colors.background;
 const CHART_BG_RGBA = 'rgba(6,7,11,1)';
+// Full screen: TradingView always paints its drawing-tools bar pure black,
+// so the full-screen chart and sheet use pure black too.
+const FULL_BG = '#000000';
+const FULL_BG_RGBA = 'rgba(0,0,0,1)';
+// The tools bar is ~50px wide with a ~4px grey divider after it; this black
+// strip covers the divider, with a few px to spare either side.
+const TOOLBAR_DIVIDER_LEFT = 46;
+const TOOLBAR_DIVIDER_WIDTH = 10;
 const NO_GRID = 'rgba(0,0,0,0)';
 const CANDLE_UP = colors.primary;
 const CANDLE_DOWN = colors.accentRed;
@@ -64,6 +72,8 @@ const CANDLE_DOWN = colors.accentRed;
 function chartHtml(symbol: string, interval: string, full: boolean) {
   const up = CANDLE_UP;
   const down = CANDLE_DOWN;
+  const bg = full ? FULL_BG : CHART_BG;
+  const bgRgba = full ? FULL_BG_RGBA : CHART_BG_RGBA;
   const config = {
     autosize: true,
     symbol,
@@ -72,10 +82,10 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     theme: 'dark',
     style: '1',
     locale: 'en',
-    backgroundColor: CHART_BG_RGBA,
+    backgroundColor: bgRgba,
     gridColor: NO_GRID,
     // Drawing-tools bar in full screen: this option takes hex, not rgba.
-    toolbar_bg: CHART_BG,
+    toolbar_bg: bg,
     enable_publishing: false,
     allow_symbol_change: false,
     // Timeframes are native buttons, so TradingView's own bar stays hidden.
@@ -99,14 +109,14 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
       'mainSeriesProperties.candleStyle.drawBorder': true,
       'mainSeriesProperties.priceLineColor': up,
       'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': CHART_BG_RGBA,
+      'paneProperties.background': bgRgba,
       'paneProperties.gridLinesMode': 'none',
       'paneProperties.vertGridProperties.color': NO_GRID,
       'paneProperties.horzGridProperties.color': NO_GRID,
-      'paneProperties.separatorColor': CHART_BG_RGBA,
+      'paneProperties.separatorColor': bgRgba,
       'scalesProperties.textColor': 'rgba(150,150,163,1)',
-      'scalesProperties.lineColor': CHART_BG_RGBA,
-      'scalesProperties.backgroundColor': CHART_BG_RGBA,
+      'scalesProperties.lineColor': bgRgba,
+      'scalesProperties.backgroundColor': bgRgba,
     },
   };
   return `<!DOCTYPE html>
@@ -115,15 +125,16 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
 <link rel="preconnect" href="https://s3.tradingview.com" />
 <link rel="preconnect" href="https://s.tradingview.com" />
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: ${bg}; overflow: hidden; }
   /* The chart is drawn 3px bigger than the window on every side and the
      excess cropped, so TradingView's own 1-2px frame line never shows. */
-  #chart { position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; background: ${CHART_BG}; }
+  #chart { position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; background: ${bg}; }
   #chart, #chart div, iframe { border: 0 !important; outline: 0 !important; box-shadow: none !important; }
-  iframe { background: ${CHART_BG}; display: block; }
+  iframe { background: ${bg}; display: block; }
 </style>
 </head><body>
 <div id="chart"></div>
+${full ? `<div style="position:fixed;top:0;bottom:0;left:${TOOLBAR_DIVIDER_LEFT}px;width:${TOOLBAR_DIVIDER_WIDTH}px;background:${bg};z-index:2147483647;pointer-events:none"></div>` : ''}
 <script>
   (function () {
     var sent = false;
@@ -733,7 +744,7 @@ const styles = StyleSheet.create({
 
   fullScreen: {
     flex: 1,
-    backgroundColor: CHART_BG,
+    backgroundColor: FULL_BG,
   },
   grabber: {
     alignSelf: 'center',
