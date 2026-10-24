@@ -1,8 +1,9 @@
 # 3D icons
 
-From Microsoft's Fluent Emoji (3D style), via the `@lobehub/fluent-emoji-3d`
-npm package (v1.1.0); `envelope` and `speech` come straight from
-github.com/microsoft/fluentui-emoji. Licensed under the MIT License.
+Most icons are JMONEY's own custom set, made for this app.
+
+`tag` and `gift` are still from Microsoft's Fluent Emoji (3D style), via the
+`@lobehub/fluent-emoji-3d` npm package (v1.1.0), licensed under the MIT License:
 
 Copyright (c) Microsoft Corporation.
 
