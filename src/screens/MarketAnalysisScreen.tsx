@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Text from '../components/AppText';
@@ -25,7 +25,6 @@ import Skeleton from '../components/Skeleton';
 import Icon3D from '../components/Icon3D';
 import { buildTradeThreads, AlertRow, TradeThread } from '../lib/tradeThreads';
 import { parseAlertFields } from '../lib/tradeAlertParser';
-import { getUpcomingEvents } from '../lib/economicCalendar';
 
 type Props = NativeStackScreenProps<MoreStackParamList, 'MarketAnalysis'>;
 
@@ -50,11 +49,13 @@ type Timeframe = (typeof TIMEFRAMES)[number]['value'];
 const CHART_BG = colors.surface;
 
 /**
- * Only TradingView's candles - no toolbars, legend, logo bar or page chrome -
- * so the chart reads as part of the native card around it. Posts 'ready'
- * once the chart frame has loaded, so the card can fade it in.
+ * Only TradingView's candles - no toolbars, legend or page chrome - styled
+ * in the app's colours and font so the chart reads as part of the native
+ * card around it. Posts 'ready' once the chart frame has loaded.
  */
 function chartHtml(symbol: string, interval: string, full: boolean) {
+  const up = colors.accentGreen;
+  const down = colors.accentRed;
   const config = {
     autosize: true,
     symbol,
@@ -63,43 +64,67 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     theme: 'dark',
     style: '1',
     locale: 'en',
-    backgroundColor: CHART_BG,
-    gridColor: 'rgba(255,255,255,0.04)',
+    toolbar_bg: CHART_BG,
+    enable_publishing: false,
+    allow_symbol_change: false,
     hide_top_toolbar: !full,
     hide_side_toolbar: !full,
     hide_legend: !full,
-    hide_volume: true,
-    allow_symbol_change: false,
-    save_image: false,
     withdateranges: false,
+    save_image: false,
+    details: false,
+    hotlist: false,
     calendar: false,
-    support_host: 'https://www.tradingview.com',
+    container_id: 'chart',
+    disabled_features: ['volume_force_overlay', 'create_volume_indicator_by_default'],
+    overrides: {
+      'paneProperties.backgroundType': 'solid',
+      'paneProperties.background': CHART_BG,
+      'paneProperties.vertGridProperties.color': 'rgba(255,255,255,0.03)',
+      'paneProperties.horzGridProperties.color': 'rgba(255,255,255,0.04)',
+      'paneProperties.separatorColor': CHART_BG,
+      'scalesProperties.textColor': colors.textFaint,
+      'scalesProperties.lineColor': 'rgba(255,255,255,0)',
+      'scalesProperties.fontSize': 11,
+      'mainSeriesProperties.candleStyle.upColor': up,
+      'mainSeriesProperties.candleStyle.downColor': down,
+      'mainSeriesProperties.candleStyle.borderUpColor': up,
+      'mainSeriesProperties.candleStyle.borderDownColor': down,
+      'mainSeriesProperties.candleStyle.wickUpColor': up,
+      'mainSeriesProperties.candleStyle.wickDownColor': down,
+      'mainSeriesProperties.priceLineColor': colors.link,
+    },
+    studies_overrides: {
+      'volume.volume.color.0': `${down}55`,
+      'volume.volume.color.1': `${up}55`,
+    },
   };
   return `<!DOCTYPE html>
 <html><head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="preconnect" href="https://s3.tradingview.com" />
+<link rel="preconnect" href="https://s.tradingview.com" />
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; background: ${CHART_BG}; overflow: hidden; }
-  .tradingview-widget-container, .tradingview-widget-container__widget { height: 100%; width: 100%; }
-  .tradingview-widget-copyright { display: none; }
+  html, body, #chart { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
 </style>
 </head><body>
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-  ${JSON.stringify(config)}
-  </script>
-</div>
+<div id="chart"></div>
 <script>
   (function () {
-    var send = function () { window.ReactNativeWebView && window.ReactNativeWebView.postMessage('ready'); };
+    var sent = false;
+    var send = function () {
+      if (sent) return; sent = true;
+      window.ReactNativeWebView && window.ReactNativeWebView.postMessage('ready');
+    };
     new MutationObserver(function (_, obs) {
       var frame = document.querySelector('iframe');
-      if (frame) { obs.disconnect(); frame.addEventListener('load', function () { setTimeout(send, 400); }); }
+      if (frame) { obs.disconnect(); frame.addEventListener('load', function () { setTimeout(send, 300); }); }
     }).observe(document.body, { childList: true, subtree: true });
     setTimeout(send, 8000);
   })();
 </script>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>new TradingView.widget(${JSON.stringify(config)});</script>
 </body></html>`;
 }
 
@@ -122,53 +147,63 @@ function stayOnChart(request: ShouldStartLoadRequest) {
   return false;
 }
 
-function Chart({ symbol, interval, full = false }: { symbol: string; interval: string; full?: boolean }) {
-  const [ready, setReady] = useState(false);
-  const fade = useRef(new Animated.Value(0)).current;
-  const html = useMemo(() => chartHtml(symbol, interval, full), [symbol, interval, full]);
-
-  useEffect(() => {
-    setReady(false);
-    fade.setValue(0);
-  }, [html, fade]);
-
-  const onReady = () => {
-    if (ready) return;
-    setReady(true);
-    Animated.timing(fade, { toValue: 1, duration: 250, useNativeDriver: true }).start();
-  };
-
+function ChartView({ html, onReady }: { html: string; onReady: () => void }) {
   return (
-    <View style={styles.chartFrame}>
-      {!ready && (
-        <View style={styles.chartLoading} pointerEvents="none">
-          <Skeleton height={14} width="40%" />
-          <Skeleton height={150} radius={12} style={styles.chartLoadingBlock} />
-          <Skeleton height={10} width="70%" />
-        </View>
-      )}
-      <Animated.View style={[styles.chartFill, { opacity: fade }]}>
-        <WebView
-          key={html}
-          source={{ html }}
-          originWhitelist={['*']}
-          onMessage={onReady}
-          onShouldStartLoadWithRequest={stayOnChart}
-          setSupportMultipleWindows={false}
-          scrollEnabled={false}
-          bounces={false}
-          overScrollMode="never"
-          javaScriptEnabled
-          style={styles.webview}
-          containerStyle={styles.webview}
-        />
-      </Animated.View>
-    </View>
+    <WebView
+      source={{ html }}
+      originWhitelist={['*']}
+      onMessage={onReady}
+      onShouldStartLoadWithRequest={stayOnChart}
+      setSupportMultipleWindows={false}
+      scrollEnabled={false}
+      bounces={false}
+      overScrollMode="never"
+      cacheEnabled
+      cacheMode="LOAD_CACHE_ELSE_NETWORK"
+      style={styles.webview}
+      containerStyle={styles.webview}
+    />
   );
 }
 
-function shortDate(d: Date) {
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+/**
+ * Switching market or timeframe loads the new chart underneath and only
+ * swaps once it has drawn, so the card never flashes empty. A skeleton
+ * shows only on the very first load.
+ */
+function Chart({ symbol, interval, full = false }: { symbol: string; interval: string; full?: boolean }) {
+  const html = useMemo(() => chartHtml(symbol, interval, full), [symbol, interval, full]);
+  // The chart on screen, and the one loading underneath it (same instance
+  // is kept when it becomes visible, so it never reloads).
+  const [shown, setShown] = useState<string | null>(null);
+  const layers = shown && shown !== html ? [shown, html] : [html];
+  const loading = shown !== html;
+
+  return (
+    <View style={[styles.chartFrame, full && styles.fullChartFrame]}>
+      {!shown && (
+        <View style={styles.chartLoading} pointerEvents="none">
+          <Skeleton height={14} width="40%" />
+          <Skeleton height={190} radius={12} style={styles.chartLoadingBlock} />
+          <Skeleton height={10} width="70%" />
+        </View>
+      )}
+      {layers.map((layer) => (
+        <View
+          key={layer}
+          style={[styles.chartFill, layer !== shown && styles.chartPending]}
+          pointerEvents={layer === shown ? 'auto' : 'none'}
+        >
+          <ChartView html={layer} onReady={() => layer === html && setShown(layer)} />
+        </View>
+      ))}
+      {loading && !!shown && (
+        <View style={styles.chartSpinner} pointerEvents="none">
+          <ActivityIndicator size="small" color={colors.textFaint} />
+        </View>
+      )}
+    </View>
+  );
 }
 
 export default function MarketAnalysisScreen({ navigation }: Props) {
@@ -185,7 +220,6 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
   const current = MARKETS.find((m) => m.key === market)!;
   const open = isMarketOpen();
-  const events = useMemo(() => getUpcomingEvents(3), []);
 
   // Active trades per market, from the same Telegram alerts the Alerts tab uses.
   const activeByMarket = useMemo(() => {
@@ -415,28 +449,6 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         </SurfaceCard>
       )}
 
-      {/* High-impact US releases that move Gold and the indices */}
-      <SectionHeader title="Key events" meta="US · High impact" />
-      <SurfaceCard style={styles.listCard}>
-        {events.map((e, i) => (
-          <View key={e.name + e.date.toISOString()} style={[styles.eventRow, i > 0 && styles.rowDivider]}>
-            <View style={styles.eventDate}>
-              <Text style={styles.eventMonth}>
-                {e.date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
-              </Text>
-              <Text numeric style={styles.eventDay}>{e.date.getDate()}</Text>
-            </View>
-            <View style={styles.tradeMain}>
-              <Text style={styles.tradeTitle}>{e.name}</Text>
-              <Text style={styles.tradeMeta}>{shortDate(e.date)} · USD</Text>
-            </View>
-            <Text numeric style={[styles.eventWhen, e.daysToGo <= 1 && styles.eventSoon]}>
-              {e.daysToGo === 0 ? 'Today' : e.daysToGo === 1 ? 'Tomorrow' : `In ${e.daysToGo} days`}
-            </Text>
-          </View>
-        ))}
-      </SurfaceCard>
-
       <Text style={styles.footnote}>
         Charts by TradingView. Market data is for education only, not financial advice.
       </Text>
@@ -576,10 +588,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.glassTile,
   },
   chartFrame: {
-    height: 340,
+    height: 400,
   },
   chartFill: {
-    flex: 1,
+    ...StyleSheet.absoluteFill,
+  },
+  chartPending: {
+    opacity: 0,
+  },
+  chartSpinner: {
+    position: 'absolute',
+    top: 10,
+    right: 14,
   },
   chartLoading: {
     ...StyleSheet.absoluteFill,
@@ -664,40 +684,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  eventRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-  },
-  eventDate: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.glassTile,
-  },
-  eventMonth: {
-    color: colors.link,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-  },
-  eventDay: {
-    color: colors.text,
-    fontSize: 17,
-    fontWeight: '800',
-    marginTop: -1,
-  },
-  eventWhen: {
-    color: colors.textFaint,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  eventSoon: {
-    color: colors.warning,
-  },
   footnote: {
     color: colors.textFaint,
     fontSize: 12,
@@ -724,5 +710,9 @@ const styles = StyleSheet.create({
   },
   fullChart: {
     flex: 1,
+  },
+  fullChartFrame: {
+    flex: 1,
+    height: undefined,
   },
 });

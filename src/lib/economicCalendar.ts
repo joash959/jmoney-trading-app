@@ -45,21 +45,3 @@ export function getNextCPI() {
   return nextEvent(CPI_2026, new Date(2027, 0, 12));
 }
 
-export type UpcomingEvent = { name: string; date: Date; daysToGo: number };
-
-/** The next few high-impact US releases (NFP and CPI), soonest first. */
-export function getUpcomingEvents(limit = 4): UpcomingEvent[] {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const events = [
-    ...NFP_2026.map((d) => ({ name: 'Non-Farm Payrolls', date: parseDate(d) })),
-    ...CPI_2026.map((d) => ({ name: 'Consumer Price Index', date: parseDate(d) })),
-  ]
-    .filter((e) => e.date >= today)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, limit);
-  return events.map((e) => ({
-    ...e,
-    daysToGo: Math.round((e.date.getTime() - today.getTime()) / 86400000),
-  }));
-}
