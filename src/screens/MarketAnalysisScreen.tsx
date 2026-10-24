@@ -74,7 +74,8 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     locale: 'en',
     backgroundColor: CHART_BG_RGBA,
     gridColor: NO_GRID,
-    toolbar_bg: CHART_BG_RGBA,
+    // Drawing-tools bar in full screen: this option takes hex, not rgba.
+    toolbar_bg: CHART_BG,
     enable_publishing: false,
     allow_symbol_change: false,
     // Timeframes are native buttons, so TradingView's own bar stays hidden.
