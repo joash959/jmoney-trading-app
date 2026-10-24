@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Text from '../components/AppText';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import type { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -45,8 +45,14 @@ const TIMEFRAMES = [
 ] as const;
 type Timeframe = (typeof TIMEFRAMES)[number]['value'];
 
-// Solid fill behind the chart, so the web canvas and the native card match.
-const CHART_BG = colors.surface;
+// The chart sits straight on the app background (like the Home P&L chart),
+// so TradingView paints in the app's own near-black. rgba form: the widget
+// ignores hex for its background and grid options.
+const CHART_BG = colors.background;
+const CHART_BG_RGBA = 'rgba(6,7,11,1)';
+const NO_GRID = 'rgba(0,0,0,0)';
+const CANDLE_UP = colors.primary;
+const CANDLE_DOWN = colors.accentRed;
 
 /**
  * Only TradingView's candles - no toolbars, legend or page chrome - in the
@@ -56,8 +62,8 @@ const CHART_BG = colors.surface;
  * option and as an override. Posts 'ready' once the chart frame has loaded.
  */
 function chartHtml(symbol: string, interval: string, full: boolean) {
-  const up = colors.accentGreen;
-  const down = colors.accentRed;
+  const up = CANDLE_UP;
+  const down = CANDLE_DOWN;
   const config = {
     autosize: true,
     symbol,
@@ -66,12 +72,13 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     theme: 'dark',
     style: '1',
     locale: 'en',
-    backgroundColor: CHART_BG,
-    gridColor: 'rgba(255,255,255,0.04)',
-    toolbar_bg: CHART_BG,
+    backgroundColor: CHART_BG_RGBA,
+    gridColor: NO_GRID,
+    toolbar_bg: CHART_BG_RGBA,
     enable_publishing: false,
     allow_symbol_change: false,
-    hide_top_toolbar: !full,
+    // Timeframes are native buttons, so TradingView's own bar stays hidden.
+    hide_top_toolbar: true,
     hide_side_toolbar: !full,
     hide_legend: !full,
     hide_volume: true,
@@ -89,17 +96,16 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
       'mainSeriesProperties.candleStyle.wickUpColor': up,
       'mainSeriesProperties.candleStyle.wickDownColor': down,
       'mainSeriesProperties.candleStyle.drawBorder': true,
-      'mainSeriesProperties.priceLineColor': colors.link,
+      'mainSeriesProperties.priceLineColor': up,
       'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': CHART_BG,
-      'paneProperties.vertGridProperties.color': 'rgba(255,255,255,0.03)',
-      'paneProperties.horzGridProperties.color': 'rgba(255,255,255,0.04)',
-      'scalesProperties.textColor': colors.textFaint,
-      'scalesProperties.lineColor': CHART_BG,
-    },
-    studies_overrides: {
-      'volume.volume.color.0': down,
-      'volume.volume.color.1': up,
+      'paneProperties.background': CHART_BG_RGBA,
+      'paneProperties.gridLinesMode': 'none',
+      'paneProperties.vertGridProperties.color': NO_GRID,
+      'paneProperties.horzGridProperties.color': NO_GRID,
+      'paneProperties.separatorColor': CHART_BG_RGBA,
+      'scalesProperties.textColor': 'rgba(150,150,163,1)',
+      'scalesProperties.lineColor': CHART_BG_RGBA,
+      'scalesProperties.backgroundColor': CHART_BG_RGBA,
     },
   };
   return `<!DOCTYPE html>
@@ -210,6 +216,31 @@ function Chart({ symbol, interval, full = false }: { symbol: string; interval: s
   );
 }
 
+function Timeframes({ value, onChange }: { value: Timeframe; onChange: (v: Timeframe) => void }) {
+  return (
+    <View style={styles.timeframes}>
+      {TIMEFRAMES.map((tf) => {
+        const active = tf.value === value;
+        return (
+          <Pressable
+            key={tf.value}
+            style={[styles.timeframe, active && styles.timeframeActive]}
+            onPress={() => {
+              if (active) return;
+              Haptics.selectionAsync();
+              onChange(tf.value);
+            }}
+          >
+            <Text numeric style={[styles.timeframeText, active && styles.timeframeTextActive]}>
+              {tf.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function MarketAnalysisScreen({ navigation }: Props) {
   const { isPremium } = useAuth();
   const { count: unreadCount } = useUnreadNotificationsCount();
@@ -220,6 +251,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
   const [market, setMarket] = useState<MarketKey>('Gold');
   const [timeframe, setTimeframe] = useState<Timeframe>('60');
   const [fullScreen, setFullScreen] = useState(false);
+  const insets = useSafeAreaInsets();
   const [alerts, setAlerts] = useState<AlertRow[]>([]);
 
   const current = MARKETS.find((m) => m.key === market)!;
@@ -360,7 +392,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
         })}
       </View>
 
-      {/* Chart card: native title row and timeframes around the candles */}
+      {/* Chart straight on the background, full width, with native title and timeframes */}
       <View style={styles.chartCard}>
         <View style={styles.chartHead}>
           <View style={styles.chartTitleCol}>
@@ -385,26 +417,7 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
 
         <Chart symbol={current.symbol} interval={timeframe} />
 
-        <View style={styles.timeframes}>
-          {TIMEFRAMES.map((tf) => {
-            const active = tf.value === timeframe;
-            return (
-              <Pressable
-                key={tf.value}
-                style={[styles.timeframe, active && styles.timeframeActive]}
-                onPress={() => {
-                  if (active) return;
-                  Haptics.selectionAsync();
-                  setTimeframe(tf.value);
-                }}
-              >
-                <Text numeric style={[styles.timeframeText, active && styles.timeframeTextActive]}>
-                  {tf.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Timeframes value={timeframe} onChange={setTimeframe} />
       </View>
 
       {/* Active trades on this market */}
@@ -460,23 +473,40 @@ export default function MarketAnalysisScreen({ navigation }: Props) {
       <Modal
         visible={fullScreen}
         animationType="slide"
-        presentationStyle="fullScreen"
+        // iOS: a card sheet you can swipe down to close; Android: full screen.
+        presentationStyle="pageSheet"
         onRequestClose={() => setFullScreen(false)}
       >
-        <SafeAreaView style={styles.fullScreen} edges={['top', 'bottom', 'left', 'right']}>
+        <View
+          style={[
+            styles.fullScreen,
+            {
+              paddingTop: Platform.OS === 'ios' ? 8 : insets.top,
+              paddingBottom: Math.max(insets.bottom, 12),
+            },
+          ]}
+        >
+          <View style={styles.grabber} />
           <View style={styles.fullHead}>
-            <Pressable hitSlop={10} onPress={() => setFullScreen(false)} accessibilityLabel="Close chart">
-              <Ionicons name="close" size={24} color={colors.text} />
+            <View style={styles.fullSide} />
+            <View style={styles.fullTitleCol}>
+              <Text style={styles.fullTitle}>{current.key}</Text>
+              <Text style={styles.chartPair}>{current.pair}</Text>
+            </View>
+            <Pressable
+              hitSlop={12}
+              style={styles.fullSide}
+              onPress={() => setFullScreen(false)}
+              accessibilityLabel="Close full-screen chart"
+            >
+              <Text style={styles.doneText}>Done</Text>
             </Pressable>
-            <Text style={styles.fullTitle}>
-              {current.key} <Text style={styles.chartPair}>{current.pair}</Text>
-            </Text>
-            <View style={{ width: 24 }} />
           </View>
           <View style={styles.fullChart}>
             <Chart symbol={current.symbol} interval={timeframe} full />
           </View>
-        </SafeAreaView>
+          <Timeframes value={timeframe} onChange={setTimeframe} />
+        </View>
       </Modal>
     </ScreenShell>
   );
@@ -534,17 +564,16 @@ const styles = StyleSheet.create({
   },
 
   chartCard: {
-    backgroundColor: CHART_BG,
-    borderRadius: 22,
-    overflow: 'hidden',
-    paddingTop: 16,
+    // Full-bleed: the chart runs edge to edge, so there are no side edges
+    // where its background could meet the page.
+    marginHorizontal: -20,
   },
   chartHead: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 16,
-    marginBottom: 6,
+    paddingHorizontal: 20,
+    marginBottom: 8,
   },
   chartTitleCol: {
     flex: 1,
@@ -621,10 +650,11 @@ const styles = StyleSheet.create({
   timeframes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.divider,
+    marginHorizontal: 20,
+    marginTop: 10,
+    padding: 4,
+    borderRadius: 14,
+    backgroundColor: colors.glassTile,
   },
   timeframe: {
     flex: 1,
@@ -700,17 +730,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: CHART_BG,
   },
+  grabber: {
+    alignSelf: 'center',
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.borderStrong,
+    marginBottom: 6,
+  },
   fullHead: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    height: 52,
+    paddingHorizontal: 20,
+    height: 56,
+  },
+  fullSide: {
+    width: 56,
+    alignItems: 'flex-end',
+  },
+  fullTitleCol: {
+    flex: 1,
+    alignItems: 'center',
   },
   fullTitle: {
     color: colors.text,
     fontSize: 17,
     fontWeight: '800',
+  },
+  doneText: {
+    color: colors.link,
+    fontSize: 16,
+    fontWeight: '700',
   },
   fullChart: {
     flex: 1,
