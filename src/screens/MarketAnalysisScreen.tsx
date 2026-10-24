@@ -49,9 +49,10 @@ type Timeframe = (typeof TIMEFRAMES)[number]['value'];
 const CHART_BG = colors.surface;
 
 /**
- * Only TradingView's candles - no toolbars, legend or page chrome - styled
- * in the app's colours and font so the chart reads as part of the native
- * card around it. Posts 'ready' once the chart frame has loaded.
+ * Only TradingView's candles - no toolbars, legend or page chrome. Uses the
+ * embed widget, whose backgroundColor and gridColor settings are officially
+ * supported, so the chart is painted in exactly the card's colour and the
+ * two read as one surface. Posts 'ready' once the chart frame has loaded.
  */
 function chartHtml(symbol: string, interval: string, full: boolean) {
   const up = colors.accentGreen;
@@ -64,39 +65,31 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     theme: 'dark',
     style: '1',
     locale: 'en',
-    toolbar_bg: CHART_BG,
-    enable_publishing: false,
-    allow_symbol_change: false,
+    backgroundColor: CHART_BG,
+    gridColor: 'rgba(255,255,255,0.04)',
     hide_top_toolbar: !full,
     hide_side_toolbar: !full,
     hide_legend: !full,
-    withdateranges: false,
+    hide_volume: true,
+    allow_symbol_change: false,
     save_image: false,
+    withdateranges: false,
+    calendar: false,
     details: false,
     hotlist: false,
-    calendar: false,
-    container_id: 'chart',
-    disabled_features: ['volume_force_overlay', 'create_volume_indicator_by_default'],
+    support_host: 'https://www.tradingview.com',
+    // Brand candle colours, where the widget accepts them.
     overrides: {
-      'paneProperties.backgroundType': 'solid',
-      'paneProperties.background': CHART_BG,
-      'paneProperties.vertGridProperties.color': 'rgba(255,255,255,0.03)',
-      'paneProperties.horzGridProperties.color': 'rgba(255,255,255,0.04)',
-      'paneProperties.separatorColor': CHART_BG,
-      'scalesProperties.textColor': colors.textFaint,
-      'scalesProperties.lineColor': 'rgba(255,255,255,0)',
-      'scalesProperties.fontSize': 11,
       'mainSeriesProperties.candleStyle.upColor': up,
       'mainSeriesProperties.candleStyle.downColor': down,
       'mainSeriesProperties.candleStyle.borderUpColor': up,
       'mainSeriesProperties.candleStyle.borderDownColor': down,
       'mainSeriesProperties.candleStyle.wickUpColor': up,
       'mainSeriesProperties.candleStyle.wickDownColor': down,
-      'mainSeriesProperties.priceLineColor': colors.link,
-    },
-    studies_overrides: {
-      'volume.volume.color.0': `${down}55`,
-      'volume.volume.color.1': `${up}55`,
+      'paneProperties.backgroundType': 'solid',
+      'paneProperties.background': CHART_BG,
+      'scalesProperties.textColor': colors.textFaint,
+      'scalesProperties.lineColor': CHART_BG,
     },
   };
   return `<!DOCTYPE html>
@@ -105,10 +98,15 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
 <link rel="preconnect" href="https://s3.tradingview.com" />
 <link rel="preconnect" href="https://s.tradingview.com" />
 <style>
-  html, body, #chart { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: ${CHART_BG}; overflow: hidden; }
+  .tradingview-widget-container, .tradingview-widget-container__widget { height: 100%; width: 100%; background: ${CHART_BG}; }
+  .tradingview-widget-copyright { display: none; }
+  iframe { background: ${CHART_BG}; }
 </style>
 </head><body>
-<div id="chart"></div>
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+</div>
 <script>
   (function () {
     var sent = false;
@@ -118,13 +116,14 @@ function chartHtml(symbol: string, interval: string, full: boolean) {
     };
     new MutationObserver(function (_, obs) {
       var frame = document.querySelector('iframe');
-      if (frame) { obs.disconnect(); frame.addEventListener('load', function () { setTimeout(send, 300); }); }
+      if (frame) { obs.disconnect(); frame.addEventListener('load', function () { setTimeout(send, 400); }); }
     }).observe(document.body, { childList: true, subtree: true });
     setTimeout(send, 8000);
   })();
 </script>
-<script src="https://s3.tradingview.com/tv.js"></script>
-<script>new TradingView.widget(${JSON.stringify(config)});</script>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+${JSON.stringify(config)}
+</script>
 </body></html>`;
 }
 
